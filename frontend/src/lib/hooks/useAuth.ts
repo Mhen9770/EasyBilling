@@ -67,8 +67,12 @@ export function useUpdateProfile() {
   const { user, updateUser } = useAuthStore();
 
   return useMutation({
-    mutationFn: (data: UpdateProfileRequest) =>
-      authApi.updateProfile(user!.id, data),
+    mutationFn: (data: UpdateProfileRequest) => {
+      if (!user?.id) {
+        throw new Error('User not authenticated');
+      }
+      return authApi.updateProfile(user.id, data);
+    },
     onSuccess: (updatedProfile) => {
       updateUser(updatedProfile);
       queryClient.invalidateQueries({ queryKey: ['user'] });
@@ -80,8 +84,12 @@ export function useChangePassword() {
   const { user } = useAuthStore();
 
   return useMutation({
-    mutationFn: (data: ChangePasswordRequest) =>
-      authApi.changePassword(user!.id, data),
+    mutationFn: (data: ChangePasswordRequest) => {
+      if (!user?.id) {
+        throw new Error('User not authenticated');
+      }
+      return authApi.changePassword(user.id, data);
+    },
   });
 }
 
