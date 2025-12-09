@@ -46,9 +46,11 @@ spring:
 
 app:
   jwt:
+    # IMPORTANT: Set JWT_SECRET environment variable in production
+    # Secret must be at least 256 bits (32 characters) for HS256
     secret: ${JWT_SECRET:ThisIsAVerySecureSecretKeyForJWTTokenGenerationPleaseChangeInProduction}
-    access-token-validity-ms: 3600000 # 1 hour
-    refresh-token-validity-ms: 604800000 # 7 days
+    access-token-validity-ms: ${JWT_ACCESS_TOKEN_VALIDITY:3600000} # 1 hour default
+    refresh-token-validity-ms: ${JWT_REFRESH_TOKEN_VALIDITY:604800000} # 7 days default
   
   multi-tenancy:
     domain: easybilling.com

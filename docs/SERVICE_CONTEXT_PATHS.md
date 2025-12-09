@@ -112,8 +112,8 @@ Then makes requests like:
 // Tenant operations
 axios.get(`${API_BASE_URL}/tenant-service/api/v1/tenants`);
 
-// Auth operations (when implemented)
-axios.post(`${API_BASE_URL}/auth-service/api/v1/login`);
+// Auth operations
+axios.post(`${API_BASE_URL}/auth-service/api/v1/auth/login`);
 ```
 
 ## Benefits
