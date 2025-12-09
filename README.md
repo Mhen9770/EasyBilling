@@ -149,8 +149,8 @@ npm run dev
 
 #### 5. Access the application
 - Frontend: http://localhost:3000
-- API Gateway: http://localhost:8080
-- API Documentation: http://localhost:8080/swagger-ui.html
+- Tenant Service API: http://localhost:8082/tenant-service
+- API Documentation: http://localhost:8082/tenant-service/swagger-ui.html
 
 ## 🔐 Security
 

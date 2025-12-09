@@ -1,5 +1,12 @@
 version: '3.8'
 
+# Service Context Paths:
+# - Tenant Service: /tenant-service
+# - Auth Service: /auth-service (planned)
+# - Billing Service: /billing-service (planned)
+# - Inventory Service: /inventory-service (planned)
+# - Customer Service: /customer-service (planned)
+
 services:
   # PostgreSQL Database
   postgres:

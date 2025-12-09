@@ -78,12 +78,12 @@ docker run -p 3000:3000 easybilling/frontend:latest
 1. **Frontend**: Open http://localhost:3000 in your browser
    - You should see the EasyBilling landing page
 
-2. **Backend API**: Open http://localhost:8082/swagger-ui.html
+2. **Backend API**: Open http://localhost:8082/tenant-service/swagger-ui.html
    - You should see the Swagger API documentation
 
 3. **Health Check**: 
    ```bash
-   curl http://localhost:8082/actuator/health
+   curl http://localhost:8082/tenant-service/actuator/health
    ```
    Should return: `{"status":"UP"}`
 
@@ -91,7 +91,7 @@ docker run -p 3000:3000 easybilling/frontend:latest
 
 ### Using Swagger UI
 
-1. Navigate to http://localhost:8082/swagger-ui.html
+1. Navigate to http://localhost:8082/tenant-service/swagger-ui.html
 2. Find the `POST /api/v1/tenants` endpoint
 3. Click "Try it out"
 4. Use this example request:
@@ -119,7 +119,7 @@ docker run -p 3000:3000 easybilling/frontend:latest
 ### Using cURL
 
 ```bash
-curl -X POST http://localhost:8082/api/v1/tenants \
+curl -X POST http://localhost:8082/tenant-service/api/v1/tenants \
   -H "Content-Type: application/json" \
   -d '{
     "name": "My Test Store",
@@ -150,25 +150,25 @@ docker exec -it easybilling-postgres psql -U easybilling -d easybilling
 ### View All Tenants
 
 ```bash
-curl http://localhost:8082/api/v1/tenants
+curl http://localhost:8082/tenant-service/api/v1/tenants
 ```
 
 ### Get Tenant by ID
 
 ```bash
-curl http://localhost:8082/api/v1/tenants/{tenant-id}
+curl http://localhost:8082/tenant-service/api/v1/tenants/{tenant-id}
 ```
 
 ### Activate Tenant
 
 ```bash
-curl -X POST http://localhost:8082/api/v1/tenants/{tenant-id}/activate
+curl -X POST http://localhost:8082/tenant-service/api/v1/tenants/{tenant-id}/activate
 ```
 
 ### Suspend Tenant
 
 ```bash
-curl -X POST http://localhost:8082/api/v1/tenants/{tenant-id}/suspend
+curl -X POST http://localhost:8082/tenant-service/api/v1/tenants/{tenant-id}/suspend
 ```
 
 ## Environment Configuration

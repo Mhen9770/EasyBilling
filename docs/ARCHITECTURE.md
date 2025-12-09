@@ -67,7 +67,7 @@ EasyBilling is a comprehensive, enterprise-grade, multi-tenant billing and POS p
 
 ### Microservices
 
-#### 1. Tenant Service (Port: 8082)
+#### 1. Tenant Service (Port: 8082, Context: /tenant-service)
 **Responsibility**: Tenant lifecycle management
 
 **Key Features**:
@@ -81,13 +81,13 @@ EasyBilling is a comprehensive, enterprise-grade, multi-tenant billing and POS p
 - `tenants` (master schema)
 - Per-tenant schemas with base tables
 
-**Endpoints**:
-- `POST /api/v1/tenants` - Create tenant
-- `GET /api/v1/tenants/{id}` - Get tenant details
-- `PUT /api/v1/tenants/{id}` - Update tenant
-- `POST /api/v1/tenants/{id}/activate` - Activate tenant
-- `POST /api/v1/tenants/{id}/suspend` - Suspend tenant
-- `GET /api/v1/tenants` - List tenants with pagination
+**Endpoints** (All prefixed with `/tenant-service`):
+- `POST /tenant-service/api/v1/tenants` - Create tenant
+- `GET /tenant-service/api/v1/tenants/{id}` - Get tenant details
+- `PUT /tenant-service/api/v1/tenants/{id}` - Update tenant
+- `POST /tenant-service/api/v1/tenants/{id}/activate` - Activate tenant
+- `POST /tenant-service/api/v1/tenants/{id}/suspend` - Suspend tenant
+- `GET /tenant-service/api/v1/tenants` - List tenants with pagination
 
 #### 2. Auth Service (Port: 8081) [Planned]
 **Responsibility**: Authentication and authorization
