@@ -1,0 +1,81 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /auth-service
+
+spring:
+  application:
+    name: auth-service
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/easybilling
+    username: easybilling
+    password: easybilling123
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+  
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        default_schema: public
+  
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    schemas: public
+  
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 3000ms
+  
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000 # 1 hour
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:ThisIsAVerySecureSecretKeyForJWTTokenGenerationPleaseChangeInProduction}
+    access-token-validity-ms: 3600000 # 1 hour
+    refresh-token-validity-ms: 604800000 # 7 days
+  
+  multi-tenancy:
+    domain: easybilling.com
+    strategy: SCHEMA_PER_TENANT
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    com.easybilling: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true

@@ -32,6 +32,9 @@ All services follow this naming convention:
 - **Port**: 8081
 - **Context Path**: `/auth-service`
 - **Base URL**: `http://localhost:8081/auth-service`
+- **API Endpoints**: `/auth-service/api/v1/auth/*`
+- **Swagger UI**: `http://localhost:8081/auth-service/swagger-ui.html`
+- **Health Check**: `http://localhost:8081/auth-service/actuator/health`
 
 ### API Gateway
 - **Port**: 8080

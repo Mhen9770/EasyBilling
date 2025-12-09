@@ -89,15 +89,22 @@ EasyBilling is a comprehensive, enterprise-grade, multi-tenant billing and POS p
 - `POST /tenant-service/api/v1/tenants/{id}/suspend` - Suspend tenant
 - `GET /tenant-service/api/v1/tenants` - List tenants with pagination
 
-#### 2. Auth Service (Port: 8081) [Planned]
+#### 2. Auth Service (Port: 8081, Context: /auth-service) ✅
 **Responsibility**: Authentication and authorization
 
 **Key Features**:
-- User authentication (JWT, OAuth2)
+- User authentication with JWT tokens
 - Role-based access control (RBAC)
-- Permission management
-- Multi-factor authentication (MFA)
-- Password reset and recovery
+- BCrypt password encryption
+- Account lockout after failed attempts
+- Access and refresh token generation
+- User registration and login
+
+**Endpoints** (All prefixed with `/auth-service`):
+- `POST /auth-service/api/v1/auth/login` - User login
+- `POST /auth-service/api/v1/auth/register` - User registration
+- `POST /auth-service/api/v1/auth/refresh` - Refresh access token
+- `POST /auth-service/api/v1/auth/logout` - User logout
 
 #### 3. Billing Service (Port: 8083) [Planned]
 **Responsibility**: Core billing and POS operations
