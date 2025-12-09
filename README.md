@@ -9,7 +9,7 @@ EasyBilling is built using a **microservices architecture** with a modular monol
 ### Tech Stack
 
 #### Backend
-- **Java 21** - Latest LTS with modern features (Records, Pattern Matching, Sealed Interfaces)
+- **Java 17** - LTS with modern features (Records, Pattern Matching, Sealed Interfaces)
 - **Spring Boot 3.4.x** - Core framework
 - **Spring Security 6+** - Authentication & Authorization
 - **Spring Data JPA** - Data access layer
@@ -114,7 +114,7 @@ The platform supports three multi-tenancy models:
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Java 21 or higher
+- Java 17 or higher
 - Node.js 20 or higher
 - Docker & Docker Compose
 - PostgreSQL 16
