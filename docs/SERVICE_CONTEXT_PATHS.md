@@ -50,11 +50,6 @@ All services follow this naming convention:
 - **Direct Swagger UI**: `http://localhost:8081/auth-service/swagger-ui.html`
 - **Health Check**: `http://localhost:8081/auth-service/actuator/health`
 
-### API Gateway
-- **Port**: 8080
-- **Context Path**: `/`
-- **Routes to**: All backend services
-
 ### Billing Service
 - **Port**: 8083
 - **Context Path**: `/billing-service`

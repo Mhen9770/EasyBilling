@@ -32,7 +32,10 @@ public class RateLimitFilter extends AbstractGatewayFilterFactory<RateLimitFilte
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
-            String clientIp = Objects.requireNonNull(exchange.getRequest().getRemoteAddress()).getAddress().getHostAddress();
+            // Get client IP with fallback
+            String clientIp = exchange.getRequest().getRemoteAddress() != null
+                    ? exchange.getRequest().getRemoteAddress().getAddress().getHostAddress()
+                    : "unknown";
             String key = "rate_limit:" + clientIp;
             
             return redisTemplate.opsForValue()
