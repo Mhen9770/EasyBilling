@@ -28,12 +28,26 @@ All services follow this naming convention:
 
 ## Planned Services
 
+### API Gateway
+- **Port**: 8080
+- **Context Path**: `/` (root)
+- **Base URL**: `http://localhost:8080`
+- **Purpose**: Routes requests to all backend services
+- **Features**: JWT authentication, rate limiting, CORS
+- **Health Check**: `http://localhost:8080/actuator/health`
+
+**Routing:**
+- All requests go through gateway (port 8080)
+- Gateway routes to services based on context path
+- Automatic JWT validation for protected endpoints
+- Rate limiting: 100 requests/minute per IP
+
 ### Auth Service
-- **Port**: 8081
+- **Port**: 8081 (internal)
 - **Context Path**: `/auth-service`
-- **Base URL**: `http://localhost:8081/auth-service`
+- **Access via Gateway**: `http://localhost:8080/auth-service/**`
 - **API Endpoints**: `/auth-service/api/v1/auth/*`
-- **Swagger UI**: `http://localhost:8081/auth-service/swagger-ui.html`
+- **Direct Swagger UI**: `http://localhost:8081/auth-service/swagger-ui.html`
 - **Health Check**: `http://localhost:8081/auth-service/actuator/health`
 
 ### API Gateway

@@ -67,7 +67,24 @@ EasyBilling is a comprehensive, enterprise-grade, multi-tenant billing and POS p
 
 ### Microservices
 
-#### 1. Tenant Service (Port: 8082, Context: /tenant-service)
+#### 0. API Gateway (Port: 8080) ✅
+**Responsibility**: Request routing, authentication, and rate limiting
+
+**Key Features**:
+- Centralized entry point for all services  
+- JWT authentication filter for protected endpoints
+- Rate limiting (100 requests/minute per IP) using Redis
+- CORS configuration for frontend
+- Circuit breaker patterns with Resilience4j
+- Dynamic routing based on context paths
+
+**Routing Rules:**
+- `/auth-service/**` → Auth Service (8081)
+- `/tenant-service/**` → Tenant Service (8082)
+- Public endpoints: login, register, refresh
+- Protected: All other endpoints require JWT
+
+#### 1. Tenant Service (Port: 8082, Context: /tenant-service) ✅
 **Responsibility**: Tenant lifecycle management
 
 **Key Features**:

@@ -9,9 +9,7 @@ include("libs:multi-tenancy")
 // Only include services that have been implemented
 include("services:tenant-service")
 include("services:auth-service")
-
-// Planned services (uncomment when implemented)
-// include("services:gateway-service")
+include("services:gateway-service")
 // include("services:billing-service")
 // include("services:inventory-service")
 // include("services:customer-service")
@@ -27,9 +25,7 @@ project(":libs:multi-tenancy").projectDir = file("libs/multi-tenancy")
 
 project(":services:tenant-service").projectDir = file("services/tenant-service")
 project(":services:auth-service").projectDir = file("services/auth-service")
-
-// Planned services project paths (uncomment when implemented)
-// project(":services:gateway-service").projectDir = file("services/gateway-service")
+project(":services:gateway-service").projectDir = file("services/gateway-service")
 // project(":services:billing-service").projectDir = file("services/billing-service")
 // project(":services:inventory-service").projectDir = file("services/inventory-service")
 // project(":services:customer-service").projectDir = file("services/customer-service")
