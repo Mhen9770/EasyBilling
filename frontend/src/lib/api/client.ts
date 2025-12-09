@@ -18,16 +18,19 @@ export const apiClient = axios.create({
  */
 apiClient.interceptors.request.use(
   (config) => {
-    // Add tenant ID if available
-    const tenantId = localStorage.getItem('tenantId');
-    if (tenantId) {
-      config.headers['X-Tenant-Id'] = tenantId;
-    }
+    // Only access localStorage on client side
+    if (typeof window !== 'undefined') {
+      // Add tenant ID if available
+      const tenantId = localStorage.getItem('tenantId');
+      if (tenantId) {
+        config.headers['X-Tenant-Id'] = tenantId;
+      }
 
-    // Add auth token if available
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      // Add auth token if available
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
 
     return config;
