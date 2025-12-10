@@ -4,13 +4,15 @@ import { useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { usePOSStore } from '@/lib/store/posStore';
 import { inventoryApi } from '@/lib/api/inventory/inventoryApi';
-import { billingApi, InvoiceRequest, CompleteInvoiceRequest } from '@/lib/api/billing/billingApi';
+import { billingApi, InvoiceRequest } from '@/lib/api/billing/billingApi';
+import { useToastStore } from '@/components/ui/toast';
 
 export default function POSPage() {
   const [searchInput, setSearchInput] = useState('');
   const [selectedPaymentMode, setSelectedPaymentMode] = useState<'CASH' | 'CARD' | 'UPI' | 'WALLET'>('CASH');
   const [paymentAmount, setPaymentAmount] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const { addToast } = useToastStore();
 
   const {
     cart,
@@ -45,11 +47,11 @@ export default function POSPage() {
           taxRate: product.taxRate,
         });
         setSearchInput('');
-        alert(`Added ${product.name} to cart`);
+        addToast(`Added ${product.name} to cart`, 'success');
       }
     },
     onError: () => {
-      alert('Product not found');
+      addToast('Product not found', 'error');
       setSearchInput('');
     },
   });
@@ -61,17 +63,17 @@ export default function POSPage() {
 
   // Complete invoice mutation
   const completeInvoice = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: CompleteInvoiceRequest }) =>
-      billingApi.completeInvoice(id, data),
+    mutationFn: ({ id, payments }: { id: string; payments: any[] }) =>
+      billingApi.completeInvoice(id, payments),
     onSuccess: () => {
-      alert('Sale completed successfully!');
+      addToast('Sale completed successfully!', 'success');
       clearCart();
       clearPayments();
       setPaymentAmount('');
       setIsProcessing(false);
     },
     onError: () => {
-      alert('Failed to complete sale');
+      addToast('Failed to complete sale', 'error');
       setIsProcessing(false);
     },
   });
@@ -80,11 +82,11 @@ export default function POSPage() {
   const holdInvoice = useMutation({
     mutationFn: (data: InvoiceRequest) => billingApi.holdInvoice(data),
     onSuccess: () => {
-      alert('Bill held successfully!');
+      addToast('Bill held successfully!', 'success');
       clearCart();
     },
     onError: () => {
-      alert('Failed to hold bill');
+      addToast('Failed to hold bill', 'error');
     },
   });
 
@@ -107,12 +109,12 @@ export default function POSPage() {
 
   const handleCompleteSale = async () => {
     if (cart.length === 0) {
-      alert('Cart is empty');
+      addToast('Cart is empty', 'warning');
       return;
     }
 
     if (getPaidAmount() < getTotal()) {
-      alert('Payment amount is less than total');
+      addToast('Payment amount is less than total', 'warning');
       return;
     }
 
@@ -139,28 +141,26 @@ export default function POSPage() {
       
       if (invoiceResponse.data) {
         // Then complete it with payments
-        const completeData: CompleteInvoiceRequest = {
-          payments: payments.map((p) => ({
-            mode: p.mode,
-            amount: p.amount,
-            reference: p.reference,
-          })),
-        };
+        const paymentsList = payments.map((p) => ({
+          mode: p.mode,
+          amount: p.amount,
+          reference: p.reference,
+        }));
 
         await completeInvoice.mutateAsync({
           id: invoiceResponse.data.id,
-          data: completeData,
+          payments: paymentsList,
         });
       }
     } catch (error) {
       setIsProcessing(false);
-      alert('Failed to complete sale');
+      addToast('Failed to complete sale', 'error');
     }
   };
 
   const handleHoldBill = () => {
     if (cart.length === 0) {
-      alert('Cart is empty');
+      addToast('Cart is empty', 'warning');
       return;
     }
 

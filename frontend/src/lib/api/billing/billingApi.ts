@@ -27,10 +27,6 @@ export interface InvoiceRequest {
   items: InvoiceItemRequest[];
 }
 
-export interface CompleteInvoiceRequest {
-  payments: PaymentRequest[];
-}
-
 export interface InvoiceItemResponse {
   id: string;
   productId: string;
@@ -107,11 +103,11 @@ export const billingApi = {
   // Complete an invoice with payments
   completeInvoice: async (
     id: string,
-    data: CompleteInvoiceRequest
+    payments: PaymentRequest[]
   ): Promise<ApiResponse<InvoiceResponse>> => {
     const response = await apiClient.post<ApiResponse<InvoiceResponse>>(
       `/billing-service/api/v1/invoices/${id}/complete`,
-      data
+      payments
     );
     return response.data;
   },

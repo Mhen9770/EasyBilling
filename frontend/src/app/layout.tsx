@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
+import { ToastContainer } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
   title: "EasyBilling - Multi-Tenant Billing Platform",
@@ -17,6 +18,7 @@ export default function RootLayout({
       <body className="antialiased">
         <Providers>
           {children}
+          <ToastContainer />
         </Providers>
       </body>
     </html>
