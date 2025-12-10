@@ -89,3 +89,5 @@ export interface PageResponse<T> {
   last: boolean;
   empty: boolean;
 }
+
+export default apiClient;

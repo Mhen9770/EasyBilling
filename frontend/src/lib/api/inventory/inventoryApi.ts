@@ -24,6 +24,7 @@ export interface StockResponse {
   productId: string;
   productName: string;
   locationId?: string;
+  locationName?: string;
   totalQuantity: number;
   reservedQuantity: number;
   availableQuantity: number;
@@ -54,11 +55,35 @@ export interface ProductRequest {
   barcode?: string;
   categoryId?: string;
   brandId?: string;
-  basePrice: number;
-  sellingPrice: number;
+  price?: number;
+  cost?: number;
+  basePrice?: number;
+  sellingPrice?: number;
   taxRate: number;
   unit: string;
   lowStockThreshold?: number;
+}
+
+export interface CategoryRequest {
+  name: string;
+  description?: string;
+  parentId?: string;
+}
+
+export interface BrandRequest {
+  name: string;
+  description?: string;
+  website?: string;
+  logoUrl?: string;
+}
+
+export interface StockMovementRequest {
+  productId: string;
+  movementType: 'IN' | 'OUT' | 'TRANSFER' | 'ADJUSTMENT';
+  quantity: number;
+  locationId: string;
+  reference?: string;
+  notes?: string;
 }
 
 export const inventoryApi = {
@@ -124,11 +149,50 @@ export const inventoryApi = {
     return response.data;
   },
 
+  // Categories
+  createCategory: async (data: CategoryRequest): Promise<ApiResponse<CategoryResponse>> => {
+    const response = await apiClient.post<ApiResponse<CategoryResponse>>(
+      '/inventory-service/api/v1/categories',
+      data
+    );
+    return response.data;
+  },
+
+  getCategories: async (): Promise<ApiResponse<CategoryResponse[]>> => {
+    return inventoryApi.listCategories();
+  },
+
   // Brands
   listBrands: async (): Promise<ApiResponse<BrandResponse[]>> => {
     const response = await apiClient.get<ApiResponse<BrandResponse[]>>(
       '/inventory-service/api/v1/brands'
     );
     return response.data;
+  },
+
+  getBrands: async (): Promise<ApiResponse<BrandResponse[]>> => {
+    return inventoryApi.listBrands();
+  },
+
+  createBrand: async (data: BrandRequest): Promise<ApiResponse<BrandResponse>> => {
+    const response = await apiClient.post<ApiResponse<BrandResponse>>(
+      '/inventory-service/api/v1/brands',
+      data
+    );
+    return response.data;
+  },
+
+  // Stock movements
+  recordStockMovement: async (data: StockMovementRequest): Promise<ApiResponse<void>> => {
+    const response = await apiClient.post<ApiResponse<void>>(
+      '/inventory-service/api/v1/stock/movements',
+      data
+    );
+    return response.data;
+  },
+
+  // Products with pagination
+  getProducts: async (params: { page: number; size: number }): Promise<ApiResponse<PageResponse<ProductResponse>>> => {
+    return inventoryApi.listProducts(params.page, params.size);
   },
 };
