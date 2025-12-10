@@ -233,7 +233,7 @@ EasyBilling is a comprehensive, enterprise-grade, multi-tenant billing and POS p
 | Language | Java | 17 | ✅ |
 | Framework | Spring Boot | 3.4.0 | ✅ |
 | Build Tool | Gradle | 8.5 | ✅ |
-| Database | PostgreSQL | 16 | ✅ |
+| Database | MySQL | 8 | ✅ |
 | Cache | Redis | 7 | ✅ |
 | Migration | Flyway | 10.x | ✅ |
 | API Docs | SpringDoc | 2.3.0 | ✅ |

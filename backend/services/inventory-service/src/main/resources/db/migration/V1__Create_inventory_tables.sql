@@ -1,6 +1,6 @@
 -- Categories table
-CREATE TABLE categories (
-    id BIGSERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS categories (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     parent_id BIGINT,
@@ -15,8 +15,8 @@ CREATE INDEX idx_categories_tenant ON categories(tenant_id);
 CREATE INDEX idx_categories_parent ON categories(parent_id);
 
 -- Brands table
-CREATE TABLE brands (
-    id BIGSERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS brands (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL UNIQUE,
     description TEXT,
     logo_url VARCHAR(500),
@@ -29,8 +29,8 @@ CREATE TABLE brands (
 CREATE INDEX idx_brands_tenant ON brands(tenant_id);
 
 -- Products table
-CREATE TABLE products (
-    id BIGSERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS products (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     sku VARCHAR(100) NOT NULL UNIQUE,
     name VARCHAR(255) NOT NULL,
     description TEXT,
@@ -60,8 +60,8 @@ CREATE INDEX idx_products_category ON products(category_id);
 CREATE INDEX idx_products_brand ON products(brand_id);
 
 -- Stock table
-CREATE TABLE stock (
-    id BIGSERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS stock (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     product_id BIGINT NOT NULL,
     location_id VARCHAR(100) NOT NULL,
     quantity DECIMAL(10,2) NOT NULL DEFAULT 0,
@@ -79,8 +79,8 @@ CREATE INDEX idx_stock_location ON stock(location_id);
 CREATE INDEX idx_stock_tenant ON stock(tenant_id);
 
 -- Stock movements table
-CREATE TABLE stock_movements (
-    id BIGSERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS stock_movements (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
     product_id BIGINT NOT NULL,
     location_id VARCHAR(100) NOT NULL,
     movement_type VARCHAR(20) NOT NULL,

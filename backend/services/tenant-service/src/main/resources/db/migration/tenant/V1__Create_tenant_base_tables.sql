@@ -38,6 +38,6 @@ CREATE INDEX idx_users_status ON users(status);
 CREATE INDEX idx_stores_code ON stores(code);
 CREATE INDEX idx_stores_status ON stores(status);
 
--- Comments
-COMMENT ON TABLE users IS 'Tenant-specific users';
-COMMENT ON TABLE stores IS 'Stores/branches for this tenant';
+-- Comments (MySQL uses table/column comments differently)
+-- users: Tenant-specific users
+-- stores: Stores/branches for this tenant

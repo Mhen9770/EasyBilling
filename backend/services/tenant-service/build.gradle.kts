@@ -19,14 +19,14 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-cache")
     
     // Database
-    runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("com.mysql:mysql-connector-j")
     
     // Redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     
     // Flyway
     implementation("org.flywaydb:flyway-core")
-    implementation("org.flywaydb:flyway-database-postgresql")
+    implementation("org.flywaydb:flyway-mysql")
     
     // MapStruct for DTO mapping
     implementation("org.mapstruct:mapstruct:1.5.5.Final")

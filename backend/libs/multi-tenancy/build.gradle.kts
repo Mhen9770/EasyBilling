@@ -10,10 +10,10 @@ dependencies {
     api("org.springframework.boot:spring-boot-starter-data-jpa")
     
     // Database
-    api("org.postgresql:postgresql:42.7.1")
+    api("com.mysql:mysql-connector-j")
     api("com.zaxxer:HikariCP")
     
     // Flyway for migrations
     api("org.flywaydb:flyway-core")
-    api("org.flywaydb:flyway-database-postgresql")
+    api("org.flywaydb:flyway-mysql")
 }

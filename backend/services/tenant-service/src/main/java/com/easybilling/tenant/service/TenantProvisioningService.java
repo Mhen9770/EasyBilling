@@ -56,13 +56,15 @@ public class TenantProvisioningService {
      * Create database schema for tenant.
      */
     private void createSchema(String schemaName) {
-        log.info("Creating schema: {}", schemaName);
+        log.info("Creating schema/database: {}", schemaName);
         
         try {
-            jdbcTemplate.execute("CREATE SCHEMA IF NOT EXISTS " + schemaName);
-            log.info("Schema created successfully: {}", schemaName);
+            // MySQL: CREATE DATABASE is equivalent to CREATE SCHEMA
+            // Using CREATE DATABASE for MySQL compatibility
+            jdbcTemplate.execute("CREATE DATABASE IF NOT EXISTS " + schemaName);
+            log.info("Schema/database created successfully: {}", schemaName);
         } catch (Exception e) {
-            log.error("Failed to create schema: {}", schemaName, e);
+            log.error("Failed to create schema/database: {}", schemaName, e);
             throw e;
         }
     }
@@ -93,13 +95,15 @@ public class TenantProvisioningService {
      * Cleanup tenant infrastructure (for testing or tenant deletion).
      */
     public void deprovisionTenant(String schemaName) {
-        log.warn("Deprovisioning tenant schema: {}", schemaName);
+        log.warn("Deprovisioning tenant schema/database: {}", schemaName);
         
         try {
-            jdbcTemplate.execute("DROP SCHEMA IF EXISTS " + schemaName + " CASCADE");
-            log.info("Schema dropped successfully: {}", schemaName);
+            // MySQL: DROP DATABASE is equivalent to DROP SCHEMA
+            // CASCADE is not needed in MySQL for DROP DATABASE
+            jdbcTemplate.execute("DROP DATABASE IF EXISTS " + schemaName);
+            log.info("Schema/database dropped successfully: {}", schemaName);
         } catch (Exception e) {
-            log.error("Failed to drop schema: {}", schemaName, e);
+            log.error("Failed to drop schema/database: {}", schemaName, e);
             throw e;
         }
     }

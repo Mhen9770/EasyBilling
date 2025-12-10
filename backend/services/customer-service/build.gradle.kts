@@ -15,8 +15,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     // Database
-    runtimeOnly("org.postgresql:postgresql")
+    runtimeOnly("com.mysql:mysql-connector-j")
     implementation("org.flywaydb:flyway-core")
+    implementation("org.flywaydb:flyway-mysql")
 
     // Documentation
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")

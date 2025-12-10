@@ -31,7 +31,7 @@ CREATE INDEX idx_tenant_slug ON tenants(slug);
 CREATE INDEX idx_tenant_status ON tenants(status);
 CREATE INDEX idx_tenant_created_at ON tenants(created_at);
 
--- Comments
-COMMENT ON TABLE tenants IS 'Master table for all tenants in the platform';
-COMMENT ON COLUMN tenants.slug IS 'Unique identifier used for subdomain (e.g., tenant1.easybilling.com)';
-COMMENT ON COLUMN tenants.schema_name IS 'PostgreSQL schema name for schema-per-tenant strategy';
+-- Comments (MySQL uses table/column comments differently)
+-- Master table for all tenants in the platform
+-- slug: Unique identifier used for subdomain (e.g., tenant1.easybilling.com)
+-- schema_name: MySQL database name for database-per-tenant strategy

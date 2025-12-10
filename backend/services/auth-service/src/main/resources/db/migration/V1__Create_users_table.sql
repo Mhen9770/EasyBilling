@@ -32,8 +32,8 @@ CREATE INDEX idx_user_email ON users(email);
 CREATE INDEX idx_user_tenant ON users(tenant_id);
 CREATE INDEX idx_user_status ON users(status);
 
--- Comments
-COMMENT ON TABLE users IS 'User accounts for authentication and authorization';
-COMMENT ON TABLE user_roles IS 'User roles for role-based access control';
-COMMENT ON COLUMN users.password IS 'BCrypt hashed password';
-COMMENT ON COLUMN users.tenant_id IS 'Reference to tenant in tenant-service';
+-- Comments (MySQL uses table/column comments differently)
+-- users: User accounts for authentication and authorization
+-- user_roles: User roles for role-based access control
+-- password: BCrypt hashed password
+-- tenant_id: Reference to tenant in tenant-service

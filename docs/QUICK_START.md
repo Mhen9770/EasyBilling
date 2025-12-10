@@ -20,10 +20,10 @@ cd EasyBilling
 
 ## Step 2: Start Infrastructure Services
 
-Start PostgreSQL and Redis using Docker Compose:
+Start MySQL and Redis using Docker Compose:
 
 ```bash
-docker-compose up -d postgres redis
+docker-compose up -d mysql redis
 ```
 
 Verify services are running:
@@ -32,7 +32,7 @@ Verify services are running:
 docker-compose ps
 ```
 
-You should see both `easybilling-postgres` and `easybilling-redis` running.
+You should see both `easybilling-mysql` and `easybilling-redis` running.
 
 ## Step 3: Start Backend Services
 
@@ -136,8 +136,8 @@ curl -X POST http://localhost:8082/tenant-service/api/v1/tenants \
 The system automatically creates a schema for your new tenant. You can verify it:
 
 ```bash
-# Connect to PostgreSQL
-docker exec -it easybilling-postgres psql -U easybilling -d easybilling
+# Connect to MySQL
+docker exec -it easybilling-mysql mysql -u postgres -proot -e "SHOW DATABASES;"
 
 # List all schemas
 \dn
@@ -180,7 +180,7 @@ Create `backend/services/tenant-service/src/main/resources/application-local.yml
 ```yaml
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/easybilling
+    url: jdbc:mysql://localhost:3306/easybilling?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: easybilling
     password: easybilling123
   
@@ -215,9 +215,9 @@ NEXT_PUBLIC_APP_NAME=EasyBilling
 **Problem**: "Connection refused" or database errors
 
 **Solution**: 
-1. Ensure PostgreSQL is running: `docker-compose ps`
-2. Check logs: `docker-compose logs postgres`
-3. Restart services: `docker-compose restart postgres`
+1. Ensure MySQL is running: `docker-compose ps`
+2. Check logs: `docker-compose logs mysql`
+3. Restart services: `docker-compose restart mysql`
 
 ### Frontend build fails
 
@@ -285,10 +285,10 @@ npm run dev
 
 **Using psql**:
 ```bash
-docker exec -it easybilling-postgres psql -U easybilling -d easybilling
+docker exec -it easybilling-mysql mysql -u postgres -proot -e "SHOW DATABASES;"
 ```
 
-**Using pgAdmin**: Connect to localhost:5432 with credentials from docker-compose.yml
+**Using MySQL Workbench**: Connect to localhost:3306 with credentials from docker-compose.yml
 
 ## Production Deployment
 

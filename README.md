@@ -15,7 +15,7 @@ EasyBilling is built using a **microservices architecture** with a modular monol
 - **Spring Data JPA** - Data access layer
 - **Spring Cloud** - Microservices infrastructure
 - **Gradle (Kotlin DSL)** - Build tool
-- **PostgreSQL** - Primary database
+- **MySQL 8** - Primary database
 - **Redis** - Caching layer
 - **OpenSearch** - Search & Analytics (optional)
 
@@ -117,7 +117,7 @@ The platform supports three multi-tenancy models:
 - Java 17 or higher
 - Node.js 20 or higher
 - Docker & Docker Compose
-- PostgreSQL 16
+- MySQL 8
 - Redis 7
 
 ### Local Development Setup

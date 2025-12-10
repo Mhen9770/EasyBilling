@@ -8,26 +8,28 @@ version: '3.8'
 # - Customer Service: /customer-service (planned)
 
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:16-alpine
-    container_name: easybilling-postgres
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: easybilling-mysql
     environment:
-      POSTGRES_DB: easybilling
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: root
+      MYSQL_DATABASE: easybilling
+      MYSQL_USER: postgres
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
     ports:
-      - "5432:5432"
+      - "3306:3306"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
-      - ./infrastructure/docker/postgres/init-scripts:/docker-entrypoint-initdb.d
+      - mysql-data:/var/lib/mysql
+      - ./infrastructure/docker/mysql/init-scripts:/docker-entrypoint-initdb.d
     networks:
       - easybilling-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "postgres", "-proot"]
       interval: 10s
       timeout: 5s
       retries: 5
+    command: --default-authentication-plugin=mysql_native_password
 
   # Redis Cache
   redis:
@@ -55,10 +57,10 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      POSTGRES_HOST: postgres
+      MYSQL_HOST: mysql
       REDIS_HOST: redis
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -76,10 +78,10 @@ services:
       - "8081:8081"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      POSTGRES_HOST: postgres
+      MYSQL_HOST: mysql
       REDIS_HOST: redis
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -97,10 +99,10 @@ services:
       - "8082:8082"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      POSTGRES_HOST: postgres
+      MYSQL_HOST: mysql
       REDIS_HOST: redis
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -118,10 +120,10 @@ services:
       - "8083:8083"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      POSTGRES_HOST: postgres
+      MYSQL_HOST: mysql
       REDIS_HOST: redis
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -139,10 +141,10 @@ services:
       - "8084:8084"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      POSTGRES_HOST: postgres
+      MYSQL_HOST: mysql
       REDIS_HOST: redis
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
       redis:
         condition: service_healthy
@@ -168,7 +170,7 @@ services:
     restart: unless-stopped
 
 volumes:
-  postgres-data:
+  mysql-data:
   redis-data:
 
 networks:

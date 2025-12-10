@@ -12,7 +12,7 @@ docker-compose up -d
 ```
 
 This will start:
-- ✅ PostgreSQL database (port 5432)
+- ✅ MySQL database (port 3306)
 - ✅ Redis cache (port 6379)
 - ✅ Gateway Service (port 8080)
 - ✅ Auth Service (port 8081)
@@ -55,8 +55,8 @@ For development, you may want to run services individually:
 ### Step 1: Start Infrastructure Services
 
 ```bash
-# Start only PostgreSQL and Redis
-docker-compose up -d postgres redis
+# Start only MySQL and Redis
+docker-compose up -d mysql redis
 
 # Verify they're running
 docker-compose ps
@@ -166,9 +166,9 @@ Each service has its own `application.yml` file. For local development, you can 
 ```yaml
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/easybilling
-    username: easybilling
-    password: easybilling123
+    url: jdbc:mysql://localhost:3306/easybilling?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: postgres
+    password: root
   
   data:
     redis:
@@ -217,19 +217,19 @@ kill -9 <PID>
 
 ### Database Connection Issues
 
-1. Ensure PostgreSQL is running:
+1. Ensure MySQL is running:
    ```bash
-   docker-compose ps postgres
+   docker-compose ps mysql
    ```
 
-2. Check PostgreSQL logs:
+2. Check MySQL logs:
    ```bash
-   docker-compose logs postgres
+   docker-compose logs mysql
    ```
 
 3. Test connection:
    ```bash
-   docker exec -it easybilling-postgres psql -U easybilling -d easybilling
+   docker exec -it easybilling-mysql mysql -u postgres -proot -e "SHOW DATABASES;"
    ```
 
 ### Service Won't Start
@@ -326,7 +326,7 @@ npm start
 
 After starting all services, verify:
 
-- [ ] PostgreSQL is running (port 5432)
+- [ ] MySQL is running (port 3306)
 - [ ] Redis is running (port 6379)
 - [ ] Gateway Service is accessible (http://localhost:8080/actuator/health)
 - [ ] Auth Service is accessible (http://localhost:8081/auth-service/actuator/health)
