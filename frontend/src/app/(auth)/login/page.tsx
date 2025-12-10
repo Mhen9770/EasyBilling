@@ -138,12 +138,12 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Register Link */}
+          {/* Register Link - Removed, use onboarding instead */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
-                Sign up now
+              New to EasyBilling?{' '}
+              <Link href="/onboarding" className="font-medium text-blue-600 hover:text-blue-500">
+                Start your free trial
               </Link>
             </p>
           </div>

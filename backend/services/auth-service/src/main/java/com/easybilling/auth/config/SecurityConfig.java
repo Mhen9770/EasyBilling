@@ -29,10 +29,14 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/refresh").permitAll()
+                        // Public endpoints - Tenant onboarding and authentication
+                        .requestMatchers("/api/v1/auth/login").permitAll()
+                        .requestMatchers("/api/v1/auth/refresh").permitAll()
+                        .requestMatchers("/api/v1/auth/onboard").permitAll() // Tenant self-service onboarding
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        // Admin-only endpoints (registration for adding users to existing tenant)
+                        // /api/v1/auth/register is now admin-only for adding users within a tenant
                         // All other requests require authentication
                         .anyRequest().authenticated()
                 );

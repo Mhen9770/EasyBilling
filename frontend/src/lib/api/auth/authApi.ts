@@ -14,7 +14,30 @@ export interface RegisterRequest {
   firstName?: string;
   lastName?: string;
   phone?: string;
-  tenantId: string;
+  tenantId?: string; // Optional for onboarding, required for regular registration
+}
+
+export interface OnboardRequest {
+  // Tenant information
+  tenantName: string;
+  businessName: string;
+  businessType?: string;
+  tenantEmail: string;
+  tenantPhone: string;
+  // Admin user information
+  adminUsername: string;
+  adminEmail: string;
+  adminPassword: string;
+  adminFirstName?: string;
+  adminLastName?: string;
+  adminPhone?: string;
+  // Optional business details
+  address?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  country?: string;
+  gstin?: string;
 }
 
 export interface UserInfo {
@@ -78,7 +101,20 @@ export const authApi = {
   },
 
   /**
-   * Register new user
+   * Tenant self-service onboarding
+   * Creates a new tenant and admin user in one step
+   */
+  async onboard(data: OnboardRequest): Promise<LoginResponse> {
+    const response = await apiClient.post<ApiResponse<LoginResponse>>(
+      '/auth-service/api/v1/auth/onboard',
+      data
+    );
+    return response.data.data!;
+  },
+
+  /**
+   * Register new user (requires authentication - admin only)
+   * Adds a user to an existing tenant
    */
   async register(data: RegisterRequest): Promise<LoginResponse> {
     const response = await apiClient.post<ApiResponse<LoginResponse>>(
