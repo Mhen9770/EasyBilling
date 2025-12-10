@@ -1,8 +1,7 @@
 package com.easybilling.config;
 
 import lombok.RequiredArgsConstructor;
-import org.hibernate.MultiTenancyStrategy;
-import org.hibernate.cfg.Environment;
+import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
@@ -44,13 +43,12 @@ public class HibernateConfig {
         Map<String, Object> jpaPropertiesMap = new HashMap<>(jpaProperties.getProperties());
         
         // Multi-tenancy configuration
-        jpaPropertiesMap.put(Environment.MULTI_TENANT, MultiTenancyStrategy.SCHEMA);
-        jpaPropertiesMap.put(Environment.MULTI_TENANT_CONNECTION_PROVIDER, multiTenantConnectionProvider);
-        jpaPropertiesMap.put(Environment.MULTI_TENANT_IDENTIFIER_RESOLVER, currentTenantIdentifierResolver);
+        jpaPropertiesMap.put(AvailableSettings.MULTI_TENANT_IDENTIFIER_RESOLVER, currentTenantIdentifierResolver);
+        jpaPropertiesMap.put(AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER, multiTenantConnectionProvider);
         
         // Disable schema validation and auto-update in multi-tenant mode
         // Schemas are managed via Flyway migrations
-        jpaPropertiesMap.put(Environment.HBM2DDL_AUTO, "none");
+        jpaPropertiesMap.put(AvailableSettings.HBM2DDL_AUTO, "none");
         
         em.setJpaPropertyMap(jpaPropertiesMap);
         

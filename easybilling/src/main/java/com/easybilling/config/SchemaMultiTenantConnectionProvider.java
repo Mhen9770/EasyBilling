@@ -15,7 +15,7 @@ import java.sql.SQLException;
  */
 @Slf4j
 @Component
-public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectionProvider {
+public class SchemaMultiTenantConnectionProvider<T> implements MultiTenantConnectionProvider<T> {
     
     private static final long serialVersionUID = 1L;
     
@@ -35,20 +35,21 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
     }
     
     @Override
-    public Connection getConnection(String tenantIdentifier) throws SQLException {
-        log.debug("Getting connection for tenant schema: {}", tenantIdentifier);
+    public Connection getConnection(T tenantIdentifier) throws SQLException {
+        String schemaName = tenantIdentifier != null ? tenantIdentifier.toString() : "easybilling";
+        log.debug("Getting connection for tenant schema: {}", schemaName);
         
         final Connection connection = getAnyConnection();
         
         try {
             // Set the schema for this connection
             // For MySQL, we use the database (schema) switching
-            if (tenantIdentifier != null && !tenantIdentifier.equals("public")) {
-                log.debug("Switching to schema: {}", tenantIdentifier);
-                connection.createStatement().execute("USE " + tenantIdentifier);
+            if (schemaName != null && !schemaName.equals("easybilling") && !schemaName.equals("public")) {
+                log.debug("Switching to schema: {}", schemaName);
+                connection.createStatement().execute("USE " + schemaName);
             }
         } catch (SQLException e) {
-            log.error("Failed to switch to tenant schema: {}", tenantIdentifier, e);
+            log.error("Failed to switch to tenant schema: {}", schemaName, e);
             throw e;
         }
         
@@ -56,8 +57,9 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
     }
     
     @Override
-    public void releaseConnection(String tenantIdentifier, Connection connection) throws SQLException {
-        log.trace("Releasing connection for tenant: {}", tenantIdentifier);
+    public void releaseConnection(T tenantIdentifier, Connection connection) throws SQLException {
+        String schemaName = tenantIdentifier != null ? tenantIdentifier.toString() : "easybilling";
+        log.trace("Releasing connection for tenant: {}", schemaName);
         
         try {
             // Reset to default schema before releasing
@@ -76,12 +78,12 @@ public class SchemaMultiTenantConnectionProvider implements MultiTenantConnectio
     }
     
     @Override
-    public boolean isUnwrappableAs(Class unwrapType) {
+    public boolean isUnwrappableAs(Class<?> unwrapType) {
         return false;
     }
     
     @Override
-    public <T> T unwrap(Class<T> unwrapType) {
+    public <U> U unwrap(Class<U> unwrapType) {
         return null;
     }
 }
