@@ -1,100 +1,143 @@
 'use client';
 
 import { useState } from 'react';
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-  status: 'ACTIVE' | 'SUSPENDED' | 'INACTIVE';
-  lastLogin: string;
-  createdAt: string;
-}
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { userApi, type UserRole, type UserResponse } from '@/lib/api/user/userApi';
+import { useToastStore } from '@/components/ui/toast';
 
 const ROLES = [
-  { value: 'ADMIN', label: 'Admin', description: 'Full system access' },
-  { value: 'MANAGER', label: 'Manager', description: 'Manage operations and reports' },
-  { value: 'STAFF', label: 'Staff', description: 'POS and basic operations' },
-  { value: 'VIEWER', label: 'Viewer', description: 'Read-only access' },
+  { value: 'ADMIN' as UserRole, label: 'Admin', description: 'Full system access' },
+  { value: 'MANAGER' as UserRole, label: 'Manager', description: 'Manage operations and reports' },
+  { value: 'STAFF' as UserRole, label: 'Staff', description: 'POS and basic operations' },
+  { value: 'VIEWER' as UserRole, label: 'Viewer', description: 'Read-only access' },
 ];
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: '1',
-      username: 'admin',
-      email: 'admin@example.com',
-      firstName: 'Admin',
-      lastName: 'User',
-      role: 'ADMIN',
-      status: 'ACTIVE',
-      lastLogin: '2024-12-10T10:30:00',
-      createdAt: '2024-01-01T00:00:00',
-    },
-  ]);
-
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [editingUser, setEditingUser] = useState<UserResponse | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterRole, setFilterRole] = useState('ALL');
+  const [filterRole, setFilterRole] = useState<UserRole | 'ALL'>('ALL');
+  const queryClient = useQueryClient();
+  const { addToast } = useToastStore();
 
-  const [newUserForm, setNewUserForm] = useState({
-    username: '',
-    email: '',
-    firstName: '',
-    lastName: '',
-    password: '',
-    role: 'STAFF',
+  const { data: usersResponse, isLoading } = useQuery({
+    queryKey: ['users', filterRole],
+    queryFn: () => userApi.listUsers(0, 50, filterRole === 'ALL' ? undefined : filterRole),
+  });
+
+  const users = usersResponse?.data?.content || [];
+
+  const createMutation = useMutation({
+    mutationFn: (data: any) => userApi.createUser(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      setIsAddModalOpen(false);
+      addToast('User created successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.response?.data?.message || 'Failed to create user', 'error');
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => userApi.updateUser(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      setEditingUser(null);
+      addToast('User updated successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.response?.data?.message || 'Failed to update user', 'error');
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => userApi.deleteUser(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      addToast('User deleted successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.response?.data?.message || 'Failed to delete user', 'error');
+    },
+  });
+
+  const suspendMutation = useMutation({
+    mutationFn: (id: string) => userApi.suspendUser(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      addToast('User suspended successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.response?.data?.message || 'Failed to suspend user', 'error');
+    },
+  });
+
+  const activateMutation = useMutation({
+    mutationFn: (id: string) => userApi.activateUser(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      addToast('User activated successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.response?.data?.message || 'Failed to activate user', 'error');
+    },
+  });
   });
 
   const filteredUsers = users.filter(user => {
     const matchesSearch = 
       user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchQuery.toLowerCase());
+      user.fullName.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesRole = filterRole === 'ALL' || user.role === filterRole;
     
     return matchesSearch && matchesRole;
   });
 
-  const handleAddUser = () => {
-    // TODO: Call API to add user
-    const newUser: User = {
-      id: String(users.length + 1),
-      ...newUserForm,
-      status: 'ACTIVE',
-      lastLogin: '',
-      createdAt: new Date().toISOString(),
-    };
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
     
-    setUsers([...users, newUser]);
-    setIsAddModalOpen(false);
-    setNewUserForm({
-      username: '',
-      email: '',
-      firstName: '',
-      lastName: '',
-      password: '',
-      role: 'STAFF',
-    });
-  };
+    const userData = {
+      username: formData.get('username') as string,
+      email: formData.get('email') as string,
+      fullName: `${formData.get('firstName')} ${formData.get('lastName')}`,
+      phone: formData.get('phone') as string || undefined,
+      role: formData.get('role') as UserRole,
+      password: formData.get('password') as string,
+    };
 
-  const handleUpdateUserStatus = (userId: string, status: User['status']) => {
-    setUsers(users.map(u => u.id === userId ? { ...u, status } : u));
-  };
-
-  const handleUpdateUserRole = (userId: string, role: string) => {
-    setUsers(users.map(u => u.id === userId ? { ...u, role } : u));
-  };
-
-  const handleDeleteUser = (userId: string) => {
-    if (confirm('Are you sure you want to delete this user?')) {
-      setUsers(users.filter(u => u.id !== userId));
+    if (editingUser) {
+      updateMutation.mutate({ id: editingUser.id, data: userData });
+    } else {
+      createMutation.mutate(userData);
     }
+  };
+
+  const handleEdit = (user: UserResponse) => {
+    setEditingUser(user);
+    setIsAddModalOpen(true);
+  };
+
+  const handleDelete = (userId: string) => {
+    if (confirm('Are you sure you want to delete this user?')) {
+      deleteMutation.mutate(userId);
+    }
+  };
+
+  const handleToggleStatus = (user: UserResponse) => {
+    if (user.status === 'ACTIVE') {
+      suspendMutation.mutate(user.id);
+    } else {
+      activateMutation.mutate(user.id);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsAddModalOpen(false);
+    setEditingUser(null);
   };
 
   return (
