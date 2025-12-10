@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class TenantProvisioningService {
     
     private final JdbcTemplate jdbcTemplate;
+    private final TenantMasterDataService masterDataService;
     
     @Value("${spring.datasource.url}")
     private String datasourceUrl;
@@ -30,18 +31,12 @@ public class TenantProvisioningService {
     
     /**
      * Provision tenant infrastructure (schema creation and migrations).
-     * For modular monolith, we use shared database with tenant_id filtering.
-     * Database/schema creation is optional and can be skipped.
+     * Uses separate schema per tenant strategy.
      */
     public void provisionTenant(Tenant tenant) {
         log.info("Provisioning tenant infrastructure for: {}", tenant.getSlug());
         
         try {
-            // For modular monolith with shared database, we can skip schema creation
-            // All tables are in the same database, filtered by tenant_id
-            // If you need separate schemas/databases per tenant, uncomment below:
-            
-            /*
             // Create schema for tenant
             String schemaName = "tenant_" + tenant.getSlug();
             createSchema(schemaName);
@@ -51,12 +46,12 @@ public class TenantProvisioningService {
             
             // Run Flyway migrations for tenant schema
             runMigrations(schemaName);
-            */
             
-            // For shared database approach, just set schema name to main database
-            tenant.setSchemaName("public"); // or the main database name
+            // Initialize master data
+            masterDataService.initializeMasterData(tenant);
             
-            log.info("Tenant infrastructure provisioned successfully for: {} (using shared database)", tenant.getSlug());
+            log.info("Tenant infrastructure provisioned successfully for: {} with schema: {}", 
+                    tenant.getSlug(), schemaName);
         } catch (Exception e) {
             log.error("Failed to provision tenant infrastructure for: {}", tenant.getSlug(), e);
             throw new RuntimeException("Failed to provision tenant infrastructure", e);

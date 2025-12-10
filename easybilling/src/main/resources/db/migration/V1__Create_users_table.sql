@@ -33,7 +33,7 @@ CREATE INDEX idx_user_tenant ON users(tenant_id);
 CREATE INDEX idx_user_status ON users(status);
 
 -- Comments (MySQL uses table/column comments differently)
--- users: User accounts for authentication and authorization
+-- users: Global user accounts for platform administration and multi-tenant access
 -- user_roles: User roles for role-based access control
 -- password: BCrypt hashed password
--- tenant_id: Reference to tenant in tenant-service
+-- tenant_id: Reference to tenant for multi-tenant users
