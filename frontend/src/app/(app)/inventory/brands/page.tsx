@@ -37,9 +37,8 @@ export default function BrandsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
+    <div className="max-w-6xl mx-auto">
+      <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Brands</h1>
           <button
             onClick={() => setIsCreateModalOpen(true)}
@@ -167,7 +166,6 @@ export default function BrandsPage() {
             </div>
           </div>
         )}
-      </div>
     </div>
   );
 }

@@ -46,9 +46,8 @@ export default function StockPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
+    <div className="max-w-7xl mx-auto">
+      <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Stock Management</h1>
           <button
             onClick={() => setIsMovementModalOpen(true)}
@@ -218,7 +217,6 @@ export default function StockPage() {
             </div>
           </div>
         )}
-      </div>
     </div>
   );
 }
