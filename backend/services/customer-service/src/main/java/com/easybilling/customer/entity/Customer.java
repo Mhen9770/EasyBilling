@@ -4,6 +4,7 @@ import com.easybilling.customer.enums.CustomerSegment;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -55,23 +56,29 @@ public class Customer {
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private CustomerSegment segment = CustomerSegment.REGULAR;
     
     @Column(nullable = false)
+    @Builder.Default
     private Integer loyaltyPoints = 0;
     
     @Column(nullable = false, precision = 19, scale = 2)
+    @Builder.Default
     private BigDecimal walletBalance = BigDecimal.ZERO;
     
     @Column(nullable = false, precision = 19, scale = 2)
+    @Builder.Default
     private BigDecimal totalSpent = BigDecimal.ZERO;
     
     @Column(nullable = false)
+    @Builder.Default
     private Integer visitCount = 0;
     
     private LocalDateTime lastVisitDate;
     
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active = true;
     
     private String notes;

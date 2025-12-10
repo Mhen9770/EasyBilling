@@ -1,7 +1,6 @@
 plugins {
+    java
     id("org.springframework.boot")
-    id("io.spring.dependency-management")
-    kotlin("jvm")
 }
 
 group = "com.easybilling"
@@ -23,9 +22,9 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
 
     // Shared modules
-    implementation(project(":backend:libs:common"))
-    implementation(project(":backend:libs:multi-tenancy"))
-    implementation(project(":backend:libs:security"))
+    implementation(project(":libs:common"))
+    implementation(project(":libs:multi-tenancy"))
+    implementation(project(":libs:security"))
 
     // Lombok
     compileOnly("org.projectlombok:lombok")

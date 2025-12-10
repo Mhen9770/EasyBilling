@@ -5,6 +5,7 @@ import com.easybilling.notification.enums.NotificationType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -47,8 +48,10 @@ public class Notification {
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private NotificationStatus status = NotificationStatus.PENDING;
     
+    @Builder.Default
     private Integer retryCount = 0;
     
     private String errorMessage;

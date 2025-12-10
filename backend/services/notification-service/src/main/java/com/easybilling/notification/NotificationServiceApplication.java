@@ -8,6 +8,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableAsync
 public class NotificationServiceApplication {
     public static void main(String[] args) {
-        SpringApplication.run(NotificationServiceApplication.java, args);
+        SpringApplication.run(NotificationServiceApplication.class, args);
     }
 }

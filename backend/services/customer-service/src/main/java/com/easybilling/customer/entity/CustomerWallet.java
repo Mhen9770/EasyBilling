@@ -3,6 +3,7 @@ package com.easybilling.customer.entity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -35,12 +36,15 @@ public class CustomerWallet {
     private String tenantId;
     
     @Column(nullable = false, precision = 19, scale = 2)
+    @Builder.Default
     private BigDecimal balance = BigDecimal.ZERO;
     
     @Column(nullable = false, precision = 19, scale = 2)
+    @Builder.Default
     private BigDecimal totalTopup = BigDecimal.ZERO;
     
     @Column(nullable = false, precision = 19, scale = 2)
+    @Builder.Default
     private BigDecimal totalSpent = BigDecimal.ZERO;
     
     @CreatedDate
