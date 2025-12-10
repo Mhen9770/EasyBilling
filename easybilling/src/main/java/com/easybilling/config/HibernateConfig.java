@@ -43,6 +43,7 @@ public class HibernateConfig {
         Map<String, Object> jpaPropertiesMap = new HashMap<>(jpaProperties.getProperties());
         
         // Multi-tenancy configuration
+        jpaPropertiesMap.put("hibernate.multiTenancy", "SCHEMA");
         jpaPropertiesMap.put(AvailableSettings.MULTI_TENANT_IDENTIFIER_RESOLVER, currentTenantIdentifierResolver);
         jpaPropertiesMap.put(AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER, multiTenantConnectionProvider);
         
