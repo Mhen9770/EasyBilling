@@ -45,8 +45,13 @@ public class SchemaMultiTenantConnectionProvider<T> implements MultiTenantConnec
             // Set the schema for this connection
             // For MySQL, we use the database (schema) switching
             if (schemaName != null && !schemaName.equals("easybilling") && !schemaName.equals("public")) {
+                // Validate schema name to prevent SQL injection
+                if (!schemaName.matches("^tenant_[a-z0-9_-]+$")) {
+                    log.error("Invalid schema name format: {}", schemaName);
+                    throw new SQLException("Invalid schema name: " + schemaName);
+                }
                 log.debug("Switching to schema: {}", schemaName);
-                connection.createStatement().execute("USE " + schemaName);
+                connection.createStatement().execute("USE `" + schemaName + "`");
             }
         } catch (SQLException e) {
             log.error("Failed to switch to tenant schema: {}", schemaName, e);
@@ -63,7 +68,7 @@ public class SchemaMultiTenantConnectionProvider<T> implements MultiTenantConnec
         
         try {
             // Reset to default schema before releasing
-            connection.createStatement().execute("USE easybilling");
+            connection.createStatement().execute("USE `easybilling`");
         } catch (SQLException e) {
             log.warn("Failed to reset to default schema", e);
         }

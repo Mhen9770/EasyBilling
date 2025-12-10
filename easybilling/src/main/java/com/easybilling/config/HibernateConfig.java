@@ -46,9 +46,7 @@ public class HibernateConfig {
         jpaPropertiesMap.put(AvailableSettings.MULTI_TENANT_IDENTIFIER_RESOLVER, currentTenantIdentifierResolver);
         jpaPropertiesMap.put(AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER, multiTenantConnectionProvider);
         
-        // Disable schema validation and auto-update in multi-tenant mode
-        // Schemas are managed via Flyway migrations
-        jpaPropertiesMap.put(AvailableSettings.HBM2DDL_AUTO, "none");
+        // JPA will handle schema creation via ddl-auto setting from application.yml
         
         em.setJpaPropertyMap(jpaPropertiesMap);
         

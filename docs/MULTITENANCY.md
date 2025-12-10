@@ -2,7 +2,7 @@
 
 ## Overview
 
-This application uses a **Schema-per-Tenant** strategy for multi-tenancy, where each tenant gets their own database schema with complete data isolation.
+This application uses a **Schema-per-Tenant** strategy for multi-tenancy, where each tenant gets their own database schema with complete data isolation. Tables are automatically created by JPA/Hibernate, and master data is inserted programmatically.
 
 ## Architecture
 
@@ -16,7 +16,8 @@ The master database contains:
 Each tenant gets a dedicated schema (e.g., `tenant_acme`, `tenant_demo`) containing:
 - All business tables (users, products, invoices, customers, etc.)
 - Complete data isolation from other tenants
-- Independent migrations and master data
+- Tables automatically created by JPA/Hibernate
+- Master data inserted programmatically
 
 ## Tenant Onboarding Process
 
@@ -30,14 +31,21 @@ When a new tenant is created:
    - A new database schema is created: `tenant_<slug>`
    - Example: For slug "acme" → schema "tenant_acme"
 
-3. **Migration Execution**
-   - Flyway runs all migrations from `db/migration/tenant/`
-   - Creates all required tables in the tenant schema
+3. **JPA Table Creation**
+   - JPA/Hibernate automatically creates all tables on first access
+   - Uses `ddl-auto=update` setting
+   - All entity definitions are applied to the new schema
 
 4. **Master Data Initialization**
-   - Default categories (Electronics, Clothing, Food, etc.)
-   - Default brands (Generic, House Brand)
-   - Initial configuration data
+   - Default categories programmatically inserted:
+     - Electronics (with sub-categories: Mobile Phones, Laptops, Audio/Video, Smart Devices)
+     - Clothing (with sub-categories: Men's, Women's, Kids, Footwear)
+     - Food & Beverages (with sub-categories: Snacks, Beverages, Groceries, Dairy)
+     - Home & Kitchen, Health & Beauty, Sports, Books, Toys
+   - Default brands inserted:
+     - Generic
+     - House Brand
+   - Uses prepared statements to prevent SQL injection
 
 5. **Tenant Activation**
    - Status updated to `TRIAL` or `ACTIVE`
@@ -57,11 +65,12 @@ When a new tenant is created:
 
 ### TenantProvisioningService
 - Creates new database schemas
-- Runs Flyway migrations for tenant schemas
-- Coordinates the provisioning process
+- Triggers JPA table creation by accessing the schema
+- Coordinates the provisioning process with master data service
 
 ### TenantMasterDataService
-- Initializes master/reference data in new tenant schemas
+- Inserts default categories and brands using prepared statements
+- Prevents SQL injection with schema name validation
 - Verifies data integrity after provisioning
 
 ### TenantInterceptor
@@ -111,15 +120,74 @@ spring:
 
 ## Migrations
 
-### Master Schema Migrations
-Location: `src/main/resources/db/migration/`
-- `V1__Create_users_table.sql` - Global users
-- `V2__Create_tenants_table.sql` - Tenant registry
+  
+## Database Configuration
 
-### Tenant Schema Migrations  
-Location: `src/main/resources/db/migration/tenant/`
-- `V1__Create_tenant_schema_tables.sql` - All tenant tables
-- `V2__Insert_master_data.sql` - Default categories, brands
+```yaml
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/easybilling
+    username: root
+    password: your_password
+    
+  jpa:
+    hibernate:
+      ddl-auto: update  # Auto-creates/updates tables in all schemas
+  
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    schemas: easybilling  # Only master schema uses Flyway
+```
+
+### Master Schema Setup
+
+1. Create master database:
+```sql
+CREATE DATABASE easybilling;
+```
+
+2. On application startup, Flyway runs migrations:
+   - `V1__Create_users_table.sql` - Global users table
+   - `V2__Create_tenants_table.sql` - Tenant registry
+
+### Tenant Schema Setup
+
+**Automatic via JPA/Hibernate:**
+- Tables are created automatically when a tenant schema is first accessed
+- All `@Entity` classes are scanned and their tables are created
+- `ddl-auto=update` ensures schema evolves with entity changes
+- No manual migration files needed for tenant schemas
+
+## Master Data
+
+Inserted **programmatically** after schema creation using prepared statements:
+
+### Default Categories (22 total)
+**Main Categories (8):**
+1. Electronics
+2. Clothing  
+3. Food & Beverages
+4. Home & Kitchen
+5. Health & Beauty
+6. Sports & Outdoors
+7. Books & Stationery
+8. Toys & Games
+
+**Sub-categories (14)** - Organized under parent categories:
+- Electronics: Mobile Phones, Laptops & Computers, Audio & Video, Smart Devices
+- Clothing: Men's, Women's, Kids, Footwear
+- Food & Beverages: Snacks, Beverages, Groceries, Dairy Products
+
+### Default Brands (2)
+1. Generic - For unbranded products
+2. House Brand - For store's own brand products
+
+### Data Insertion Security
+- ✅ Uses **prepared statements** (no SQL injection risk)
+- ✅ **Schema name validation** using regex: `^tenant_[a-z0-9_-]+$`
+- ✅ **Backtick escaping** for MySQL identifiers
+- ✅ **Duplicate prevention** using `ON DUPLICATE KEY UPDATE`
 
 ## Usage
 
@@ -136,11 +204,11 @@ POST /api/v1/tenants
 ```
 
 This will:
-1. Create tenant record
-2. Create schema `tenant_acme`
-3. Run all migrations
-4. Populate master data
-5. Return tenant details
+1. Create tenant record in master schema
+2. Create new database schema `tenant_acme`
+3. JPA automatically creates all tables on first access
+4. Insert default categories and brands
+5. Return tenant details with `status: "TRIAL"`
 
 ### Accessing Tenant Data
 
@@ -166,25 +234,28 @@ curl -H "X-Tenant-Id: acme" https://api.easybilling.com/api/v1/products
 - **Application Level**: TenantContext ensures correct schema selection
 - **Connection Level**: Hibernate switches schemas per connection
 
-## Migration Management
+## Schema Evolution
 
-### Adding New Tables
+### Adding New Entity/Table
 
-1. Create migration in `db/migration/tenant/V<N>__Description.sql`
-2. Run migration on existing tenants:
+1. Create new `@Entity` class in `com.easybilling.entity`
+2. Restart application or wait for next deployment
+3. **Automatic**: Hibernate creates the table in all schemas (master + tenant)
+4. No manual migration needed
 
-```java
-// Manual migration for existing tenants
-tenantRepository.findAll().forEach(tenant -> {
-    provisioningService.runMigrations(tenant.getSchemaName());
-});
-```
+### Modifying Existing Entity
 
-### Rolling Back
+1. Update entity class (add/remove fields)
+2. **Automatic**: Hibernate applies changes via `ddl-auto=update`
+3. **Limitation**: Cannot drop columns automatically (safety feature)
+4. For complex changes, manual ALTER statements may be needed
 
-Schema-level rollback requires manual intervention:
-1. Identify the schema
-2. Execute rollback SQL manually or via Flyway repair
+### Best Practices
+
+- Use `@Column(nullable = false)` for required fields
+- Define proper indexes with `@Index` in `@Table`
+- Use appropriate column lengths: `@Column(length = 255)`
+- Test schema changes on a test tenant first
 
 ## Troubleshooting
 
