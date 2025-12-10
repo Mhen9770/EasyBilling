@@ -9,8 +9,8 @@ spring:
   
   datasource:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/easybilling}
-    username: ${DATABASE_USERNAME:easybilling}
-    password: ${DATABASE_PASSWORD:password}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:root}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10

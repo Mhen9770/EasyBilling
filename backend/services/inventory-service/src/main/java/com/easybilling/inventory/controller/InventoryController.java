@@ -75,7 +75,10 @@ public class InventoryController {
             @PathVariable Long id,
             @RequestHeader("X-Tenant-Id") String tenantId) {
         inventoryService.deleteProduct(id, tenantId);
-        return ApiResponse.success("Product deleted successfully");
+        return ApiResponse.<Void>builder()
+                .success(true)
+                .message("Product deleted successfully")
+                .build();
     }
 
     // Category Management
@@ -131,6 +134,9 @@ public class InventoryController {
             @RequestHeader("X-Tenant-Id") String tenantId,
             @RequestHeader("X-User-Id") String userId) {
         inventoryService.recordStockMovement(request, tenantId, userId);
-        return ApiResponse.success("Stock movement recorded successfully");
+        return ApiResponse.<Void>builder()
+                .success(true)
+                .message("Stock movement recorded successfully")
+                .build();
     }
 }

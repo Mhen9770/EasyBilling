@@ -38,7 +38,7 @@ public class BillingService {
             boolean available = inventoryClient.checkStockAvailability(
                     itemReq.getProductId(), 
                     locationId, 
-                    itemReq.getQuantity(), 
+                    BigDecimal.valueOf(itemReq.getQuantity()), 
                     tenantId
             );
             if (!available) {
@@ -133,7 +133,7 @@ public class BillingService {
             inventoryClient.deductStock(
                     item.getProductId(),
                     locationId,
-                    item.getQuantity(),
+                    BigDecimal.valueOf(item.getQuantity()),
                     invoice.getInvoiceNumber(),
                     userId,
                     tenantId
@@ -266,7 +266,7 @@ public class BillingService {
             inventoryClient.reverseStockDeduction(
                     item.getProductId(),
                     locationId,
-                    item.getQuantity(),
+                    BigDecimal.valueOf(item.getQuantity()),
                     invoice.getInvoiceNumber(),
                     userId,
                     tenantId
@@ -300,7 +300,7 @@ public class BillingService {
                 inventoryClient.reverseStockDeduction(
                         item.getProductId(),
                         locationId,
-                        item.getQuantity(),
+                        BigDecimal.valueOf(item.getQuantity()),
                         invoice.getInvoiceNumber() + "-RTN",
                         userId,
                         tenantId

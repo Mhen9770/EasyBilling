@@ -42,7 +42,7 @@ public class Product {
     private Brand brand;
 
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal cost Price;
+    private BigDecimal costPrice;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal sellingPrice;

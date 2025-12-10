@@ -77,13 +77,11 @@ public class InventoryService {
                 .map(this::mapToProductResponse)
                 .collect(Collectors.toList());
 
-        return new PageResponse<>(
+        return PageResponse.of(
                 products,
                 page.getNumber(),
                 page.getSize(),
-                page.getTotalElements(),
-                page.getTotalPages(),
-                page.isLast()
+                page.getTotalElements()
         );
     }
 

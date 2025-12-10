@@ -10,7 +10,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,24 +18,22 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiResponse<Void>> handleResourceNotFoundException(ResourceNotFoundException ex) {
-        ErrorDetails error = new ErrorDetails(
-                LocalDateTime.now(),
-                ex.getMessage(),
-                "RESOURCE_NOT_FOUND"
-        );
+        ErrorDetails error = ErrorDetails.builder()
+                .code("RESOURCE_NOT_FOUND")
+                .message(ex.getMessage())
+                .build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse.error(error));
+                .body(ApiResponse.error(ex.getMessage(), error));
     }
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ApiResponse<Void>> handleValidationException(ValidationException ex) {
-        ErrorDetails error = new ErrorDetails(
-                LocalDateTime.now(),
-                ex.getMessage(),
-                "VALIDATION_ERROR"
-        );
+        ErrorDetails error = ErrorDetails.builder()
+                .code("VALIDATION_ERROR")
+                .message(ex.getMessage())
+                .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error(error));
+                .body(ApiResponse.error(ex.getMessage(), error));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -47,24 +44,23 @@ public class GlobalExceptionHandler {
                 errors.put(error.getField(), error.getDefaultMessage())
         );
 
-        ErrorDetails errorDetails = new ErrorDetails(
-                LocalDateTime.now(),
-                "Validation failed",
-                "VALIDATION_ERROR"
-        );
+        ErrorDetails errorDetails = ErrorDetails.builder()
+                .code("VALIDATION_ERROR")
+                .message("Validation failed")
+                .metadata(new HashMap<>(errors))
+                .build();
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error(errorDetails, errors));
+                .body(ApiResponse.error("Validation failed", errorDetails));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGenericException(Exception ex) {
-        ErrorDetails error = new ErrorDetails(
-                LocalDateTime.now(),
-                "An unexpected error occurred: " + ex.getMessage(),
-                "INTERNAL_SERVER_ERROR"
-        );
+        ErrorDetails error = ErrorDetails.builder()
+                .code("INTERNAL_SERVER_ERROR")
+                .message("An unexpected error occurred: " + ex.getMessage())
+                .build();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error(error));
+                .body(ApiResponse.error("An unexpected error occurred", error));
     }
 }

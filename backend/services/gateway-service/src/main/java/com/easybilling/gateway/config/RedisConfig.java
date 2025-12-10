@@ -13,7 +13,12 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
     
+    /**
+     * Use as the primary ReactiveRedisTemplate to avoid ambiguity with the auto-configured
+     * reactiveStringRedisTemplate.
+     */
     @Bean
+    @Primary
     public ReactiveRedisTemplate<String, String> reactiveRedisTemplate(
             ReactiveRedisConnectionFactory connectionFactory) {
         
