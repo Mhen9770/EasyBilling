@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,6 +88,64 @@ public class CustomerController {
             @RequestHeader("X-Tenant-Id") String tenantId) {
         log.info("Fetching customer by phone {} for tenant: {}", phone, tenantId);
         CustomerResponse response = customerService.getCustomerByPhone(phone, tenantId);
+        return ResponseEntity.ok(createSuccessResponse(response));
+    }
+    
+    @PostMapping("/{id}/purchase")
+    public ResponseEntity<Map<String, Object>> recordPurchase(
+            @PathVariable String id,
+            @RequestHeader("X-Tenant-Id") String tenantId,
+            @RequestParam BigDecimal amount) {
+        log.info("Recording purchase of {} for customer {} in tenant: {}", amount, id, tenantId);
+        CustomerResponse response = customerService.recordPurchase(id, tenantId, amount);
+        return ResponseEntity.ok(createSuccessResponse(response));
+    }
+    
+    @PostMapping("/{id}/wallet/add")
+    public ResponseEntity<Map<String, Object>> addToWallet(
+            @PathVariable String id,
+            @RequestHeader("X-Tenant-Id") String tenantId,
+            @RequestParam BigDecimal amount) {
+        log.info("Adding {} to wallet for customer {} in tenant: {}", amount, id, tenantId);
+        CustomerResponse response = customerService.addToWallet(id, tenantId, amount);
+        return ResponseEntity.ok(createSuccessResponse(response));
+    }
+    
+    @PostMapping("/{id}/wallet/deduct")
+    public ResponseEntity<Map<String, Object>> deductFromWallet(
+            @PathVariable String id,
+            @RequestHeader("X-Tenant-Id") String tenantId,
+            @RequestParam BigDecimal amount) {
+        log.info("Deducting {} from wallet for customer {} in tenant: {}", amount, id, tenantId);
+        CustomerResponse response = customerService.deductFromWallet(id, tenantId, amount);
+        return ResponseEntity.ok(createSuccessResponse(response));
+    }
+    
+    @PostMapping("/{id}/loyalty/redeem")
+    public ResponseEntity<Map<String, Object>> redeemLoyaltyPoints(
+            @PathVariable String id,
+            @RequestHeader("X-Tenant-Id") String tenantId,
+            @RequestParam int points) {
+        log.info("Redeeming {} loyalty points for customer {} in tenant: {}", points, id, tenantId);
+        CustomerResponse response = customerService.redeemLoyaltyPoints(id, tenantId, points);
+        return ResponseEntity.ok(createSuccessResponse(response));
+    }
+    
+    @PostMapping("/{id}/deactivate")
+    public ResponseEntity<Map<String, Object>> deactivateCustomer(
+            @PathVariable String id,
+            @RequestHeader("X-Tenant-Id") String tenantId) {
+        log.info("Deactivating customer {} for tenant: {}", id, tenantId);
+        CustomerResponse response = customerService.deactivateCustomer(id, tenantId);
+        return ResponseEntity.ok(createSuccessResponse(response));
+    }
+    
+    @PostMapping("/{id}/reactivate")
+    public ResponseEntity<Map<String, Object>> reactivateCustomer(
+            @PathVariable String id,
+            @RequestHeader("X-Tenant-Id") String tenantId) {
+        log.info("Reactivating customer {} for tenant: {}", id, tenantId);
+        CustomerResponse response = customerService.reactivateCustomer(id, tenantId);
         return ResponseEntity.ok(createSuccessResponse(response));
     }
     

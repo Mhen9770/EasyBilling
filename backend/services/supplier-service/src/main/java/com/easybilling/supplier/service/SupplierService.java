@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -101,6 +102,135 @@ public class SupplierService {
         Supplier supplier = supplierRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new RuntimeException("Supplier not found"));
         supplierRepository.delete(supplier);
+    }
+    
+    // Business Logic Methods
+    
+    /**
+     * Record a purchase from supplier
+     */
+    public SupplierResponse recordPurchase(String supplierId, String tenantId, BigDecimal amount, boolean isPaid) {
+        log.info("Recording purchase of {} from supplier {} in tenant {}", amount, supplierId, tenantId);
+        
+        Supplier supplier = supplierRepository.findByIdAndTenantId(supplierId, tenantId)
+                .orElseThrow(() -> new RuntimeException("Supplier not found"));
+        
+        // Update total purchases
+        supplier.setTotalPurchases(supplier.getTotalPurchases().add(amount));
+        supplier.setPurchaseCount(supplier.getPurchaseCount() + 1);
+        supplier.setLastPurchaseDate(LocalDateTime.now());
+        
+        // Update outstanding balance if not paid
+        if (!isPaid) {
+            supplier.setOutstandingBalance(supplier.getOutstandingBalance().add(amount));
+        }
+        
+        Supplier updated = supplierRepository.save(supplier);
+        log.info("Supplier {} purchase recorded. Total purchases: {}, Outstanding: {}", 
+                supplierId, updated.getTotalPurchases(), updated.getOutstandingBalance());
+        
+        return mapToResponse(updated);
+    }
+    
+    /**
+     * Record payment to supplier
+     */
+    public SupplierResponse recordPayment(String supplierId, String tenantId, BigDecimal amount) {
+        log.info("Recording payment of {} to supplier {} in tenant {}", amount, supplierId, tenantId);
+        
+        Supplier supplier = supplierRepository.findByIdAndTenantId(supplierId, tenantId)
+                .orElseThrow(() -> new RuntimeException("Supplier not found"));
+        
+        if (supplier.getOutstandingBalance().compareTo(amount) < 0) {
+            throw new RuntimeException("Payment amount exceeds outstanding balance");
+        }
+        
+        supplier.setOutstandingBalance(supplier.getOutstandingBalance().subtract(amount));
+        
+        Supplier updated = supplierRepository.save(supplier);
+        log.info("Payment recorded for supplier {}. New outstanding balance: {}", 
+                supplierId, updated.getOutstandingBalance());
+        
+        return mapToResponse(updated);
+    }
+    
+    /**
+     * Calculate payment due date based on credit days
+     */
+    public LocalDateTime calculateDueDate(String supplierId, String tenantId) {
+        Supplier supplier = supplierRepository.findByIdAndTenantId(supplierId, tenantId)
+                .orElseThrow(() -> new RuntimeException("Supplier not found"));
+        
+        if (supplier.getLastPurchaseDate() == null) {
+            return LocalDateTime.now().plusDays(supplier.getCreditDays());
+        }
+        
+        return supplier.getLastPurchaseDate().plusDays(supplier.getCreditDays());
+    }
+    
+    /**
+     * Check if payment is overdue
+     */
+    public boolean isPaymentOverdue(String supplierId, String tenantId) {
+        LocalDateTime dueDate = calculateDueDate(supplierId, tenantId);
+        return LocalDateTime.now().isAfter(dueDate);
+    }
+    
+    /**
+     * Get suppliers with outstanding balance
+     */
+    @Transactional(readOnly = true)
+    public Page<SupplierResponse> getSuppliersWithOutstanding(String tenantId, Pageable pageable) {
+        // This would need a repository method
+        return supplierRepository.findByTenantId(tenantId, pageable)
+                .map(this::mapToResponse)
+                .map(supplier -> {
+                    if (supplier.getOutstandingBalance().compareTo(BigDecimal.ZERO) > 0) {
+                        return supplier;
+                    }
+                    return null;
+                });
+    }
+    
+    /**
+     * Deactivate supplier
+     */
+    public SupplierResponse deactivateSupplier(String supplierId, String tenantId) {
+        Supplier supplier = supplierRepository.findByIdAndTenantId(supplierId, tenantId)
+                .orElseThrow(() -> new RuntimeException("Supplier not found"));
+        
+        supplier.setActive(false);
+        Supplier updated = supplierRepository.save(supplier);
+        
+        return mapToResponse(updated);
+    }
+    
+    /**
+     * Reactivate supplier
+     */
+    public SupplierResponse reactivateSupplier(String supplierId, String tenantId) {
+        Supplier supplier = supplierRepository.findByIdAndTenantId(supplierId, tenantId)
+                .orElseThrow(() -> new RuntimeException("Supplier not found"));
+        
+        supplier.setActive(true);
+        Supplier updated = supplierRepository.save(supplier);
+        
+        return mapToResponse(updated);
+    }
+    
+    /**
+     * Update credit terms
+     */
+    public SupplierResponse updateCreditTerms(String supplierId, String tenantId, int creditDays) {
+        log.info("Updating credit terms to {} days for supplier {} in tenant {}", creditDays, supplierId, tenantId);
+        
+        Supplier supplier = supplierRepository.findByIdAndTenantId(supplierId, tenantId)
+                .orElseThrow(() -> new RuntimeException("Supplier not found"));
+        
+        supplier.setCreditDays(creditDays);
+        Supplier updated = supplierRepository.save(supplier);
+        
+        return mapToResponse(updated);
     }
     
     private SupplierResponse mapToResponse(Supplier supplier) {
