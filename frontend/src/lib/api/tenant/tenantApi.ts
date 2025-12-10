@@ -41,7 +41,7 @@ export interface TenantResponse {
 export const tenantApi = {
   createTenant: async (data: TenantRequest): Promise<ApiResponse<TenantResponse>> => {
     const response = await apiClient.post<ApiResponse<TenantResponse>>(
-      '/tenant-service/api/v1/tenants',
+      '/api/v1/tenants',
       data
     );
     return response.data;
@@ -49,14 +49,14 @@ export const tenantApi = {
 
   getTenant: async (id: string): Promise<ApiResponse<TenantResponse>> => {
     const response = await apiClient.get<ApiResponse<TenantResponse>>(
-      `/tenant-service/api/v1/tenants/${id}`
+      `/api/v1/tenants/${id}`
     );
     return response.data;
   },
 
   updateTenant: async (id: string, data: Partial<TenantRequest>): Promise<ApiResponse<TenantResponse>> => {
     const response = await apiClient.put<ApiResponse<TenantResponse>>(
-      `/tenant-service/api/v1/tenants/${id}`,
+      `/api/v1/tenants/${id}`,
       data
     );
     return response.data;
@@ -64,7 +64,7 @@ export const tenantApi = {
 
   getCurrentTenant: async (): Promise<ApiResponse<TenantResponse>> => {
     const response = await apiClient.get<ApiResponse<TenantResponse>>(
-      '/tenant-service/api/v1/tenants/current'
+      '/api/v1/tenants/current'
     );
     return response.data;
   },

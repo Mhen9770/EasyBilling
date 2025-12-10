@@ -69,7 +69,7 @@ export type ReportResponse = SalesReportResponse | InventoryReportResponse | Rec
 export const reportsApi = {
   generateReport: async (request: ReportRequest): Promise<ApiResponse<ReportResponse>> => {
     const response = await apiClient.post<ApiResponse<ReportResponse>>(
-      '/reports-service/api/v1/reports/generate',
+      '/api/v1/reports/generate',
       request
     );
     return response.data;
@@ -77,7 +77,7 @@ export const reportsApi = {
 
   getReportTypes: async (): Promise<ApiResponse<ReportType[]>> => {
     const response = await apiClient.get<ApiResponse<ReportType[]>>(
-      '/reports-service/api/v1/reports/types'
+      '/api/v1/reports/types'
     );
     return response.data;
   },

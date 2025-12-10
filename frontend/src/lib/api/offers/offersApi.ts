@@ -59,7 +59,7 @@ export const offersApi = {
   // CRUD operations
   createOffer: async (data: OfferRequest): Promise<ApiResponse<OfferResponse>> => {
     const response = await apiClient.post<ApiResponse<OfferResponse>>(
-      '/offers-service/api/v1/offers',
+      '/api/v1/offers',
       data
     );
     return response.data;
@@ -67,7 +67,7 @@ export const offersApi = {
 
   listOffers: async (page = 0, size = 20): Promise<ApiResponse<PageResponse<OfferResponse>>> => {
     const response = await apiClient.get<ApiResponse<PageResponse<OfferResponse>>>(
-      '/offers-service/api/v1/offers',
+      '/api/v1/offers',
       { params: { page, size } }
     );
     return response.data;
@@ -75,21 +75,21 @@ export const offersApi = {
 
   getActiveOffers: async (): Promise<ApiResponse<OfferResponse[]>> => {
     const response = await apiClient.get<ApiResponse<OfferResponse[]>>(
-      '/offers-service/api/v1/offers/active'
+      '/api/v1/offers/active'
     );
     return response.data;
   },
 
   getOffer: async (id: string): Promise<ApiResponse<OfferResponse>> => {
     const response = await apiClient.get<ApiResponse<OfferResponse>>(
-      `/offers-service/api/v1/offers/${id}`
+      `/api/v1/offers/${id}`
     );
     return response.data;
   },
 
   updateOffer: async (id: string, data: OfferRequest): Promise<ApiResponse<OfferResponse>> => {
     const response = await apiClient.put<ApiResponse<OfferResponse>>(
-      `/offers-service/api/v1/offers/${id}`,
+      `/api/v1/offers/${id}`,
       data
     );
     return response.data;
@@ -97,7 +97,7 @@ export const offersApi = {
 
   deleteOffer: async (id: string): Promise<ApiResponse<void>> => {
     const response = await apiClient.delete<ApiResponse<void>>(
-      `/offers-service/api/v1/offers/${id}`
+      `/api/v1/offers/${id}`
     );
     return response.data;
   },
@@ -105,14 +105,14 @@ export const offersApi = {
   // Offer lifecycle operations
   activateOffer: async (id: string): Promise<ApiResponse<OfferResponse>> => {
     const response = await apiClient.post<ApiResponse<OfferResponse>>(
-      `/offers-service/api/v1/offers/${id}/activate`
+      `/api/v1/offers/${id}/activate`
     );
     return response.data;
   },
 
   pauseOffer: async (id: string): Promise<ApiResponse<OfferResponse>> => {
     const response = await apiClient.post<ApiResponse<OfferResponse>>(
-      `/offers-service/api/v1/offers/${id}/pause`
+      `/api/v1/offers/${id}/pause`
     );
     return response.data;
   },
@@ -123,7 +123,7 @@ export const offersApi = {
     request: DiscountCalculationRequest
   ): Promise<ApiResponse<DiscountCalculationResponse>> => {
     const response = await apiClient.post<ApiResponse<DiscountCalculationResponse>>(
-      `/offers-service/api/v1/offers/${id}/calculate-discount`,
+      `/api/v1/offers/${id}/calculate-discount`,
       request
     );
     return response.data;
@@ -134,7 +134,7 @@ export const offersApi = {
     request: DiscountCalculationRequest
   ): Promise<ApiResponse<DiscountCalculationResponse>> => {
     const response = await apiClient.post<ApiResponse<DiscountCalculationResponse>>(
-      `/offers-service/api/v1/offers/${id}/apply`,
+      `/api/v1/offers/${id}/apply`,
       request
     );
     return response.data;
@@ -142,7 +142,7 @@ export const offersApi = {
 
   getApplicableOffers: async (request: DiscountCalculationRequest): Promise<ApiResponse<OfferResponse[]>> => {
     const response = await apiClient.post<ApiResponse<OfferResponse[]>>(
-      '/offers-service/api/v1/offers/applicable',
+      '/api/v1/offers/applicable',
       request
     );
     return response.data;
@@ -152,7 +152,7 @@ export const offersApi = {
     request: DiscountCalculationRequest
   ): Promise<ApiResponse<DiscountCalculationResponse[]>> => {
     const response = await apiClient.post<ApiResponse<DiscountCalculationResponse[]>>(
-      '/offers-service/api/v1/offers/best-combination',
+      '/api/v1/offers/best-combination',
       request
     );
     return response.data;

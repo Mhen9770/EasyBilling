@@ -63,9 +63,10 @@ const navigationItems: NavItem[] = [
 interface SidebarProps {
   collapsed: boolean;
   onToggle: () => void;
+  isMobile?: boolean;
 }
 
-export function Sidebar({ collapsed, onToggle }: SidebarProps) {
+export function Sidebar({ collapsed, onToggle, isMobile = false }: SidebarProps) {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>(['/inventory']);
 
@@ -80,11 +81,21 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   };
 
   return (
-    <aside
-      className={`${
-        collapsed ? 'w-20' : 'w-64'
-      } bg-gradient-to-b from-blue-900 to-blue-800 text-white transition-all duration-300 flex flex-col h-full fixed left-0 top-0 z-40`}
-    >
+    <>
+      {/* Mobile Overlay */}
+      {isMobile && !collapsed && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+          onClick={onToggle}
+        />
+      )}
+      <aside
+        className={`${
+          collapsed ? 'w-16 sm:w-20' : 'w-64'
+        } ${
+          isMobile && collapsed ? '-translate-x-full' : 'translate-x-0'
+        } bg-gradient-to-b from-blue-900 to-blue-800 text-white transition-all duration-300 flex flex-col h-full fixed left-0 top-0 z-40 lg:translate-x-0`}
+      >
       {/* Header */}
       <div className="p-4 border-b border-blue-700">
         <div className="flex items-center justify-between">
@@ -161,17 +172,20 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         </ul>
       </nav>
 
-      {/* Toggle Button */}
-      <div className="p-4 border-t border-blue-700">
-        <button
-          onClick={onToggle}
-          className="w-full px-3 py-2 bg-blue-700 hover:bg-blue-600 rounded-lg transition-colors flex items-center justify-center space-x-2"
-          title={collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-        >
-          <span className="text-lg">{collapsed ? '▶' : '◀'}</span>
-          {!collapsed && <span className="text-sm">Collapse</span>}
-        </button>
-      </div>
+      {/* Toggle Button - Hidden on mobile */}
+      {!isMobile && (
+        <div className="p-4 border-t border-blue-700">
+          <button
+            onClick={onToggle}
+            className="w-full px-3 py-2 bg-blue-700 hover:bg-blue-600 rounded-lg transition-colors flex items-center justify-center space-x-2"
+            title={collapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+          >
+            <span className="text-lg">{collapsed ? '▶' : '◀'}</span>
+            {!collapsed && <span className="text-sm">Collapse</span>}
+          </button>
+        </div>
+      )}
     </aside>
+    </>
   );
 }

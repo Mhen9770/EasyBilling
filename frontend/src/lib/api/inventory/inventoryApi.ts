@@ -2,22 +2,27 @@ import apiClient from '../client';
 import { ApiResponse, PageResponse } from '../types';
 
 export interface ProductResponse {
-  id: string;
+  id: string | number;
   name: string;
   description?: string;
   sku: string;
   barcode?: string;
-  categoryId?: string;
-  categoryName?: string;
-  brandId?: string;
-  brandName?: string;
-  basePrice: number;
+  category?: any;
+  brand?: any;
+  costPrice?: number;
   sellingPrice: number;
+  mrp?: number;
   taxRate: number;
   unit: string;
-  lowStockThreshold: number;
-  active: boolean;
-  createdAt: string;
+  isActive?: boolean;
+  trackStock?: boolean;
+  lowStockThreshold?: number;
+  imageUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  // Legacy fields for backward compatibility
+  basePrice?: number;
+  active?: boolean;
 }
 
 export interface StockResponse {
@@ -55,13 +60,14 @@ export interface ProductRequest {
   barcode?: string;
   categoryId?: string;
   brandId?: string;
-  price?: number;
-  cost?: number;
-  basePrice?: number;
-  sellingPrice?: number;
-  taxRate: number;
+  costPrice: number;
+  sellingPrice: number;
+  mrp: number;
+  taxRate?: number;
   unit: string;
+  trackStock?: boolean;
   lowStockThreshold?: number;
+  imageUrl?: string;
 }
 
 export interface CategoryRequest {
@@ -90,7 +96,7 @@ export const inventoryApi = {
   // Product management
   createProduct: async (data: ProductRequest): Promise<ApiResponse<ProductResponse>> => {
     const response = await apiClient.post<ApiResponse<ProductResponse>>(
-      '/inventory-service/api/v1/products',
+      '/api/v1/products',
       data
     );
     return response.data;
@@ -98,7 +104,7 @@ export const inventoryApi = {
 
   listProducts: async (page = 0, size = 20): Promise<ApiResponse<PageResponse<ProductResponse>>> => {
     const response = await apiClient.get<ApiResponse<PageResponse<ProductResponse>>>(
-      '/inventory-service/api/v1/products',
+      '/api/v1/products',
       { params: { page, size } }
     );
     return response.data;
@@ -106,21 +112,21 @@ export const inventoryApi = {
 
   getProduct: async (id: string): Promise<ApiResponse<ProductResponse>> => {
     const response = await apiClient.get<ApiResponse<ProductResponse>>(
-      `/inventory-service/api/v1/products/${id}`
+      `/api/v1/products/${id}`
     );
     return response.data;
   },
 
   findByBarcode: async (barcode: string): Promise<ApiResponse<ProductResponse>> => {
     const response = await apiClient.get<ApiResponse<ProductResponse>>(
-      `/inventory-service/api/v1/products/barcode/${barcode}`
+      `/api/v1/products/barcode/${barcode}`
     );
     return response.data;
   },
 
   updateProduct: async (id: string, data: ProductRequest): Promise<ApiResponse<ProductResponse>> => {
     const response = await apiClient.put<ApiResponse<ProductResponse>>(
-      `/inventory-service/api/v1/products/${id}`,
+      `/api/v1/products/${id}`,
       data
     );
     return response.data;
@@ -128,7 +134,7 @@ export const inventoryApi = {
 
   deleteProduct: async (id: string): Promise<ApiResponse<void>> => {
     const response = await apiClient.delete<ApiResponse<void>>(
-      `/inventory-service/api/v1/products/${id}`
+      `/api/v1/products/${id}`
     );
     return response.data;
   },
@@ -136,7 +142,7 @@ export const inventoryApi = {
   // Stock management
   getStock: async (productId: string): Promise<ApiResponse<StockResponse>> => {
     const response = await apiClient.get<ApiResponse<StockResponse>>(
-      `/inventory-service/api/v1/stock/product/${productId}`
+      `/api/v1/stock/product/${productId}`
     );
     return response.data;
   },
@@ -144,7 +150,7 @@ export const inventoryApi = {
   // Categories
   listCategories: async (): Promise<ApiResponse<CategoryResponse[]>> => {
     const response = await apiClient.get<ApiResponse<CategoryResponse[]>>(
-      '/inventory-service/api/v1/categories'
+      '/api/v1/categories'
     );
     return response.data;
   },
@@ -152,7 +158,7 @@ export const inventoryApi = {
   // Categories
   createCategory: async (data: CategoryRequest): Promise<ApiResponse<CategoryResponse>> => {
     const response = await apiClient.post<ApiResponse<CategoryResponse>>(
-      '/inventory-service/api/v1/categories',
+      '/api/v1/categories',
       data
     );
     return response.data;
@@ -162,10 +168,25 @@ export const inventoryApi = {
     return inventoryApi.listCategories();
   },
 
+  updateCategory: async (id: string, data: CategoryRequest): Promise<ApiResponse<CategoryResponse>> => {
+    const response = await apiClient.put<ApiResponse<CategoryResponse>>(
+      `/api/v1/categories/${id}`,
+      data
+    );
+    return response.data;
+  },
+
+  deleteCategory: async (id: string): Promise<ApiResponse<void>> => {
+    const response = await apiClient.delete<ApiResponse<void>>(
+      `/api/v1/categories/${id}`
+    );
+    return response.data;
+  },
+
   // Brands
   listBrands: async (): Promise<ApiResponse<BrandResponse[]>> => {
     const response = await apiClient.get<ApiResponse<BrandResponse[]>>(
-      '/inventory-service/api/v1/brands'
+      '/api/v1/brands'
     );
     return response.data;
   },
@@ -176,8 +197,23 @@ export const inventoryApi = {
 
   createBrand: async (data: BrandRequest): Promise<ApiResponse<BrandResponse>> => {
     const response = await apiClient.post<ApiResponse<BrandResponse>>(
-      '/inventory-service/api/v1/brands',
+      '/api/v1/brands',
       data
+    );
+    return response.data;
+  },
+
+  updateBrand: async (id: string, data: BrandRequest): Promise<ApiResponse<BrandResponse>> => {
+    const response = await apiClient.put<ApiResponse<BrandResponse>>(
+      `/api/v1/brands/${id}`,
+      data
+    );
+    return response.data;
+  },
+
+  deleteBrand: async (id: string): Promise<ApiResponse<void>> => {
+    const response = await apiClient.delete<ApiResponse<void>>(
+      `/api/v1/brands/${id}`
     );
     return response.data;
   },
@@ -185,7 +221,7 @@ export const inventoryApi = {
   // Stock movements
   recordStockMovement: async (data: StockMovementRequest): Promise<ApiResponse<void>> => {
     const response = await apiClient.post<ApiResponse<void>>(
-      '/inventory-service/api/v1/stock/movements',
+      '/api/v1/stock/movements',
       data
     );
     return response.data;
@@ -194,5 +230,19 @@ export const inventoryApi = {
   // Products with pagination
   getProducts: async (params: { page: number; size: number }): Promise<ApiResponse<PageResponse<ProductResponse>>> => {
     return inventoryApi.listProducts(params.page, params.size);
+  },
+
+  // Advanced features
+  getStockSummary: async (): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>('/api/v1/inventory/dashboard');
+    return response.data;
+  },
+
+  getLowStockAlerts: async (locationId?: string): Promise<ApiResponse<StockResponse[]>> => {
+    const response = await apiClient.get<ApiResponse<StockResponse[]>>(
+      '/api/v1/stock/low-stock-alerts',
+      { params: locationId ? { locationId } : {} }
+    );
+    return response.data;
   },
 };

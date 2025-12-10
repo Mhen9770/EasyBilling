@@ -74,14 +74,25 @@ export const usePOSStore = create<POSState>()(
         }
       },
 
-      updateCartItem: (productId, quantity) => {
+      updateCartItem: (productId, itemOrQuantity) => {
         const cart = get().cart;
-        if (quantity <= 0) {
-          set({ cart: cart.filter((item) => item.productId !== productId) });
+        if (typeof itemOrQuantity === 'number') {
+          // Legacy: quantity only
+          const quantity = itemOrQuantity;
+          if (quantity <= 0) {
+            set({ cart: cart.filter((item) => item.productId !== productId) });
+          } else {
+            set({
+              cart: cart.map((item) =>
+                item.productId === productId ? { ...item, quantity } : item
+              ),
+            });
+          }
         } else {
+          // New: full item update
           set({
             cart: cart.map((item) =>
-              item.productId === productId ? { ...item, quantity } : item
+              item.productId === productId ? itemOrQuantity : item
             ),
           });
         }

@@ -4,11 +4,13 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { inventoryApi } from '@/lib/api/inventory/inventoryApi';
 import type { StockMovementRequest } from '@/lib/api/types';
+import { useToastStore } from '@/components/ui/toast';
 
 export default function StockPage() {
   const [selectedProduct, setSelectedProduct] = useState<string>('');
   const [isMovementModalOpen, setIsMovementModalOpen] = useState(false);
   const queryClient = useQueryClient();
+  const { addToast } = useToastStore();
 
   const { data: products } = useQuery({
     queryKey: ['products'],
@@ -26,6 +28,10 @@ export default function StockPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stock'] });
       setIsMovementModalOpen(false);
+      addToast('Stock movement recorded successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.response?.data?.message || 'Failed to record stock movement', 'error');
     },
   });
 

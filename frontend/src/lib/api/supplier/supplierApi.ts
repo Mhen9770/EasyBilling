@@ -46,7 +46,7 @@ export const supplierApi = {
   // CRUD operations
   createSupplier: async (data: SupplierRequest): Promise<ApiResponse<SupplierResponse>> => {
     const response = await apiClient.post<ApiResponse<SupplierResponse>>(
-      '/supplier-service/api/v1/suppliers',
+      '/api/v1/suppliers',
       data
     );
     return response.data;
@@ -54,7 +54,7 @@ export const supplierApi = {
 
   listSuppliers: async (page = 0, size = 20, search?: string): Promise<ApiResponse<PageResponse<SupplierResponse>>> => {
     const response = await apiClient.get<ApiResponse<PageResponse<SupplierResponse>>>(
-      '/supplier-service/api/v1/suppliers',
+      '/api/v1/suppliers',
       { params: { page, size, search } }
     );
     return response.data;
@@ -62,14 +62,14 @@ export const supplierApi = {
 
   getSupplier: async (id: string): Promise<ApiResponse<SupplierResponse>> => {
     const response = await apiClient.get<ApiResponse<SupplierResponse>>(
-      `/supplier-service/api/v1/suppliers/${id}`
+      `/api/v1/suppliers/${id}`
     );
     return response.data;
   },
 
   updateSupplier: async (id: string, data: SupplierRequest): Promise<ApiResponse<SupplierResponse>> => {
     const response = await apiClient.put<ApiResponse<SupplierResponse>>(
-      `/supplier-service/api/v1/suppliers/${id}`,
+      `/api/v1/suppliers/${id}`,
       data
     );
     return response.data;
@@ -77,7 +77,7 @@ export const supplierApi = {
 
   deleteSupplier: async (id: string): Promise<ApiResponse<void>> => {
     const response = await apiClient.delete<ApiResponse<void>>(
-      `/supplier-service/api/v1/suppliers/${id}`
+      `/api/v1/suppliers/${id}`
     );
     return response.data;
   },
@@ -85,7 +85,7 @@ export const supplierApi = {
   // Business logic operations
   recordPurchase: async (id: string, amount: number, isPaid = false): Promise<ApiResponse<SupplierResponse>> => {
     const response = await apiClient.post<ApiResponse<SupplierResponse>>(
-      `/supplier-service/api/v1/suppliers/${id}/purchase`,
+      `/api/v1/suppliers/${id}/purchase`,
       null,
       { params: { amount, isPaid } }
     );
@@ -94,7 +94,7 @@ export const supplierApi = {
 
   recordPayment: async (id: string, amount: number): Promise<ApiResponse<SupplierResponse>> => {
     const response = await apiClient.post<ApiResponse<SupplierResponse>>(
-      `/supplier-service/api/v1/suppliers/${id}/payment`,
+      `/api/v1/suppliers/${id}/payment`,
       null,
       { params: { amount } }
     );
@@ -103,7 +103,7 @@ export const supplierApi = {
 
   updateCreditTerms: async (id: string, creditDays: number): Promise<ApiResponse<SupplierResponse>> => {
     const response = await apiClient.put<ApiResponse<SupplierResponse>>(
-      `/supplier-service/api/v1/suppliers/${id}/credit-terms`,
+      `/api/v1/suppliers/${id}/credit-terms`,
       null,
       { params: { creditDays } }
     );
@@ -112,14 +112,14 @@ export const supplierApi = {
 
   deactivateSupplier: async (id: string): Promise<ApiResponse<SupplierResponse>> => {
     const response = await apiClient.post<ApiResponse<SupplierResponse>>(
-      `/supplier-service/api/v1/suppliers/${id}/deactivate`
+      `/api/v1/suppliers/${id}/deactivate`
     );
     return response.data;
   },
 
   reactivateSupplier: async (id: string): Promise<ApiResponse<SupplierResponse>> => {
     const response = await apiClient.post<ApiResponse<SupplierResponse>>(
-      `/supplier-service/api/v1/suppliers/${id}/reactivate`
+      `/api/v1/suppliers/${id}/reactivate`
     );
     return response.data;
   },

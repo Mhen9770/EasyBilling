@@ -14,7 +14,30 @@ export interface RegisterRequest {
   firstName?: string;
   lastName?: string;
   phone?: string;
-  tenantId: string;
+  tenantId?: string; // Optional for onboarding, required for regular registration
+}
+
+export interface OnboardRequest {
+  // Tenant information
+  tenantName: string;
+  businessName: string;
+  businessType?: string;
+  tenantEmail: string;
+  tenantPhone: string;
+  // Admin user information
+  adminUsername: string;
+  adminEmail: string;
+  adminPassword: string;
+  adminFirstName?: string;
+  adminLastName?: string;
+  adminPhone?: string;
+  // Optional business details
+  address?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  country?: string;
+  gstin?: string;
 }
 
 export interface UserInfo {
@@ -71,18 +94,31 @@ export const authApi = {
    */
   async login(data: LoginRequest): Promise<LoginResponse> {
     const response = await apiClient.post<ApiResponse<LoginResponse>>(
-      '/auth-service/api/v1/auth/login',
+      '/api/v1/auth/login',
       data
     );
     return response.data.data!;
   },
 
   /**
-   * Register new user
+   * Tenant self-service onboarding
+   * Creates a new tenant and admin user in one step
+   */
+  async onboard(data: OnboardRequest): Promise<LoginResponse> {
+    const response = await apiClient.post<ApiResponse<LoginResponse>>(
+      '/api/v1/auth/onboard',
+      data
+    );
+    return response.data.data!;
+  },
+
+  /**
+   * Register new user (requires authentication - admin only)
+   * Adds a user to an existing tenant
    */
   async register(data: RegisterRequest): Promise<LoginResponse> {
     const response = await apiClient.post<ApiResponse<LoginResponse>>(
-      '/auth-service/api/v1/auth/register',
+      '/api/v1/auth/register',
       data
     );
     return response.data.data!;
@@ -93,7 +129,7 @@ export const authApi = {
    */
   async refreshToken(refreshToken: string): Promise<LoginResponse> {
     const response = await apiClient.post<ApiResponse<LoginResponse>>(
-      '/auth-service/api/v1/auth/refresh',
+      '/api/v1/auth/refresh',
       { refreshToken }
     );
     return response.data.data!;
@@ -103,7 +139,7 @@ export const authApi = {
    * Logout user
    */
   async logout(): Promise<void> {
-    await apiClient.post('/auth-service/api/v1/auth/logout');
+    await apiClient.post('/api/v1/auth/logout');
   },
 
   /**
@@ -111,7 +147,7 @@ export const authApi = {
    */
   async getCurrentUser(userId: string): Promise<UserProfile> {
     const response = await apiClient.get<ApiResponse<UserProfile>>(
-      '/auth-service/api/v1/users/me',
+      '/api/v1/users/me',
       {
         headers: { 'X-User-Id': userId }
       }
@@ -124,7 +160,7 @@ export const authApi = {
    */
   async updateProfile(userId: string, data: UpdateProfileRequest): Promise<UserProfile> {
     const response = await apiClient.put<ApiResponse<UserProfile>>(
-      '/auth-service/api/v1/users/me',
+      '/api/v1/users/me',
       data,
       {
         headers: { 'X-User-Id': userId }
@@ -138,7 +174,7 @@ export const authApi = {
    */
   async changePassword(userId: string, data: ChangePasswordRequest): Promise<void> {
     await apiClient.post(
-      '/auth-service/api/v1/users/me/change-password',
+      '/api/v1/users/me/change-password',
       data,
       {
         headers: { 'X-User-Id': userId }
@@ -150,6 +186,6 @@ export const authApi = {
    * Request password reset
    */
   async requestPasswordReset(email: string): Promise<void> {
-    await apiClient.post('/auth-service/api/v1/users/reset-password', { email });
+    await apiClient.post('/api/v1/users/reset-password', { email });
   },
 };

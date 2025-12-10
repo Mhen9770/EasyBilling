@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
+import { ToastContainer } from "@/components/ui/toast";
 
 export const metadata: Metadata = {
   title: "EasyBilling - Multi-Tenant Billing Platform",
@@ -13,10 +14,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased">
+    <html lang="en" className="h-full">
+      <body className="antialiased h-full w-full overflow-x-hidden">
         <Providers>
-          {children}
+          <div className="h-full w-full">
+            {children}
+          </div>
+          <ToastContainer />
         </Providers>
       </body>
     </html>

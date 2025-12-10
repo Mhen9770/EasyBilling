@@ -1,0 +1,15 @@
+package com.easybilling.repository;
+
+import com.easybilling.entity.StockMovement;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface StockMovementRepository extends JpaRepository<StockMovement, Long> {
+    List<StockMovement> findByProductIdAndTenantIdOrderByCreatedAtDesc(Long productId, String tenantId);
+    Page<StockMovement> findByTenantIdOrderByCreatedAtDesc(String tenantId, Pageable pageable);
+}
