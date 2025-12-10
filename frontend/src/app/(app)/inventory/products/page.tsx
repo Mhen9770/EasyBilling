@@ -4,12 +4,14 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { inventoryApi } from '@/lib/api/inventory/inventoryApi';
 import type { ProductRequest } from '@/lib/api/types';
+import { useToastStore } from '@/components/ui/toast';
 
 export default function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any>(null);
   const queryClient = useQueryClient();
+  const { addToast } = useToastStore();
 
   const { data: products, isLoading } = useQuery({
     queryKey: ['products', searchTerm],
@@ -31,6 +33,10 @@ export default function ProductsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       setIsCreateModalOpen(false);
+      addToast('Product created successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.response?.data?.message || 'Failed to create product', 'error');
     },
   });
 
@@ -40,6 +46,10 @@ export default function ProductsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       setEditingProduct(null);
+      addToast('Product updated successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.response?.data?.message || 'Failed to update product', 'error');
     },
   });
 
@@ -47,6 +57,10 @@ export default function ProductsPage() {
     mutationFn: (id: string) => inventoryApi.deleteProduct(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
+      addToast('Product deleted successfully', 'success');
+    },
+    onError: (error: any) => {
+      addToast(error?.response?.data?.message || 'Failed to delete product', 'error');
     },
   });
 
