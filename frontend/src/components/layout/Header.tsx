@@ -5,7 +5,12 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 
-export function Header() {
+interface HeaderProps {
+  onMenuClick?: () => void;
+  isMobile?: boolean;
+}
+
+export function Header({ onMenuClick, isMobile = false }: HeaderProps) {
   const { user, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -28,16 +33,29 @@ export function Header() {
   const breadcrumbs = getBreadcrumbs();
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
-      <div className="px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex items-center justify-between">
+    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-30">
+      <div className="px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
+        <div className="flex items-center justify-between gap-2 sm:gap-4">
+          {/* Mobile Menu Button */}
+          {isMobile && onMenuClick && (
+            <button
+              onClick={onMenuClick}
+              className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              aria-label="Toggle menu"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          )}
+
           {/* Breadcrumbs */}
-          <div>
-            <div className="flex items-center space-x-2 text-sm text-gray-500 mb-1">
-              <Link href="/dashboard" className="hover:text-blue-600">Home</Link>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm text-gray-500 mb-1 overflow-x-auto">
+              <Link href="/dashboard" className="hover:text-blue-600 whitespace-nowrap">Home</Link>
               {breadcrumbs.map((crumb, index) => (
-                <span key={crumb.href} className="flex items-center">
-                  <span className="mx-2">/</span>
+                <span key={crumb.href} className="flex items-center whitespace-nowrap">
+                  <span className="mx-1 sm:mx-2">/</span>
                   {index === breadcrumbs.length - 1 ? (
                     <span className="text-gray-900 font-medium">{crumb.label}</span>
                   ) : (
@@ -48,16 +66,16 @@ export function Header() {
                 </span>
               ))}
             </div>
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
               {breadcrumbs.length > 0 ? breadcrumbs[breadcrumbs.length - 1].label : 'Dashboard'}
             </h2>
           </div>
 
           {/* Right side - Notifications and Profile */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
             {/* Notifications */}
             <button className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
-              <span className="text-xl">🔔</span>
+              <span className="text-lg sm:text-xl">🔔</span>
               {/* Notification badge */}
               <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
             </button>
@@ -66,9 +84,9 @@ export function Header() {
             <div className="relative">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                className="flex items-center space-x-2 sm:space-x-3 p-1.5 sm:p-2 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <div className="text-right hidden sm:block">
+                <div className="text-right hidden lg:block">
                   <p className="text-sm font-medium text-gray-900">
                     {user?.firstName && user?.lastName
                       ? `${user.firstName} ${user.lastName}`
@@ -78,7 +96,7 @@ export function Header() {
                     {user?.roles?.[0]?.replace('ROLE_', '') || 'User'}
                   </p>
                 </div>
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-semibold">
+                <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-semibold text-sm sm:text-base">
                   {user?.firstName?.[0] || user?.username?.[0] || 'U'}
                 </div>
               </button>

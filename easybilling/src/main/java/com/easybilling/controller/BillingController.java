@@ -96,4 +96,29 @@ public class BillingController extends BaseController {
         String userId = getCurrentUserId();
         return ApiResponse.success("Return processed", billingService.processReturn(tenantId, id, userId, itemIds, reason));
     }
+
+    @GetMapping("/held")
+    @Operation(summary = "List all held invoices")
+    public ApiResponse<List<HeldInvoiceResponse>> listHeldInvoices() {
+        String tenantId = getCurrentTenantId();
+        return ApiResponse.success(billingService.listHeldInvoices(tenantId));
+    }
+
+    @GetMapping("/held/{holdReference}")
+    @Operation(summary = "Resume a held invoice")
+    public ApiResponse<InvoiceRequest> resumeHeldInvoice(@PathVariable String holdReference) {
+        String tenantId = getCurrentTenantId();
+        return ApiResponse.success("Held invoice retrieved", billingService.resumeHeldInvoice(tenantId, holdReference));
+    }
+
+    @DeleteMapping("/held/{holdReference}")
+    @Operation(summary = "Delete a held invoice")
+    public ApiResponse<Void> deleteHeldInvoice(@PathVariable String holdReference) {
+        String tenantId = getCurrentTenantId();
+        billingService.deleteHeldInvoice(tenantId, holdReference);
+        return ApiResponse.<Void>builder()
+                .success(true)
+                .message("Held invoice deleted")
+                .build();
+    }
 }

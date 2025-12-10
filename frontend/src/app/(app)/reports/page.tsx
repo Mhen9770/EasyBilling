@@ -224,11 +224,12 @@ export default function ReportsPage() {
       {!reportData && (
         <div className="bg-white rounded-lg shadow-md p-6 mt-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Report Preview</h2>
-        <div className="text-center py-12 text-gray-500">
-          <div className="text-6xl mb-4">📊</div>
-          <p className="text-lg">Select date range and generate a report to see the results here</p>
+          <div className="text-center py-12 text-gray-500">
+            <div className="text-6xl mb-4">📊</div>
+            <p className="text-lg">Select date range and generate a report to see the results here</p>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">

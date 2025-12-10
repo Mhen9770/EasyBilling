@@ -2,22 +2,27 @@ import apiClient from '../client';
 import { ApiResponse, PageResponse } from '../types';
 
 export interface ProductResponse {
-  id: string;
+  id: string | number;
   name: string;
   description?: string;
   sku: string;
   barcode?: string;
-  categoryId?: string;
-  categoryName?: string;
-  brandId?: string;
-  brandName?: string;
-  basePrice: number;
+  category?: any;
+  brand?: any;
+  costPrice?: number;
   sellingPrice: number;
+  mrp?: number;
   taxRate: number;
   unit: string;
-  lowStockThreshold: number;
-  active: boolean;
-  createdAt: string;
+  isActive?: boolean;
+  trackStock?: boolean;
+  lowStockThreshold?: number;
+  imageUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  // Legacy fields for backward compatibility
+  basePrice?: number;
+  active?: boolean;
 }
 
 export interface StockResponse {
@@ -55,13 +60,14 @@ export interface ProductRequest {
   barcode?: string;
   categoryId?: string;
   brandId?: string;
-  price?: number;
-  cost?: number;
-  basePrice?: number;
-  sellingPrice?: number;
-  taxRate: number;
+  costPrice: number;
+  sellingPrice: number;
+  mrp: number;
+  taxRate?: number;
   unit: string;
+  trackStock?: boolean;
   lowStockThreshold?: number;
+  imageUrl?: string;
 }
 
 export interface CategoryRequest {
@@ -224,5 +230,19 @@ export const inventoryApi = {
   // Products with pagination
   getProducts: async (params: { page: number; size: number }): Promise<ApiResponse<PageResponse<ProductResponse>>> => {
     return inventoryApi.listProducts(params.page, params.size);
+  },
+
+  // Advanced features
+  getStockSummary: async (): Promise<ApiResponse<any>> => {
+    const response = await apiClient.get<ApiResponse<any>>('/api/v1/inventory/dashboard');
+    return response.data;
+  },
+
+  getLowStockAlerts: async (locationId?: string): Promise<ApiResponse<StockResponse[]>> => {
+    const response = await apiClient.get<ApiResponse<StockResponse[]>>(
+      '/api/v1/stock/low-stock-alerts',
+      { params: locationId ? { locationId } : {} }
+    );
+    return response.data;
   },
 };

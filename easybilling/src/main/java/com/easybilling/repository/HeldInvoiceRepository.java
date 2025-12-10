@@ -10,6 +10,8 @@ import java.util.Optional;
 @Repository
 public interface HeldInvoiceRepository extends JpaRepository<HeldInvoice, String> {
     
+    List<HeldInvoice> findByTenantIdOrderByHeldAtDesc(String tenantId);
+    
     List<HeldInvoice> findByTenantIdAndStoreIdOrderByHeldAtDesc(String tenantId, String storeId);
     
     Optional<HeldInvoice> findByTenantIdAndHoldReference(String tenantId, String holdReference);

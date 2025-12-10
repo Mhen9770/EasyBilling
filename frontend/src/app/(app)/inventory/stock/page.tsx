@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tantml:react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { inventoryApi } from '@/lib/api/inventory/inventoryApi';
 import type { StockMovementRequest } from '@/lib/api/types';
 import { useToastStore } from '@/components/ui/toast';

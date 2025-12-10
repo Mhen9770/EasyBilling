@@ -6,6 +6,7 @@ import { reportsApi } from '@/lib/api/reports/reportsApi';
 import { billingApi } from '@/lib/api/billing/billingApi';
 import { customerApi } from '@/lib/api/customer/customerApi';
 import { inventoryApi } from '@/lib/api/inventory/inventoryApi';
+import { PageLoader, CardLoader, InlineLoader } from '@/components/ui/Loader';
 import Link from 'next/link';
 
 export default function DashboardPage() {
@@ -45,20 +46,30 @@ export default function DashboardPage() {
   const invoices = recentInvoices?.data?.content || [];
   const totalCustomers = customersData?.data?.totalElements || 0;
 
+  const isLoading = !salesReport && !inventoryReport && !recentInvoices && !customersData;
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <PageLoader text="Loading dashboard..." />
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-4 sm:space-y-6">
       {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-xl p-8 text-white">
-        <h2 className="text-3xl font-bold mb-2">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-6 lg:p-8 text-white">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-2">
           Welcome back, {user?.firstName || user?.username}!
         </h2>
-        <p className="text-blue-100">
+        <p className="text-sm sm:text-base text-blue-100">
           Here's what's happening with your business today
         </p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         <div className="bg-white rounded-xl shadow-md p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -127,7 +138,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Activity & Alerts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Recent Invoices */}
         <div className="bg-white rounded-xl shadow-md p-6">
           <div className="flex justify-between items-center mb-4">
@@ -236,8 +247,8 @@ export default function DashboardPage() {
 
       {/* Quick Actions */}
       <div>
-        <h3 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Quick Actions</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           <Link
             href="/pos"
             className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer"

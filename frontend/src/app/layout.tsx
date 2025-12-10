@@ -14,10 +14,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased">
+    <html lang="en" className="h-full">
+      <body className="antialiased h-full w-full overflow-x-hidden">
         <Providers>
-          {children}
+          <div className="h-full w-full">
+            {children}
+          </div>
           <ToastContainer />
         </Providers>
       </body>

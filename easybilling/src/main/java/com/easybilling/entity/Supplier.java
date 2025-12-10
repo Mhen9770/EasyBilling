@@ -58,17 +58,21 @@ public class Supplier {
     private String website;
     
     @Column(nullable = false, precision = 19, scale = 2)
+    @Builder.Default
     private BigDecimal totalPurchases = BigDecimal.ZERO;
     
     @Column(nullable = false, precision = 19, scale = 2)
+    @Builder.Default
     private BigDecimal outstandingBalance = BigDecimal.ZERO;
     
     @Column(nullable = false)
+    @Builder.Default
     private Integer purchaseCount = 0;
     
     private LocalDateTime lastPurchaseDate;
     
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active = true;
     
     private String notes;
@@ -80,6 +84,7 @@ public class Supplier {
     private String ifscCode;
     
     @Column(nullable = false)
+    @Builder.Default
     private Integer creditDays = 0;
     
     @CreatedDate

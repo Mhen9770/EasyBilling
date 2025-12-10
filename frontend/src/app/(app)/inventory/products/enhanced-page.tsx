@@ -30,7 +30,7 @@ export default function EnhancedProductsPage() {
   // Fetch data
   const { data: productsData, isLoading } = useQuery({
     queryKey: ['products', searchTerm, filter],
-    queryFn: () => inventoryApi.listProducts(0, 1000),
+    queryFn: () => inventoryApi.getProducts({ page: 0, size: 1000 }),
   });
 
   const { data: categories } = useQuery({
@@ -191,10 +191,6 @@ export default function EnhancedProductsPage() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     
-    const sellingPrice = parseFloat(formData.get('price') as string);
-    const costPrice = parseFloat(formData.get('cost') as string);
-    const mrpValue = formData.get('mrp') ? parseFloat(formData.get('mrp') as string) : sellingPrice;
-    
     const productData: ProductRequest = {
       name: formData.get('name') as string,
       sku: formData.get('sku') as string,
@@ -202,9 +198,8 @@ export default function EnhancedProductsPage() {
       description: formData.get('description') as string,
       categoryId: formData.get('categoryId') as string || undefined,
       brandId: formData.get('brandId') as string || undefined,
-      sellingPrice: sellingPrice,
-      costPrice: costPrice,
-      mrp: mrpValue,
+      price: parseFloat(formData.get('price') as string),
+      cost: parseFloat(formData.get('cost') as string),
       taxRate: parseFloat(formData.get('taxRate') as string) || 0,
       unit: formData.get('unit') as string,
       trackStock: formData.get('trackStock') === 'true',
@@ -712,18 +707,6 @@ function ProductModal({ product, categories, brands, onSubmit, onClose, isSubmit
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">MRP *</label>
-              <input
-                type="number"
-                step="0.01"
-                name="mrp"
-                required
-                defaultValue={product?.mrp || product?.sellingPrice}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Tax Rate (%)</label>
               <input
                 type="number"
@@ -734,46 +717,42 @@ function ProductModal({ product, categories, brands, onSubmit, onClose, isSubmit
               />
             </div>
 
-            <div className="md:col-span-2">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Unit *</label>
-                  <select
-                    name="unit"
-                    required
-                    defaultValue={product?.unit || 'PCS'}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="PCS">PCS</option>
-                    <option value="KG">KG</option>
-                    <option value="LITER">LITER</option>
-                    <option value="METER">METER</option>
-                    <option value="BOX">BOX</option>
-                  </select>
-                </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Unit *</label>
+              <select
+                name="unit"
+                required
+                defaultValue={product?.unit || 'PCS'}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="PCS">PCS</option>
+                <option value="KG">KG</option>
+                <option value="LITER">LITER</option>
+                <option value="METER">METER</option>
+                <option value="BOX">BOX</option>
+              </select>
+            </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Track Stock</label>
-                  <select
-                    name="trackStock"
-                    defaultValue={product?.trackStock ? 'true' : 'false'}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="true">Yes</option>
-                    <option value="false">No</option>
-                  </select>
-                </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Track Stock</label>
+              <select
+                name="trackStock"
+                defaultValue={product?.trackStock ? 'true' : 'false'}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
+            </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Low Stock Threshold</label>
-                  <input
-                    type="number"
-                    name="lowStockThreshold"
-                    defaultValue={product?.lowStockThreshold || 10}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Low Stock Threshold</label>
+              <input
+                type="number"
+                name="lowStockThreshold"
+                defaultValue={product?.lowStockThreshold || 10}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              />
             </div>
           </div>
 

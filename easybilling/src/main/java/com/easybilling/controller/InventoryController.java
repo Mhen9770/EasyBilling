@@ -3,6 +3,11 @@ package com.easybilling.controller;
 import com.easybilling.dto.ApiResponse;
 import com.easybilling.dto.PageResponse;
 import com.easybilling.dto.*;
+import com.easybilling.dto.StockAdjustmentRequest;
+import com.easybilling.dto.StockTransferRequest;
+import com.easybilling.dto.BulkProductUpdateRequest;
+import com.easybilling.dto.ProductSearchRequest;
+import com.easybilling.dto.InventoryDashboardResponse;
 import com.easybilling.service.InventoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -130,5 +135,65 @@ public class InventoryController extends BaseController {
                 .success(true)
                 .message("Stock movement recorded successfully")
                 .build();
+    }
+
+    // Advanced Inventory Features
+    @PostMapping("/stock/adjust")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Adjust stock levels")
+    public ApiResponse<Void> adjustStock(@Valid @RequestBody StockAdjustmentRequest request) {
+        String tenantId = getCurrentTenantId();
+        String userId = getCurrentUserId();
+        inventoryService.adjustStock(request, tenantId, userId);
+        return ApiResponse.<Void>builder()
+                .success(true)
+                .message("Stock adjusted successfully")
+                .build();
+    }
+
+    @PostMapping("/stock/transfer")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Transfer stock between locations")
+    public ApiResponse<Void> transferStock(@Valid @RequestBody StockTransferRequest request) {
+        String tenantId = getCurrentTenantId();
+        String userId = getCurrentUserId();
+        inventoryService.transferStock(request, tenantId, userId);
+        return ApiResponse.<Void>builder()
+                .success(true)
+                .message("Stock transferred successfully")
+                .build();
+    }
+
+    @PostMapping("/products/bulk-update")
+    @Operation(summary = "Bulk update products")
+    public ApiResponse<Void> bulkUpdateProducts(@Valid @RequestBody BulkProductUpdateRequest request) {
+        String tenantId = getCurrentTenantId();
+        inventoryService.bulkUpdateProducts(request, tenantId);
+        return ApiResponse.<Void>builder()
+                .success(true)
+                .message("Products updated successfully")
+                .build();
+    }
+
+    @PostMapping("/products/search")
+    @Operation(summary = "Advanced product search")
+    public ApiResponse<PageResponse<ProductResponse>> searchProducts(@Valid @RequestBody ProductSearchRequest request) {
+        String tenantId = getCurrentTenantId();
+        return ApiResponse.success(inventoryService.searchProducts(request, tenantId));
+    }
+
+    @GetMapping("/inventory/dashboard")
+    @Operation(summary = "Get inventory dashboard data")
+    public ApiResponse<InventoryDashboardResponse> getInventoryDashboard() {
+        String tenantId = getCurrentTenantId();
+        return ApiResponse.success(inventoryService.getInventoryDashboard(tenantId));
+    }
+
+    @GetMapping("/stock/low-stock-alerts")
+    @Operation(summary = "Get low stock alerts")
+    public ApiResponse<List<StockResponse>> getLowStockAlerts(
+            @RequestParam(required = false) String locationId) {
+        String tenantId = getCurrentTenantId();
+        return ApiResponse.success(inventoryService.getLowStockAlerts(tenantId, locationId));
     }
 }

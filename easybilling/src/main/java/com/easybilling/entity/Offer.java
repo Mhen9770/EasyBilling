@@ -46,6 +46,7 @@ public class Offer {
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private OfferStatus status = OfferStatus.DRAFT;
     
     @Column(nullable = false, precision = 19, scale = 2)
@@ -63,14 +64,17 @@ public class Offer {
     
     private Integer usageLimit;
     
+    @Builder.Default
     private Integer usageCount = 0;
     
     private String applicableProducts; // JSON array of product IDs
     
     private String applicableCategories; // JSON array of category IDs
     
+    @Builder.Default
     private Boolean stackable = false;
     
+    @Builder.Default
     private Integer priority = 0;
     
     private String termsAndConditions;
