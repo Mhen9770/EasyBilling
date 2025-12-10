@@ -75,4 +75,25 @@ public class BillingController {
         String holdRef = billingService.holdInvoice(tenantId, userId, request);
         return ApiResponse.success("Invoice held", holdRef);
     }
+    
+    @PostMapping("/{id}/cancel")
+    @Operation(summary = "Cancel completed invoice and reverse stock")
+    public ApiResponse<InvoiceResponse> cancelInvoice(
+            @RequestHeader("X-Tenant-Id") String tenantId,
+            @RequestHeader("X-User-Id") String userId,
+            @PathVariable String id,
+            @RequestParam String reason) {
+        return ApiResponse.success("Invoice cancelled", billingService.cancelInvoice(tenantId, id, userId, reason));
+    }
+    
+    @PostMapping("/{id}/return")
+    @Operation(summary = "Process return for invoice items")
+    public ApiResponse<InvoiceResponse> processReturn(
+            @RequestHeader("X-Tenant-Id") String tenantId,
+            @RequestHeader("X-User-Id") String userId,
+            @PathVariable String id,
+            @RequestParam List<String> itemIds,
+            @RequestParam String reason) {
+        return ApiResponse.success("Return processed", billingService.processReturn(tenantId, id, userId, itemIds, reason));
+    }
 }

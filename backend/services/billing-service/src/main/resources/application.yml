@@ -50,6 +50,11 @@ app:
       - THERMAL
       - A4
     default-currency: INR
+
+# Service URLs for inter-service communication
+inventory:
+  service:
+    url: http://localhost:8084
     
 # Actuator
 management:

@@ -29,8 +29,26 @@ public class BillingService {
     private final InvoiceRepository invoiceRepository;
     private final HeldInvoiceRepository heldInvoiceRepository;
     private final ObjectMapper objectMapper;
+    private final com.easybilling.billing.client.InventoryClient inventoryClient;
 
     public InvoiceResponse createInvoice(String tenantId, String userId, InvoiceRequest request) {
+        // Business Logic: Validate stock availability before creating invoice
+        String locationId = request.getStoreId(); // Using store as location
+        for (InvoiceItemRequest itemReq : request.getItems()) {
+            boolean available = inventoryClient.checkStockAvailability(
+                    itemReq.getProductId(), 
+                    locationId, 
+                    itemReq.getQuantity(), 
+                    tenantId
+            );
+            if (!available) {
+                log.warn("Insufficient stock for product: {} at location: {}", 
+                        itemReq.getProductName(), locationId);
+                // Continue anyway - stock checks are advisory not blocking
+                // Real-world scenario: allow overselling with backorder
+            }
+        }
+        
         Invoice invoice = Invoice.builder()
                 .invoiceNumber(generateInvoiceNumber(tenantId))
                 .status(InvoiceStatus.DRAFT)
@@ -73,12 +91,15 @@ public class BillingService {
 
         invoice.calculateTotals();
         Invoice saved = invoiceRepository.save(invoice);
+        
+        log.info("Invoice created: {} with {} items", saved.getInvoiceNumber(), saved.getItems().size());
         return mapToResponse(saved);
     }
 
     public InvoiceResponse completeInvoice(String tenantId, String invoiceId, String userId, List<PaymentRequest> paymentRequests) {
         Invoice invoice = findInvoice(tenantId, invoiceId);
         
+        // Business Logic: Add payments
         for (PaymentRequest payReq : paymentRequests) {
             Payment payment = Payment.builder()
                     .mode(payReq.getMode())
@@ -92,11 +113,36 @@ public class BillingService {
         }
 
         invoice.calculateTotals();
+        
+        // Business Logic: Validate payment amount
+        if (invoice.getBalanceAmount().compareTo(BigDecimal.ZERO) > 0) {
+            log.warn("Invoice {} completed with pending balance: {}", 
+                    invoice.getInvoiceNumber(), invoice.getBalanceAmount());
+            // Allow completing with balance - credit sales
+        }
+        
         invoice.setStatus(InvoiceStatus.COMPLETED);
         invoice.setCompletedBy(userId);
         invoice.setCompletedAt(LocalDateTime.now());
 
         Invoice saved = invoiceRepository.save(invoice);
+        
+        // Business Logic: Deduct stock from inventory after invoice completion
+        String locationId = invoice.getStoreId();
+        for (InvoiceItem item : invoice.getItems()) {
+            inventoryClient.deductStock(
+                    item.getProductId(),
+                    locationId,
+                    item.getQuantity(),
+                    invoice.getInvoiceNumber(),
+                    userId,
+                    tenantId
+            );
+        }
+        
+        log.info("Invoice completed: {} with total amount: {}", 
+                saved.getInvoiceNumber(), saved.getTotalAmount());
+        
         return mapToResponse(saved);
     }
 
@@ -196,5 +242,77 @@ public class BillingService {
         response.setReferenceNumber(payment.getReferenceNumber());
         response.setPaidAt(payment.getPaidAt());
         return response;
+    }
+    
+    /**
+     * Business Logic: Cancel invoice and reverse stock
+     */
+    public InvoiceResponse cancelInvoice(String tenantId, String invoiceId, String userId, String reason) {
+        Invoice invoice = findInvoice(tenantId, invoiceId);
+        
+        if (invoice.getStatus() != InvoiceStatus.COMPLETED) {
+            throw new IllegalStateException("Only completed invoices can be cancelled");
+        }
+        
+        invoice.setStatus(InvoiceStatus.CANCELLED);
+        invoice.setNotes((invoice.getNotes() != null ? invoice.getNotes() + "\n" : "") + 
+                        "Cancelled by: " + userId + ", Reason: " + reason);
+        
+        Invoice saved = invoiceRepository.save(invoice);
+        
+        // Business Logic: Reverse stock deduction
+        String locationId = invoice.getStoreId();
+        for (InvoiceItem item : invoice.getItems()) {
+            inventoryClient.reverseStockDeduction(
+                    item.getProductId(),
+                    locationId,
+                    item.getQuantity(),
+                    invoice.getInvoiceNumber(),
+                    userId,
+                    tenantId
+            );
+        }
+        
+        log.info("Invoice cancelled: {} by user: {}, reason: {}", 
+                invoice.getInvoiceNumber(), userId, reason);
+        
+        return mapToResponse(saved);
+    }
+    
+    /**
+     * Business Logic: Process return for items
+     */
+    public InvoiceResponse processReturn(String tenantId, String invoiceId, String userId, List<String> itemIds, String reason) {
+        Invoice invoice = findInvoice(tenantId, invoiceId);
+        
+        if (invoice.getStatus() != InvoiceStatus.COMPLETED) {
+            throw new IllegalStateException("Only completed invoices can have returns");
+        }
+        
+        invoice.setStatus(InvoiceStatus.RETURNED);
+        invoice.setNotes((invoice.getNotes() != null ? invoice.getNotes() + "\n" : "") + 
+                        "Return processed by: " + userId + ", Reason: " + reason);
+        
+        // Business Logic: Reverse stock for returned items
+        String locationId = invoice.getStoreId();
+        for (InvoiceItem item : invoice.getItems()) {
+            if (itemIds.contains(item.getId())) {
+                inventoryClient.reverseStockDeduction(
+                        item.getProductId(),
+                        locationId,
+                        item.getQuantity(),
+                        invoice.getInvoiceNumber() + "-RTN",
+                        userId,
+                        tenantId
+                );
+            }
+        }
+        
+        Invoice saved = invoiceRepository.save(invoice);
+        
+        log.info("Return processed for invoice: {} with {} items", 
+                invoice.getInvoiceNumber(), itemIds.size());
+        
+        return mapToResponse(saved);
     }
 }
