@@ -36,7 +36,7 @@ Tailwind CSS, shadcn/ui, TanStack Query (React Query), Zustand/Jotai/Recoil for 
 
 Databases:
 
-Primary RDBMS: PostgreSQL or MySQL (configurable)
+Primary RDBMS: MySQL 8 (PostgreSQL support can be added later if needed)
 
 Caching: Redis
 

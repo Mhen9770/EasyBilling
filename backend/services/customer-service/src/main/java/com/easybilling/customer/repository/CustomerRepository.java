@@ -1,0 +1,26 @@
+package com.easybilling.customer.repository;
+
+import com.easybilling.customer.entity.Customer;
+import com.easybilling.customer.enums.CustomerSegment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface CustomerRepository extends JpaRepository<Customer, String> {
+    
+    Page<Customer> findByTenantId(String tenantId, Pageable pageable);
+    
+    Optional<Customer> findByTenantIdAndPhone(String tenantId, String phone);
+    
+    Optional<Customer> findByTenantIdAndEmail(String tenantId, String email);
+    
+    Page<Customer> findByTenantIdAndSegment(String tenantId, CustomerSegment segment, Pageable pageable);
+    
+    Page<Customer> findByTenantIdAndActive(String tenantId, Boolean active, Pageable pageable);
+    
+    long countByTenantId(String tenantId);
+}
