@@ -1,235 +1,95 @@
-# EasyBilling Platform
+# EasyBilling
 
-A comprehensive, enterprise-grade, multi-tenant billing SaaS platform designed to serve all kinds of shops and showrooms including grocery stores, garments, electronics, jewellery, furniture, pharmacies, and more.
+Modular Monolithic Billing & POS Application built with Spring Boot 3.4.0 and Java 17.
 
-## 🏗️ Architecture Overview
+## Prerequisites
 
-EasyBilling is built using a **microservices architecture** with a modular monolith approach within each service. This design enables independent scaling and deployment while maintaining clean module boundaries.
-
-### Tech Stack
-
-#### Backend
-- **Java 17** - LTS with modern features (Records, Pattern Matching, Sealed Interfaces)
-- **Spring Boot 3.4.x** - Core framework
-- **Spring Security 6+** - Authentication & Authorization
-- **Spring Data JPA** - Data access layer
-- **Spring Cloud** - Microservices infrastructure
-- **Gradle (Kotlin DSL)** - Build tool
-- **MySQL 8** - Primary database
-- **Redis** - Caching layer
-- **OpenSearch** - Search & Analytics (optional)
-
-#### Frontend
-- **Next.js 15** (App Router) - React framework
-- **React 19** - UI library
-- **TypeScript (Strict Mode)** - Type safety
-- **Tailwind CSS** - Styling
-- **shadcn/ui** - Component library
-- **TanStack Query** - Server state management
-- **Zustand** - Client state management
-
-#### DevOps
-- **Docker & Docker Compose** - Containerization
-- **Kubernetes** - Orchestration
-- **GitHub Actions** - CI/CD
-- **Prometheus & Grafana** - Monitoring
-- **ELK Stack** - Logging
-
-## 📁 Project Structure
-
-```
-EasyBilling/
-├── backend/                          # Backend services (Java/Spring Boot)
-│   ├── buildSrc/                     # Gradle build logic
-│   ├── libs/                         # Shared libraries
-│   │   ├── common/                   # Common utilities
-│   │   ├── security/                 # Security components
-│   │   └── multi-tenancy/            # Multi-tenancy framework
-│   ├── services/                     # Microservices
-│   │   ├── auth-service/             # Authentication & IAM
-│   │   ├── tenant-service/           # Tenant & Subscription Management
-│   │   ├── billing-service/          # Billing & POS
-│   │   ├── inventory-service/        # Product & Inventory
-│   │   ├── customer-service/         # Customer & Loyalty
-│   │   ├── pricing-service/          # Pricing & Offers
-│   │   ├── tax-service/              # Tax & Compliance
-│   │   ├── reporting-service/        # Reports & Analytics
-│   │   ├── notification-service/     # Notifications
-│   │   └── gateway-service/          # API Gateway
-│   ├── build.gradle.kts              # Root build file
-│   └── settings.gradle.kts           # Gradle settings
-├── frontend/                         # Frontend application (Next.js)
-│   ├── app/                          # Next.js app directory
-│   │   ├── (superadmin)/            # Super admin portal
-│   │   ├── (tenant)/                # Tenant backoffice
-│   │   ├── (pos)/                   # POS interface
-│   │   └── api/                     # API routes
-│   ├── components/                  # React components
-│   ├── lib/                         # Utilities & hooks
-│   └── public/                      # Static assets
-├── infrastructure/                   # Infrastructure as Code
-│   ├── docker/                      # Docker files
-│   ├── kubernetes/                  # K8s manifests
-│   └── terraform/                   # Cloud infrastructure
-├── docs/                            # Documentation
-├── .github/                         # GitHub Actions workflows
-└── DevelopmentPlan.md              # Detailed development plan
-
-```
-
-## 🏢 Multi-Tenancy Strategy
-
-The platform supports three multi-tenancy models:
-
-1. **Schema-per-tenant** (Default) - Recommended for most use cases
-2. **Database-per-tenant** - For very large enterprise tenants
-3. **Shared schema with tenant_id** - For small instances
-
-### Tenant Resolution
-- Subdomain: `tenantX.easybilling.com`
-- HTTP Header: `X-Tenant-Id`
-- JWT token context
-
-## 🔑 Key Features
-
-### Multi-Tenant Services
-1. **Billing & POS** - Invoice creation, returns, exchanges, multiple payment modes
-2. **Inventory & Product Catalog** - Products, variants, stock management
-3. **Customer & Loyalty** - Customer management, loyalty points, membership
-4. **Supplier & Purchase** - Purchase orders, GRN, returns
-5. **Pricing & Offers** - Rule-based discounts, promotions
-6. **Tax & Compliance** - GST/VAT configuration, tax calculations
-7. **Reporting & Analytics** - Sales reports, inventory analysis
-8. **Notifications** - SMS, Email, WhatsApp
-9. **Document Templates** - Invoice templates, branding
-
-### Global Services
-1. **Auth & IAM** - User authentication, role-based access control
-2. **Tenant Management** - Onboarding, subscription lifecycle
-3. **Configuration** - Master data, global settings
-4. **Integration Gateway** - Payment gateways, external integrations
-5. **Audit & Logging** - Activity logs, security events
-6. **API Gateway** - Single entry point, rate limiting
-
-## 🚀 Getting Started
-
-### Prerequisites
 - Java 17 or higher
-- Node.js 20 or higher
-- Docker & Docker Compose
-- MySQL 8
-- Redis 7
+- Maven 3.9+ 
+- MySQL 8.0+
+- Redis (optional, for caching)
 
-### Local Development Setup
-
-#### 1. Clone the repository
-```bash
-git clone https://github.com/Mhen9770/EasyBilling.git
-cd EasyBilling
-```
-
-#### 2. Start infrastructure services
-```bash
-docker-compose up -d postgres redis
-```
-
-#### 3. Setup Backend
-```bash
-cd backend
-./gradlew clean build
-./gradlew bootRun
-```
-
-#### 4. Setup Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-#### 5. Access the application
-- Frontend: http://localhost:3000
-- Tenant Service API: http://localhost:8082/tenant-service
-- API Documentation: http://localhost:8082/tenant-service/swagger-ui.html
-
-## 🔐 Security
-
-- JWT-based authentication with OAuth2
-- Role-Based Access Control (RBAC)
-- Fine-grained permissions per tenant
-- Data isolation between tenants
-- CSRF protection
-- Input validation at all layers
-
-### Default Roles
-- **SUPER_ADMIN** - Platform administration
-- **TENANT_ADMIN** - Tenant management
-- **STAFF** - Configurable permissions per user
-
-## 📊 API Documentation
-
-API documentation is available via OpenAPI/Swagger at `/swagger-ui.html` on each service.
-
-## 🧪 Testing
+## Building the Project
 
 ```bash
-# Backend tests
-cd backend
-./gradlew test
-
-# Frontend tests
-cd frontend
-npm test
-
-# Integration tests
-./gradlew integrationTest
+cd easybilling
+mvn clean install
 ```
 
-## 📦 Deployment
+## Running the Application
 
-### Docker
 ```bash
-docker-compose up -d
+mvn spring-boot:run
 ```
 
-### Kubernetes
+Or run the JAR:
+
 ```bash
-kubectl apply -f infrastructure/kubernetes/
+java -jar target/easybilling-1.0.0-SNAPSHOT.jar
 ```
 
-### Helm Chart
-```bash
-helm install easybilling ./infrastructure/helm/easybilling
+## Configuration
+
+Edit `src/main/resources/application.yml` to configure:
+
+- Database connection (MySQL)
+- Redis connection (optional)
+- JWT secret key
+- Server port (default: 8080)
+
+## Environment Variables
+
+- `DB_HOST` - Database host (default: localhost)
+- `DB_PORT` - Database port (default: 3306)
+- `DB_NAME` - Database name (default: easybilling)
+- `DB_USER` - Database user (default: root)
+- `DB_PASSWORD` - Database password (default: root)
+- `REDIS_HOST` - Redis host (default: localhost)
+- `REDIS_PORT` - Redis port (default: 6379)
+- `JWT_SECRET` - JWT secret key (required in production)
+
+## API Documentation
+
+Once the application is running, access Swagger UI at:
+
+```
+http://localhost:8080/swagger-ui.html
 ```
 
-## 🔄 CI/CD
+## Project Structure
 
-GitHub Actions workflows are configured for:
-- Automated testing
-- Code quality checks
-- Security scanning
-- Docker image building
-- Kubernetes deployment
+```
+easybilling/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/easybilling/
+│   │   │       ├── config/          # Configuration classes
+│   │   │       ├── controller/      # REST controllers
+│   │   │       ├── service/         # Business logic
+│   │   │       ├── repository/      # Data access layer
+│   │   │       ├── entity/          # JPA entities
+│   │   │       ├── dto/             # Data transfer objects
+│   │   │       ├── exception/      # Custom exceptions
+│   │   │       └── EasyBillingApplication.java
+│   │   └── resources/
+│   │       ├── application.yml      # Application configuration
+│   │       └── db/migration/       # Flyway migrations
+│   └── test/                        # Test classes
+└── pom.xml                          # Maven configuration
+```
 
-## 📈 Monitoring & Observability
+## Features
 
-- **Metrics**: Prometheus + Spring Boot Actuator
-- **Logging**: ELK Stack (Elasticsearch, Logstash, Kibana)
-- **Tracing**: OpenTelemetry
-- **Health Checks**: `/actuator/health` endpoints
+- **Multi-tenancy**: Schema-per-tenant strategy
+- **Authentication**: JWT-based authentication
+- **Billing & POS**: Invoice creation, payments, returns
+- **Inventory Management**: Products, stock, movements
+- **Customer Management**: Customer profiles, loyalty points, wallet
+- **Reports**: Sales reports, inventory reports
+- **Swagger UI**: API documentation
 
-## 📝 License
+## License
 
-[Add your license here]
+Copyright (c) 2025 EasyBilling
 
-## 👥 Contributing
-
-[Add contribution guidelines]
-
-## 📞 Support
-
-For support, please contact [your support email/link]
-
----
-
-Built with ❤️ for modern retail businesses

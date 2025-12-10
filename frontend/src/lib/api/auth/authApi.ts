@@ -94,7 +94,7 @@ export const authApi = {
    */
   async login(data: LoginRequest): Promise<LoginResponse> {
     const response = await apiClient.post<ApiResponse<LoginResponse>>(
-      '/auth-service/api/v1/auth/login',
+      '/api/v1/auth/login',
       data
     );
     return response.data.data!;
@@ -106,7 +106,7 @@ export const authApi = {
    */
   async onboard(data: OnboardRequest): Promise<LoginResponse> {
     const response = await apiClient.post<ApiResponse<LoginResponse>>(
-      '/auth-service/api/v1/auth/onboard',
+      '/api/v1/auth/onboard',
       data
     );
     return response.data.data!;
@@ -118,7 +118,7 @@ export const authApi = {
    */
   async register(data: RegisterRequest): Promise<LoginResponse> {
     const response = await apiClient.post<ApiResponse<LoginResponse>>(
-      '/auth-service/api/v1/auth/register',
+      '/api/v1/auth/register',
       data
     );
     return response.data.data!;
@@ -129,7 +129,7 @@ export const authApi = {
    */
   async refreshToken(refreshToken: string): Promise<LoginResponse> {
     const response = await apiClient.post<ApiResponse<LoginResponse>>(
-      '/auth-service/api/v1/auth/refresh',
+      '/api/v1/auth/refresh',
       { refreshToken }
     );
     return response.data.data!;
@@ -139,7 +139,7 @@ export const authApi = {
    * Logout user
    */
   async logout(): Promise<void> {
-    await apiClient.post('/auth-service/api/v1/auth/logout');
+    await apiClient.post('/api/v1/auth/logout');
   },
 
   /**
@@ -147,7 +147,7 @@ export const authApi = {
    */
   async getCurrentUser(userId: string): Promise<UserProfile> {
     const response = await apiClient.get<ApiResponse<UserProfile>>(
-      '/auth-service/api/v1/users/me',
+      '/api/v1/users/me',
       {
         headers: { 'X-User-Id': userId }
       }
@@ -160,7 +160,7 @@ export const authApi = {
    */
   async updateProfile(userId: string, data: UpdateProfileRequest): Promise<UserProfile> {
     const response = await apiClient.put<ApiResponse<UserProfile>>(
-      '/auth-service/api/v1/users/me',
+      '/api/v1/users/me',
       data,
       {
         headers: { 'X-User-Id': userId }
@@ -174,7 +174,7 @@ export const authApi = {
    */
   async changePassword(userId: string, data: ChangePasswordRequest): Promise<void> {
     await apiClient.post(
-      '/auth-service/api/v1/users/me/change-password',
+      '/api/v1/users/me/change-password',
       data,
       {
         headers: { 'X-User-Id': userId }
@@ -186,6 +186,6 @@ export const authApi = {
    * Request password reset
    */
   async requestPasswordReset(email: string): Promise<void> {
-    await apiClient.post('/auth-service/api/v1/users/reset-password', { email });
+    await apiClient.post('/api/v1/users/reset-password', { email });
   },
 };

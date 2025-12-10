@@ -20,13 +20,7 @@ apiClient.interceptors.request.use(
   (config) => {
     // Only access localStorage on client side
     if (typeof window !== 'undefined') {
-      // Add tenant ID if available
-      const tenantId = localStorage.getItem('tenantId');
-      if (tenantId) {
-        config.headers['X-Tenant-Id'] = tenantId;
-      }
-
-      // Add auth token if available
+      // Add auth token if available (tenant ID and user ID are extracted from JWT token)
       const token = localStorage.getItem('authToken');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;

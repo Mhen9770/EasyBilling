@@ -28,7 +28,7 @@ export interface UserResponse {
 export const userApi = {
   createUser: async (data: UserRequest): Promise<ApiResponse<UserResponse>> => {
     const response = await apiClient.post<ApiResponse<UserResponse>>(
-      '/auth-service/api/v1/users',
+      '/api/v1/users',
       data
     );
     return response.data;
@@ -36,7 +36,7 @@ export const userApi = {
 
   listUsers: async (page = 0, size = 20, role?: UserRole): Promise<ApiResponse<PageResponse<UserResponse>>> => {
     const response = await apiClient.get<ApiResponse<PageResponse<UserResponse>>>(
-      '/auth-service/api/v1/users',
+      '/api/v1/users',
       { params: { page, size, role } }
     );
     return response.data;
@@ -44,14 +44,14 @@ export const userApi = {
 
   getUser: async (id: string): Promise<ApiResponse<UserResponse>> => {
     const response = await apiClient.get<ApiResponse<UserResponse>>(
-      `/auth-service/api/v1/users/${id}`
+      `/api/v1/users/${id}`
     );
     return response.data;
   },
 
   updateUser: async (id: string, data: Partial<UserRequest>): Promise<ApiResponse<UserResponse>> => {
     const response = await apiClient.put<ApiResponse<UserResponse>>(
-      `/auth-service/api/v1/users/${id}`,
+      `/api/v1/users/${id}`,
       data
     );
     return response.data;
@@ -59,28 +59,28 @@ export const userApi = {
 
   deleteUser: async (id: string): Promise<ApiResponse<void>> => {
     const response = await apiClient.delete<ApiResponse<void>>(
-      `/auth-service/api/v1/users/${id}`
+      `/api/v1/users/${id}`
     );
     return response.data;
   },
 
   suspendUser: async (id: string): Promise<ApiResponse<UserResponse>> => {
     const response = await apiClient.post<ApiResponse<UserResponse>>(
-      `/auth-service/api/v1/users/${id}/suspend`
+      `/api/v1/users/${id}/suspend`
     );
     return response.data;
   },
 
   activateUser: async (id: string): Promise<ApiResponse<UserResponse>> => {
     const response = await apiClient.post<ApiResponse<UserResponse>>(
-      `/auth-service/api/v1/users/${id}/activate`
+      `/api/v1/users/${id}/activate`
     );
     return response.data;
   },
 
   updateRole: async (id: string, role: UserRole): Promise<ApiResponse<UserResponse>> => {
     const response = await apiClient.put<ApiResponse<UserResponse>>(
-      `/auth-service/api/v1/users/${id}/role`,
+      `/api/v1/users/${id}/role`,
       { role }
     );
     return response.data;
@@ -88,7 +88,7 @@ export const userApi = {
 
   getCurrentUser: async (): Promise<ApiResponse<UserResponse>> => {
     const response = await apiClient.get<ApiResponse<UserResponse>>(
-      '/auth-service/api/v1/users/me'
+      '/api/v1/users/me'
     );
     return response.data;
   },

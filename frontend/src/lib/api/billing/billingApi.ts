@@ -77,7 +77,7 @@ export const billingApi = {
   // Create a new invoice (draft)
   createInvoice: async (data: InvoiceRequest): Promise<ApiResponse<InvoiceResponse>> => {
     const response = await apiClient.post<ApiResponse<InvoiceResponse>>(
-      '/billing-service/api/v1/invoices',
+      '/api/v1/invoices',
       data
     );
     return response.data;
@@ -86,7 +86,7 @@ export const billingApi = {
   // Get invoice by ID
   getInvoice: async (id: string): Promise<ApiResponse<InvoiceResponse>> => {
     const response = await apiClient.get<ApiResponse<InvoiceResponse>>(
-      `/billing-service/api/v1/invoices/${id}`
+      `/api/v1/invoices/${id}`
     );
     return response.data;
   },
@@ -94,7 +94,7 @@ export const billingApi = {
   // List all invoices
   listInvoices: async (page = 0, size = 20): Promise<ApiResponse<PageResponse<InvoiceResponse>>> => {
     const response = await apiClient.get<ApiResponse<PageResponse<InvoiceResponse>>>(
-      '/billing-service/api/v1/invoices',
+      '/api/v1/invoices',
       { params: { page, size } }
     );
     return response.data;
@@ -106,7 +106,7 @@ export const billingApi = {
     payments: PaymentRequest[]
   ): Promise<ApiResponse<InvoiceResponse>> => {
     const response = await apiClient.post<ApiResponse<InvoiceResponse>>(
-      `/billing-service/api/v1/invoices/${id}/complete`,
+      `/api/v1/invoices/${id}/complete`,
       payments
     );
     return response.data;
@@ -115,7 +115,7 @@ export const billingApi = {
   // Hold an invoice for later
   holdInvoice: async (data: InvoiceRequest): Promise<ApiResponse<InvoiceResponse>> => {
     const response = await apiClient.post<ApiResponse<InvoiceResponse>>(
-      '/billing-service/api/v1/invoices/hold',
+      '/api/v1/invoices/hold',
       data
     );
     return response.data;

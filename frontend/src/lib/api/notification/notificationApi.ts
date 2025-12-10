@@ -29,7 +29,7 @@ export interface NotificationResponse {
 export const notificationApi = {
   sendNotification: async (data: NotificationRequest): Promise<ApiResponse<NotificationResponse>> => {
     const response = await apiClient.post<ApiResponse<NotificationResponse>>(
-      '/notification-service/api/v1/notifications/send',
+      '/api/v1/notifications/send',
       data
     );
     return response.data;
@@ -41,7 +41,7 @@ export const notificationApi = {
     status?: NotificationStatus
   ): Promise<ApiResponse<PageResponse<NotificationResponse>>> => {
     const response = await apiClient.get<ApiResponse<PageResponse<NotificationResponse>>>(
-      '/notification-service/api/v1/notifications',
+      '/api/v1/notifications',
       { params: { page, size, status } }
     );
     return response.data;
