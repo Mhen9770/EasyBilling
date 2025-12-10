@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,6 +100,71 @@ public class OffersController {
         log.info("Deleting offer {} for tenant: {}", id, tenantId);
         offersService.deleteOffer(id, tenantId);
         return ResponseEntity.ok(createSuccessResponse("Offer deleted successfully"));
+    }
+    
+    @PostMapping("/{id}/calculate-discount")
+    public ResponseEntity<Map<String, Object>> calculateDiscount(
+            @PathVariable String id,
+            @RequestHeader("X-Tenant-Id") String tenantId,
+            @RequestParam BigDecimal purchaseAmount,
+            @RequestParam(required = false) List<String> productIds,
+            @RequestParam(required = false) List<String> categoryIds) {
+        log.info("Calculating discount for offer {} with purchase amount {}", id, purchaseAmount);
+        
+        BigDecimal discount = offersService.calculateDiscount(id, tenantId, purchaseAmount, productIds, categoryIds);
+        
+        Map<String, Object> data = new HashMap<>();
+        data.put("offerId", id);
+        data.put("purchaseAmount", purchaseAmount);
+        data.put("discountAmount", discount);
+        data.put("finalAmount", purchaseAmount.subtract(discount));
+        
+        return ResponseEntity.ok(createSuccessResponse(data));
+    }
+    
+    @PostMapping("/{id}/apply")
+    public ResponseEntity<Map<String, Object>> applyOffer(
+            @PathVariable String id,
+            @RequestHeader("X-Tenant-Id") String tenantId,
+            @RequestParam BigDecimal purchaseAmount,
+            @RequestParam(required = false) List<String> productIds,
+            @RequestParam(required = false) List<String> categoryIds) {
+        log.info("Applying offer {} to purchase of {}", id, purchaseAmount);
+        
+        BigDecimal discount = offersService.applyOffer(id, tenantId, purchaseAmount, productIds, categoryIds);
+        
+        Map<String, Object> data = new HashMap<>();
+        data.put("offerId", id);
+        data.put("purchaseAmount", purchaseAmount);
+        data.put("discountAmount", discount);
+        data.put("finalAmount", purchaseAmount.subtract(discount));
+        data.put("applied", true);
+        
+        return ResponseEntity.ok(createSuccessResponse(data));
+    }
+    
+    @GetMapping("/applicable")
+    public ResponseEntity<Map<String, Object>> getApplicableOffers(
+            @RequestHeader("X-Tenant-Id") String tenantId,
+            @RequestParam BigDecimal purchaseAmount,
+            @RequestParam(required = false) List<String> productIds,
+            @RequestParam(required = false) List<String> categoryIds) {
+        log.info("Getting applicable offers for tenant: {}, amount: {}", tenantId, purchaseAmount);
+        
+        List<OfferResponse> offers = offersService.getApplicableOffers(tenantId, purchaseAmount, productIds, categoryIds);
+        return ResponseEntity.ok(createSuccessResponse(offers));
+    }
+    
+    @GetMapping("/best-combination")
+    public ResponseEntity<Map<String, Object>> getBestOfferCombination(
+            @RequestHeader("X-Tenant-Id") String tenantId,
+            @RequestParam BigDecimal purchaseAmount,
+            @RequestParam(required = false) List<String> productIds,
+            @RequestParam(required = false) List<String> categoryIds) {
+        log.info("Calculating best offer combination for tenant: {}, amount: {}", tenantId, purchaseAmount);
+        
+        List<OfferResponse> offers = offersService.calculateBestOfferCombination(tenantId, purchaseAmount, productIds, categoryIds);
+        return ResponseEntity.ok(createSuccessResponse(offers));
     }
     
     private Map<String, Object> createSuccessResponse(Object data) {

@@ -119,6 +119,200 @@ public class OffersService {
         offerRepository.delete(offer);
     }
     
+    // Business Logic Methods
+    
+    /**
+     * Calculate discount amount for a given purchase
+     */
+    public BigDecimal calculateDiscount(String offerId, String tenantId, BigDecimal purchaseAmount,
+                                       List<String> productIds, List<String> categoryIds) {
+        Offer offer = offerRepository.findByIdAndTenantId(offerId, tenantId)
+                .orElseThrow(() -> new RuntimeException("Offer not found"));
+        
+        // Validate offer is active and within validity period
+        if (!isOfferValid(offer)) {
+            throw new RuntimeException("Offer is not valid");
+        }
+        
+        // Check minimum purchase amount
+        if (offer.getMinimumPurchaseAmount() != null &&
+            purchaseAmount.compareTo(offer.getMinimumPurchaseAmount()) < 0) {
+            log.info("Purchase amount {} is below minimum {}", purchaseAmount, offer.getMinimumPurchaseAmount());
+            return BigDecimal.ZERO;
+        }
+        
+        // Check if offer is applicable to products/categories
+        if (!isOfferApplicable(offer, productIds, categoryIds)) {
+            log.info("Offer not applicable to provided products/categories");
+            return BigDecimal.ZERO;
+        }
+        
+        // Calculate discount based on offer type
+        BigDecimal discount = switch (offer.getType()) {
+            case PERCENTAGE_DISCOUNT -> calculatePercentageDiscount(purchaseAmount, offer.getDiscountValue());
+            case FIXED_AMOUNT_DISCOUNT -> offer.getDiscountValue();
+            case MINIMUM_PURCHASE -> calculateMinimumPurchaseDiscount(purchaseAmount, offer);
+            default -> BigDecimal.ZERO;
+        };
+        
+        // Apply maximum discount cap if set
+        if (offer.getMaximumDiscountAmount() != null &&
+            discount.compareTo(offer.getMaximumDiscountAmount()) > 0) {
+            discount = offer.getMaximumDiscountAmount();
+        }
+        
+        log.info("Calculated discount {} for offer {} on purchase amount {}", discount, offerId, purchaseAmount);
+        return discount;
+    }
+    
+    /**
+     * Apply offer to a purchase and increment usage count
+     */
+    public BigDecimal applyOffer(String offerId, String tenantId, BigDecimal purchaseAmount,
+                                  List<String> productIds, List<String> categoryIds) {
+        Offer offer = offerRepository.findByIdAndTenantId(offerId, tenantId)
+                .orElseThrow(() -> new RuntimeException("Offer not found"));
+        
+        // Check usage limit
+        if (offer.getUsageLimit() != null && offer.getUsageCount() >= offer.getUsageLimit()) {
+            throw new RuntimeException("Offer usage limit reached");
+        }
+        
+        BigDecimal discount = calculateDiscount(offerId, tenantId, purchaseAmount, productIds, categoryIds);
+        
+        // Increment usage count
+        offer.setUsageCount(offer.getUsageCount() + 1);
+        offerRepository.save(offer);
+        
+        log.info("Applied offer {}. New usage count: {}/{}", offerId, offer.getUsageCount(), offer.getUsageLimit());
+        
+        return discount;
+    }
+    
+    /**
+     * Get applicable offers for a purchase
+     */
+    @Transactional(readOnly = true)
+    public List<OfferResponse> getApplicableOffers(String tenantId, BigDecimal purchaseAmount,
+                                                    List<String> productIds, List<String> categoryIds) {
+        List<Offer> activeOffers = offerRepository.findActiveOffers(tenantId, LocalDateTime.now());
+        
+        return activeOffers.stream()
+                .filter(offer -> isOfferValid(offer))
+                .filter(offer -> isOfferApplicable(offer, productIds, categoryIds))
+                .filter(offer -> offer.getMinimumPurchaseAmount() == null ||
+                               purchaseAmount.compareTo(offer.getMinimumPurchaseAmount()) >= 0)
+                .filter(offer -> offer.getUsageLimit() == null ||
+                               offer.getUsageCount() < offer.getUsageLimit())
+                .sorted((o1, o2) -> o2.getPriority().compareTo(o1.getPriority()))
+                .map(this::mapToResponse)
+                .toList();
+    }
+    
+    /**
+     * Calculate best offer combination (stacking logic)
+     */
+    public List<OfferResponse> calculateBestOfferCombination(String tenantId, BigDecimal purchaseAmount,
+                                                             List<String> productIds, List<String> categoryIds) {
+        List<Offer> activeOffers = offerRepository.findActiveOffers(tenantId, LocalDateTime.now());
+        
+        // Filter applicable offers
+        List<Offer> applicableOffers = activeOffers.stream()
+                .filter(offer -> isOfferValid(offer))
+                .filter(offer -> isOfferApplicable(offer, productIds, categoryIds))
+                .sorted((o1, o2) -> o2.getPriority().compareTo(o1.getPriority()))
+                .toList();
+        
+        // Separate stackable and non-stackable
+        List<Offer> stackable = applicableOffers.stream()
+                .filter(Offer::getStackable)
+                .toList();
+        
+        List<Offer> nonStackable = applicableOffers.stream()
+                .filter(o -> !o.getStackable())
+                .toList();
+        
+        // If there are non-stackable offers, pick the best one
+        if (!nonStackable.isEmpty()) {
+            Offer bestNonStackable = nonStackable.stream()
+                    .max((o1, o2) -> calculateDiscount(o1.getId(), tenantId, purchaseAmount, productIds, categoryIds)
+                            .compareTo(calculateDiscount(o2.getId(), tenantId, purchaseAmount, productIds, categoryIds)))
+                    .orElse(null);
+            
+            if (bestNonStackable != null) {
+                return List.of(mapToResponse(bestNonStackable));
+            }
+        }
+        
+        // Return all stackable offers
+        return stackable.stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+    
+    // Private helper methods
+    
+    private boolean isOfferValid(Offer offer) {
+        if (offer.getStatus() != OfferStatus.ACTIVE) {
+            return false;
+        }
+        
+        LocalDateTime now = LocalDateTime.now();
+        return !now.isBefore(offer.getValidFrom()) && !now.isAfter(offer.getValidTo());
+    }
+    
+    private boolean isOfferApplicable(Offer offer, List<String> productIds, List<String> categoryIds) {
+        // If no specific products/categories specified, offer applies to all
+        if ((offer.getApplicableProducts() == null || offer.getApplicableProducts().isEmpty()) &&
+            (offer.getApplicableCategories() == null || offer.getApplicableCategories().isEmpty())) {
+            return true;
+        }
+        
+        // Check if any product matches
+        if (offer.getApplicableProducts() != null && productIds != null) {
+            try {
+                List<String> applicableProducts = objectMapper.readValue(
+                        offer.getApplicableProducts(),
+                        objectMapper.getTypeFactory().constructCollectionType(List.class, String.class)
+                );
+                if (productIds.stream().anyMatch(applicableProducts::contains)) {
+                    return true;
+                }
+            } catch (JsonProcessingException e) {
+                log.error("Error parsing applicable products", e);
+            }
+        }
+        
+        // Check if any category matches
+        if (offer.getApplicableCategories() != null && categoryIds != null) {
+            try {
+                List<String> applicableCategories = objectMapper.readValue(
+                        offer.getApplicableCategories(),
+                        objectMapper.getTypeFactory().constructCollectionType(List.class, String.class)
+                );
+                if (categoryIds.stream().anyMatch(applicableCategories::contains)) {
+                    return true;
+                }
+            } catch (JsonProcessingException e) {
+                log.error("Error parsing applicable categories", e);
+            }
+        }
+        
+        return false;
+    }
+    
+    private BigDecimal calculatePercentageDiscount(BigDecimal amount, BigDecimal percentage) {
+        return amount.multiply(percentage).divide(new BigDecimal("100"), 2, BigDecimal.ROUND_HALF_UP);
+    }
+    
+    private BigDecimal calculateMinimumPurchaseDiscount(BigDecimal amount, Offer offer) {
+        if (offer.getMinimumPurchaseAmount() != null &&
+            amount.compareTo(offer.getMinimumPurchaseAmount()) >= 0) {
+            return offer.getDiscountValue();
+        }
+        return BigDecimal.ZERO;
+    }
+    
     private OfferResponse mapToResponse(Offer offer) {
         OfferResponse response = new OfferResponse();
         response.setId(offer.getId());
