@@ -2,42 +2,12 @@
 
 import Link from 'next/link';
 import { useEffect } from 'react';
-import confetti from 'canvas-confetti';
+// import confetti from 'canvas-confetti'; // Install: npm install canvas-confetti @types/canvas-confetti
 
 export default function OnboardingSuccessPage() {
   useEffect(() => {
-    // Trigger confetti animation
-    const duration = 3 * 1000;
-    const animationEnd = Date.now() + duration;
-
-    const randomInRange = (min: number, max: number) => {
-      return Math.random() * (max - min) + min;
-    };
-
-    const interval = setInterval(() => {
-      const timeLeft = animationEnd - Date.now();
-
-      if (timeLeft <= 0) {
-        return clearInterval(interval);
-      }
-
-      confetti({
-        particleCount: 2,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0 },
-        colors: ['#3B82F6', '#8B5CF6', '#10B981'],
-      });
-      confetti({
-        particleCount: 2,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1 },
-        colors: ['#3B82F6', '#8B5CF6', '#10B981'],
-      });
-    }, 50);
-
-    return () => clearInterval(interval);
+    // Confetti animation - install canvas-confetti package to enable
+    // npm install canvas-confetti @types/canvas-confetti
   }, []);
 
   return (
