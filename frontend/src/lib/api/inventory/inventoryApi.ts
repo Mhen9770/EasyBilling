@@ -162,6 +162,21 @@ export const inventoryApi = {
     return inventoryApi.listCategories();
   },
 
+  updateCategory: async (id: string, data: CategoryRequest): Promise<ApiResponse<CategoryResponse>> => {
+    const response = await apiClient.put<ApiResponse<CategoryResponse>>(
+      `/inventory-service/api/v1/categories/${id}`,
+      data
+    );
+    return response.data;
+  },
+
+  deleteCategory: async (id: string): Promise<ApiResponse<void>> => {
+    const response = await apiClient.delete<ApiResponse<void>>(
+      `/inventory-service/api/v1/categories/${id}`
+    );
+    return response.data;
+  },
+
   // Brands
   listBrands: async (): Promise<ApiResponse<BrandResponse[]>> => {
     const response = await apiClient.get<ApiResponse<BrandResponse[]>>(
@@ -178,6 +193,21 @@ export const inventoryApi = {
     const response = await apiClient.post<ApiResponse<BrandResponse>>(
       '/inventory-service/api/v1/brands',
       data
+    );
+    return response.data;
+  },
+
+  updateBrand: async (id: string, data: BrandRequest): Promise<ApiResponse<BrandResponse>> => {
+    const response = await apiClient.put<ApiResponse<BrandResponse>>(
+      `/inventory-service/api/v1/brands/${id}`,
+      data
+    );
+    return response.data;
+  },
+
+  deleteBrand: async (id: string): Promise<ApiResponse<void>> => {
+    const response = await apiClient.delete<ApiResponse<void>>(
+      `/inventory-service/api/v1/brands/${id}`
     );
     return response.data;
   },
