@@ -288,7 +288,7 @@ export default function EnhancedReportsPage() {
                 />
                 <StatCard
                   title="Stock Value"
-                  value={`₹${inventoryData.summary?.totalValue?.toFixed(2) || '0.00'}`}
+                  value={`₹${inventoryData.summary?.totalStockValue?.toFixed(2) || '0.00'}`}
                   icon="💰"
                   color="green"
                 />

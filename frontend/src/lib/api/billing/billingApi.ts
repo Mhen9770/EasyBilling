@@ -179,6 +179,28 @@ export const billingApi = {
     );
     return response.data;
   },
+
+  // Cancel an invoice
+  cancelInvoice: async (id: string, reason: string): Promise<ApiResponse<InvoiceResponse>> => {
+    const response = await apiClient.post<ApiResponse<InvoiceResponse>>(
+      `/api/v1/invoices/${id}/cancel`,
+      { reason }
+    );
+    return response.data;
+  },
+
+  // Return an invoice
+  returnInvoice: async (
+    id: string,
+    items: Array<{ productId: string; quantity: number }>,
+    reason: string
+  ): Promise<ApiResponse<InvoiceResponse>> => {
+    const response = await apiClient.post<ApiResponse<InvoiceResponse>>(
+      `/api/v1/invoices/${id}/return`,
+      { items, reason }
+    );
+    return response.data;
+  },
 };
 
 export interface HeldInvoiceResponse {
