@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
         @Index(name = "idx_payment_tenant", columnList = "tenant_id"),
         @Index(name = "idx_payment_invoice", columnList = "invoice_id")
 })
-@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = String.class))
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = Integer.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
 @NoArgsConstructor
@@ -46,7 +46,7 @@ public class Payment implements TenantAware {
     private BigDecimal amount;
     
     @Column(nullable = false, name = "tenant_id")
-    private String tenantId;
+    private Integer tenantId;
 
     private String referenceNumber;
     

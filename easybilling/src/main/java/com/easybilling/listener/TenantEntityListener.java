@@ -17,10 +17,10 @@ public class TenantEntityListener {
     public void setTenantOnPersist(Object entity) {
         if (entity instanceof TenantAware) {
             TenantAware tenantAware = (TenantAware) entity;
-            String currentTenantId = TenantContext.getTenantId();
+            Integer currentTenantId = TenantContext.getTenantId();
             
-            if (currentTenantId != null && !currentTenantId.isBlank()) {
-                if (tenantAware.getTenantId() == null || tenantAware.getTenantId().isBlank()) {
+            if (currentTenantId != null) {
+                if (tenantAware.getTenantId() == null) {
                     log.debug("Setting tenantId {} on entity {}", currentTenantId, entity.getClass().getSimpleName());
                     tenantAware.setTenantId(currentTenantId);
                 } else if (!tenantAware.getTenantId().equals(currentTenantId)) {
@@ -36,10 +36,10 @@ public class TenantEntityListener {
     public void setTenantOnUpdate(Object entity) {
         if (entity instanceof TenantAware) {
             TenantAware tenantAware = (TenantAware) entity;
-            String currentTenantId = TenantContext.getTenantId();
+            Integer currentTenantId = TenantContext.getTenantId();
             
-            if (currentTenantId != null && !currentTenantId.isBlank()) {
-                if (tenantAware.getTenantId() == null || tenantAware.getTenantId().isBlank()) {
+            if (currentTenantId != null) {
+                if (tenantAware.getTenantId() == null) {
                     log.debug("Setting tenantId {} on entity {}", currentTenantId, entity.getClass().getSimpleName());
                     tenantAware.setTenantId(currentTenantId);
                 } else if (!tenantAware.getTenantId().equals(currentTenantId)) {

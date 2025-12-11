@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
     @Index(name = "idx_notification_status", columnList = "status"),
     @Index(name = "idx_notification_type", columnList = "type")
 })
-@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = String.class))
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = Integer.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
 @Builder
@@ -36,7 +36,7 @@ public class Notification implements TenantAware {
     private String id;
     
     @Column(nullable = false)
-    private String tenantId;
+    private Integer tenantId;
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

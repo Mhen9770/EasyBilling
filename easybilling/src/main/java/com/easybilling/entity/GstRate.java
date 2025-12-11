@@ -24,7 +24,7 @@ import java.time.LocalDate;
         @Index(name = "idx_active", columnList = "is_active"),
         @Index(name = "idx_gst_rate_tenant", columnList = "tenant_id")
 })
-@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = String.class))
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = Integer.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId OR tenant_id IS NULL")
 @Data
 @Builder
@@ -71,7 +71,7 @@ public class GstRate implements TenantAware {
     private Boolean isActive = true;
     
     @Column(name = "tenant_id")
-    private String tenantId; // null for global GST rates, specific for tenant-specific overrides
+    private Integer tenantId; // null for global GST rates, specific for tenant-specific overrides
     
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "products")
-@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = String.class))
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = Integer.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
 @NoArgsConstructor
@@ -74,7 +74,7 @@ public class Product implements TenantAware {
     private String imageUrl;
 
     @Column(nullable = false)
-    private String tenantId;
+    private Integer tenantId;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

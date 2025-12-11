@@ -14,27 +14,27 @@ import java.util.Optional;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, String> {
     
-    Page<Customer> findByTenantId(String tenantId, Pageable pageable);
+    Page<Customer> findByTenantId(Integer tenantId, Pageable pageable);
     
-    Optional<Customer> findByIdAndTenantId(String id, String tenantId);
+    Optional<Customer> findByIdAndTenantId(String id, Integer tenantId);
     
-    Optional<Customer> findByPhoneAndTenantId(String phone, String tenantId);
+    Optional<Customer> findByPhoneAndTenantId(String phone, Integer tenantId);
     
-    Optional<Customer> findByTenantIdAndPhone(String tenantId, String phone);
+    Optional<Customer> findByTenantIdAndPhone(Integer tenantId, String phone);
     
-    Optional<Customer> findByTenantIdAndEmail(String tenantId, String email);
+    Optional<Customer> findByTenantIdAndEmail(Integer tenantId, String email);
     
-    Page<Customer> findByTenantIdAndSegment(String tenantId, CustomerSegment segment, Pageable pageable);
+    Page<Customer> findByTenantIdAndSegment(Integer tenantId, CustomerSegment segment, Pageable pageable);
     
-    Page<Customer> findByTenantIdAndActive(String tenantId, Boolean active, Pageable pageable);
+    Page<Customer> findByTenantIdAndActive(Integer tenantId, Boolean active, Pageable pageable);
     
     @Query("SELECT c FROM Customer c WHERE c.tenantId = :tenantId AND " +
            "(LOWER(c.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(c.phone) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(c.email) LIKE LOWER(CONCAT('%', :search, '%')))")
-    Page<Customer> searchCustomers(@Param("tenantId") String tenantId, 
+    Page<Customer> searchCustomers(@Param("tenantId") Integer tenantId, 
                                    @Param("search") String search, 
                                    Pageable pageable);
     
-    long countByTenantId(String tenantId);
+    long countByTenantId(Integer tenantId);
 }

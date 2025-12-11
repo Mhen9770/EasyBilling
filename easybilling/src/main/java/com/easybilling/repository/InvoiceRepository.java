@@ -15,14 +15,14 @@ import java.util.Optional;
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, String> {
     
-    Page<Invoice> findByTenantIdOrderByCreatedAtDesc(String tenantId, Pageable pageable);
+    Page<Invoice> findByTenantIdOrderByCreatedAtDesc(Integer tenantId, Pageable pageable);
     
-    Page<Invoice> findByTenantIdAndStatusOrderByCreatedAtDesc(String tenantId, InvoiceStatus status, Pageable pageable);
+    Page<Invoice> findByTenantIdAndStatusOrderByCreatedAtDesc(Integer tenantId, InvoiceStatus status, Pageable pageable);
     
-    Optional<Invoice> findByTenantIdAndInvoiceNumber(String tenantId, String invoiceNumber);
+    Optional<Invoice> findByTenantIdAndInvoiceNumber(Integer tenantId, String invoiceNumber);
     
-    List<Invoice> findByTenantIdAndStoreIdAndCreatedAtBetween(String tenantId, String storeId, LocalDateTime start, LocalDateTime end);
+    List<Invoice> findByTenantIdAndStoreIdAndCreatedAtBetween(Integer tenantId, String storeId, LocalDateTime start, LocalDateTime end);
     
     @Query("SELECT COUNT(i) FROM Invoice i WHERE i.tenantId = :tenantId AND i.createdAt >= :startDate")
-    Long countInvoicesSince(String tenantId, LocalDateTime startDate);
+    Long countInvoicesSince(Integer tenantId, LocalDateTime startDate);
 }

@@ -23,7 +23,7 @@ import java.util.Set;
         @Index(name = "idx_user_tenant", columnList = "tenant_id"),
         @Index(name = "idx_user_status", columnList = "status")
 })
-@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = String.class))
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = Integer.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
 @Builder
@@ -55,11 +55,8 @@ public class User implements TenantAware {
     @Column(length = 20)
     private String phone;
     
-    @Column(name = "tenant_id", nullable = false, length = 36)
-    private String tenantId;
-
-    @Column(name = "tenant_slug", nullable = false, length = 36)
-    private String tenantSlug;
+    @Column(name = "tenant_id", nullable = false)
+    private Integer tenantId;
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)

@@ -20,7 +20,7 @@ import java.time.Instant;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TenantResponse {
     
-    private String id;
+    private Integer id;
     private String name;
     private String slug;
     private String description;

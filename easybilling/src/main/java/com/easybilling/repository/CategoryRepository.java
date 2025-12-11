@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-    List<Category> findByTenantIdAndIsActive(String tenantId, Boolean isActive);
-    Optional<Category> findByIdAndTenantId(Long id, String tenantId);
+    List<Category> findByTenantIdAndIsActive(Integer tenantId, Boolean isActive);
+    Optional<Category> findByIdAndTenantId(Long id, Integer tenantId);
 }

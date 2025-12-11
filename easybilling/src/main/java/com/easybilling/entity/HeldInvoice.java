@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "held_invoices")
-@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = String.class))
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = Integer.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
 @NoArgsConstructor
@@ -30,7 +30,7 @@ public class HeldInvoice implements TenantAware {
     private String id;
 
     @Column(nullable = false)
-    private String tenantId;
+    private Integer tenantId;
 
     @Column(nullable = false)
     private String storeId;

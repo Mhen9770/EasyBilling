@@ -24,7 +24,7 @@ import java.util.Set;
         @Index(name = "idx_security_group_name", columnList = "name"),
         @Index(name = "idx_security_group_status", columnList = "is_active")
 })
-@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = String.class))
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = Integer.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
 @Builder
@@ -45,7 +45,7 @@ public class SecurityGroup implements TenantAware {
     private String description;
     
     @Column(name = "tenant_id", nullable = false, length = 36)
-    private String tenantId;
+    private Integer tenantId;
     
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "security_group_permissions", 

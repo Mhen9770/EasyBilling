@@ -21,7 +21,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "invoices")
-@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = String.class))
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = Integer.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
 @NoArgsConstructor
@@ -42,7 +42,7 @@ public class Invoice implements TenantAware {
     private InvoiceStatus status;
 
     @Column(nullable = false)
-    private String tenantId;
+    private Integer tenantId;
 
     @Column(nullable = false)
     private String storeId;

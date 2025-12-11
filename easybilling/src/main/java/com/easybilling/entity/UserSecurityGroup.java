@@ -20,7 +20,7 @@ import java.time.Instant;
         @Index(name = "idx_user_security_group_group", columnList = "security_group_id"),
         @Index(name = "idx_user_security_group_tenant", columnList = "tenant_id")
 })
-@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = String.class))
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = Integer.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
 @Builder
@@ -41,7 +41,7 @@ public class UserSecurityGroup implements TenantAware {
     private String securityGroupId;
     
     @Column(nullable = false, name = "tenant_id")
-    private String tenantId;
+    private Integer tenantId;
     
     @CreationTimestamp
     @Column(name = "assigned_at", nullable = false, updatable = false)

@@ -23,9 +23,9 @@ public class TenantFilterAspect {
     
     @Before("execution(* com.easybilling.repository..*(..))")
     public void enableTenantFilter() {
-        String tenantId = TenantContext.getTenantId();
+        Integer tenantId = TenantContext.getTenantId();
         
-        if (tenantId != null && !tenantId.isBlank()) {
+        if (tenantId != null) {
             Session session = entityManager.unwrap(Session.class);
             org.hibernate.Filter filter = session.enableFilter("tenantFilter");
             filter.setParameter("tenantId", tenantId);

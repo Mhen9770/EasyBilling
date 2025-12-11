@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @Table(name = "stock", uniqueConstraints = {
     @UniqueConstraint(columnNames = {"product_id", "location_id"})
 })
-@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = String.class))
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = Integer.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
 @NoArgsConstructor
@@ -47,7 +47,7 @@ public class Stock implements TenantAware {
     private BigDecimal availableQuantity = BigDecimal.ZERO;
 
     @Column(nullable = false)
-    private String tenantId;
+    private Integer tenantId;
 
     @CreatedDate
     @Column(nullable = false, updatable = false)

@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CustomerVisitRepository extends JpaRepository<CustomerVisit, String> {
     
-    long countByTenantIdAndCustomerId(String tenantId, String customerId);
+    long countByTenantIdAndCustomerId(Integer tenantId, String customerId);
 }

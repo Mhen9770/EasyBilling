@@ -23,8 +23,8 @@ import java.time.Instant;
 public class Tenant {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
     
     @Column(nullable = false, length = 100)
     private String name;

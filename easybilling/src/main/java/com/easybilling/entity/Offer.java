@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
     @Index(name = "idx_offer_status", columnList = "status"),
     @Index(name = "idx_offer_dates", columnList = "valid_from, valid_to")
 })
-@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = String.class))
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = Integer.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
 @Builder
@@ -38,7 +38,7 @@ public class Offer implements TenantAware {
     private String id;
     
     @Column(nullable = false)
-    private String tenantId;
+    private Integer tenantId;
     
     @Column(nullable = false)
     private String name;

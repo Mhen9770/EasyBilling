@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
     @Index(name = "idx_wallet_customer", columnList = "customer_id"),
     @Index(name = "idx_wallet_tenant", columnList = "tenant_id")
 })
-@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = String.class))
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = Integer.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
 @Builder
@@ -39,7 +39,7 @@ public class CustomerWallet implements TenantAware {
     private String customerId;
     
     @Column(nullable = false)
-    private String tenantId;
+    private Integer tenantId;
     
     @Column(nullable = false, precision = 19, scale = 2)
     @Builder.Default

@@ -18,7 +18,7 @@ import java.math.BigDecimal;
         @Index(name = "idx_invoice_item_tenant", columnList = "tenant_id"),
         @Index(name = "idx_invoice_item_invoice", columnList = "invoice_id")
 })
-@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = String.class))
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = Integer.class))
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
 @NoArgsConstructor
@@ -69,7 +69,7 @@ public class InvoiceItem implements TenantAware {
     private BigDecimal lineTotal;
     
     @Column(nullable = false, name = "tenant_id")
-    private String tenantId;
+    private Integer tenantId;
     
     // GST fields for India
     @Column(name = "hsn_code", length = 20)
