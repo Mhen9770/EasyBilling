@@ -27,7 +27,7 @@ public class OffersService {
     private final OfferRepository offerRepository;
     private final ObjectMapper objectMapper;
     
-    public OfferResponse createOffer(OfferRequest request, String tenantId) {
+    public OfferResponse createOffer(OfferRequest request, Integer tenantId) {
         log.info("Creating offer for tenant: {}", tenantId);
         
         Offer offer = Offer.builder()
@@ -55,27 +55,27 @@ public class OffersService {
     }
     
     @Transactional(readOnly = true)
-    public Page<OfferResponse> getAllOffers(String tenantId, Pageable pageable) {
+    public Page<OfferResponse> getAllOffers(Integer tenantId, Pageable pageable) {
         return offerRepository.findByTenantId(tenantId, pageable)
                 .map(this::mapToResponse);
     }
     
     @Transactional(readOnly = true)
-    public OfferResponse getOfferById(String id, String tenantId) {
+    public OfferResponse getOfferById(String id, Integer tenantId) {
         Offer offer = offerRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new RuntimeException("Offer not found"));
         return mapToResponse(offer);
     }
     
     @Transactional(readOnly = true)
-    public List<OfferResponse> getActiveOffers(String tenantId) {
+    public List<OfferResponse> getActiveOffers(Integer tenantId) {
         return offerRepository.findActiveOffers(tenantId, LocalDateTime.now())
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
     }
     
-    public OfferResponse updateOffer(String id, OfferRequest request, String tenantId) {
+    public OfferResponse updateOffer(String id, OfferRequest request, Integer tenantId) {
         Offer offer = offerRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new RuntimeException("Offer not found"));
         
@@ -98,7 +98,7 @@ public class OffersService {
         return mapToResponse(updated);
     }
     
-    public OfferResponse activateOffer(String id, String tenantId) {
+    public OfferResponse activateOffer(String id, Integer tenantId) {
         Offer offer = offerRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new RuntimeException("Offer not found"));
         offer.setStatus(OfferStatus.ACTIVE);
@@ -106,7 +106,7 @@ public class OffersService {
         return mapToResponse(updated);
     }
     
-    public OfferResponse pauseOffer(String id, String tenantId) {
+    public OfferResponse pauseOffer(String id, Integer tenantId) {
         Offer offer = offerRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new RuntimeException("Offer not found"));
         offer.setStatus(OfferStatus.PAUSED);
@@ -114,7 +114,7 @@ public class OffersService {
         return mapToResponse(updated);
     }
     
-    public void deleteOffer(String id, String tenantId) {
+    public void deleteOffer(String id, Integer tenantId) {
         Offer offer = offerRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new RuntimeException("Offer not found"));
         offerRepository.delete(offer);
@@ -125,7 +125,7 @@ public class OffersService {
     /**
      * Calculate discount amount for a given purchase
      */
-    public BigDecimal calculateDiscount(String offerId, String tenantId, BigDecimal purchaseAmount,
+    public BigDecimal calculateDiscount(String offerId, Integer tenantId, BigDecimal purchaseAmount,
                                        List<String> productIds, List<String> categoryIds) {
         Offer offer = offerRepository.findByIdAndTenantId(offerId, tenantId)
                 .orElseThrow(() -> new RuntimeException("Offer not found"));
@@ -169,7 +169,7 @@ public class OffersService {
     /**
      * Apply offer to a purchase and increment usage count
      */
-    public BigDecimal applyOffer(String offerId, String tenantId, BigDecimal purchaseAmount,
+    public BigDecimal applyOffer(String offerId, Integer tenantId, BigDecimal purchaseAmount,
                                   List<String> productIds, List<String> categoryIds) {
         Offer offer = offerRepository.findByIdAndTenantId(offerId, tenantId)
                 .orElseThrow(() -> new RuntimeException("Offer not found"));
@@ -194,7 +194,7 @@ public class OffersService {
      * Get applicable offers for a purchase
      */
     @Transactional(readOnly = true)
-    public List<OfferResponse> getApplicableOffers(String tenantId, BigDecimal purchaseAmount,
+    public List<OfferResponse> getApplicableOffers(Integer tenantId, BigDecimal purchaseAmount,
                                                     List<String> productIds, List<String> categoryIds) {
         List<Offer> activeOffers = offerRepository.findActiveOffers(tenantId, LocalDateTime.now());
         
@@ -213,7 +213,7 @@ public class OffersService {
     /**
      * Calculate best offer combination (stacking logic)
      */
-    public List<OfferResponse> calculateBestOfferCombination(String tenantId, BigDecimal purchaseAmount,
+    public List<OfferResponse> calculateBestOfferCombination(Integer tenantId, BigDecimal purchaseAmount,
                                                              List<String> productIds, List<String> categoryIds) {
         List<Offer> activeOffers = offerRepository.findActiveOffers(tenantId, LocalDateTime.now());
         

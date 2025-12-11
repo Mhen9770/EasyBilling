@@ -29,7 +29,7 @@ public class BillingController extends BaseController {
     @PostMapping
     @Operation(summary = "Create new invoice")
     public ApiResponse<InvoiceResponse> createInvoice(@Valid @RequestBody InvoiceRequest request) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         String userId = getCurrentUserId();
         return ApiResponse.success("Invoice created", billingService.createInvoice(tenantId, userId, request));
     }
@@ -39,7 +39,7 @@ public class BillingController extends BaseController {
     public ApiResponse<PageResponse<InvoiceResponse>> listInvoices(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         Pageable pageable = PageRequest.of(page, size);
         Page<InvoiceResponse> result = billingService.listInvoices(tenantId, pageable);
         return ApiResponse.success(PageResponse.of(
@@ -53,7 +53,7 @@ public class BillingController extends BaseController {
     @GetMapping("/{id}")
     @Operation(summary = "Get invoice by ID")
     public ApiResponse<InvoiceResponse> getInvoice(@PathVariable String id) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         return ApiResponse.success(billingService.getInvoice(tenantId, id));
     }
 
@@ -62,7 +62,7 @@ public class BillingController extends BaseController {
     public ApiResponse<InvoiceResponse> completeInvoice(
             @PathVariable String id,
             @Valid @RequestBody List<PaymentRequest> payments) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         String userId = getCurrentUserId();
         return ApiResponse.success("Invoice completed", billingService.completeInvoice(tenantId, id, userId, payments));
     }
@@ -70,7 +70,7 @@ public class BillingController extends BaseController {
     @PostMapping("/hold")
     @Operation(summary = "Hold invoice for later")
     public ApiResponse<String> holdInvoice(@Valid @RequestBody InvoiceRequest request) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         String userId = getCurrentUserId();
         String holdRef = billingService.holdInvoice(tenantId, userId, request);
         return ApiResponse.success("Invoice held", holdRef);
@@ -81,7 +81,7 @@ public class BillingController extends BaseController {
     public ApiResponse<InvoiceResponse> cancelInvoice(
             @PathVariable String id,
             @RequestParam String reason) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         String userId = getCurrentUserId();
         return ApiResponse.success("Invoice cancelled", billingService.cancelInvoice(tenantId, id, userId, reason));
     }
@@ -92,7 +92,7 @@ public class BillingController extends BaseController {
             @PathVariable String id,
             @RequestParam List<String> itemIds,
             @RequestParam String reason) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         String userId = getCurrentUserId();
         return ApiResponse.success("Return processed", billingService.processReturn(tenantId, id, userId, itemIds, reason));
     }
@@ -100,21 +100,21 @@ public class BillingController extends BaseController {
     @GetMapping("/held")
     @Operation(summary = "List all held invoices")
     public ApiResponse<List<HeldInvoiceResponse>> listHeldInvoices() {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         return ApiResponse.success(billingService.listHeldInvoices(tenantId));
     }
 
     @GetMapping("/held/{holdReference}")
     @Operation(summary = "Resume a held invoice")
     public ApiResponse<InvoiceRequest> resumeHeldInvoice(@PathVariable String holdReference) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         return ApiResponse.success("Held invoice retrieved", billingService.resumeHeldInvoice(tenantId, holdReference));
     }
 
     @DeleteMapping("/held/{holdReference}")
     @Operation(summary = "Delete a held invoice")
     public ApiResponse<Void> deleteHeldInvoice(@PathVariable String holdReference) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         billingService.deleteHeldInvoice(tenantId, holdReference);
         return ApiResponse.<Void>builder()
                 .success(true)

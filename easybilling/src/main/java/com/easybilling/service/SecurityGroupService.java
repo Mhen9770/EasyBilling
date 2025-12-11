@@ -42,7 +42,7 @@ public class SecurityGroupService {
      */
     @Transactional
     @CacheEvict(value = "securityGroups", key = "#tenantId")
-    public SecurityGroupResponse createSecurityGroup(String tenantId, SecurityGroupRequest request, String createdBy) {
+    public SecurityGroupResponse createSecurityGroup(Integer tenantId, SecurityGroupRequest request, String createdBy) {
         log.info("Creating security group: {} for tenant: {}", request.getName(), tenantId);
         
         // Check if security group with same name exists for this tenant
@@ -121,7 +121,7 @@ public class SecurityGroupService {
      */
     @Transactional(readOnly = true)
     @Cacheable(value = "securityGroups", key = "#tenantId")
-    public List<SecurityGroupResponse> getSecurityGroupsByTenant(String tenantId) {
+    public List<SecurityGroupResponse> getSecurityGroupsByTenant(Integer tenantId) {
         log.debug("Getting security groups for tenant: {}", tenantId);
         
         List<SecurityGroup> securityGroups = securityGroupRepository.findByTenantId(tenantId);
@@ -138,7 +138,7 @@ public class SecurityGroupService {
      * Get active security groups for a tenant.
      */
     @Transactional(readOnly = true)
-    public List<SecurityGroupResponse> getActiveSecurityGroups(String tenantId) {
+    public List<SecurityGroupResponse> getActiveSecurityGroups(Integer tenantId) {
         log.debug("Getting active security groups for tenant: {}", tenantId);
         
         List<SecurityGroup> securityGroups = securityGroupRepository.findByTenantIdAndIsActiveTrue(tenantId);

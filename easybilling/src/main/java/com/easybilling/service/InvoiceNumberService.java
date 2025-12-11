@@ -25,7 +25,7 @@ public class InvoiceNumberService {
      * Format: INV/YYYY-YY/NNNN
      * Example: INV/2024-25/0001
      */
-    public String generateInvoiceNumber(String tenantId, String prefix) {
+    public String generateInvoiceNumber(Integer tenantId, String prefix) {
         String financialYear = getCurrentFinancialYear();
         String key = tenantId + "_" + financialYear;
         
@@ -42,7 +42,7 @@ public class InvoiceNumberService {
     /**
      * Generate invoice number with default prefix.
      */
-    public String generateInvoiceNumber(String tenantId) {
+    public String generateInvoiceNumber(Integer tenantId) {
         return generateInvoiceNumber(tenantId, "INV");
     }
     
@@ -98,7 +98,7 @@ public class InvoiceNumberService {
     /**
      * Reset sequence counter (use with caution, typically for new financial year).
      */
-    public void resetSequence(String tenantId, String financialYear) {
+    public void resetSequence(Integer tenantId, String financialYear) {
         String key = tenantId + "_" + financialYear;
         sequenceCounters.put(key, new AtomicInteger(0));
         log.info("Reset invoice sequence for tenant: {} and FY: {}", tenantId, financialYear);
@@ -107,7 +107,7 @@ public class InvoiceNumberService {
     /**
      * Get current sequence number (for display/debugging).
      */
-    public int getCurrentSequence(String tenantId) {
+    public int getCurrentSequence(Integer tenantId) {
         String financialYear = getCurrentFinancialYear();
         String key = tenantId + "_" + financialYear;
         AtomicInteger counter = sequenceCounters.get(key);

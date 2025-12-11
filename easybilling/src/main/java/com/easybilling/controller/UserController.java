@@ -71,7 +71,7 @@ public class UserController extends BaseController {
     @Operation(summary = "Create user", description = "Create a new user (Admin only)")
     @PreAuthorize("hasPermission(null, 'USER_CREATE')")
     public ApiResponse<UserProfileResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         String createdBy = getCurrentUsername();
         
         UserProfileResponse response = userService.createUser(tenantId, request, createdBy);
@@ -149,7 +149,7 @@ public class UserController extends BaseController {
     
     @GetMapping("/tenant/{tenantId}")
     @Operation(summary = "Get users by tenant", description = "Get all users for a tenant (Admin only)")
-    public ApiResponse<List<UserProfileResponse>> getUsersByTenant(@PathVariable String tenantId) {
+    public ApiResponse<List<UserProfileResponse>> getUsersByTenant(@PathVariable Integer tenantId) {
         List<UserProfileResponse> response = userService.getUsersByTenant(tenantId);
         return ApiResponse.success(response);
     }

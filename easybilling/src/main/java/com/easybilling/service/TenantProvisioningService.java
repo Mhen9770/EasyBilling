@@ -46,7 +46,7 @@ public class TenantProvisioningService {
      * Cleanup tenant resources (for testing or tenant deletion).
      * In same-schema approach, this would involve soft-deleting or archiving tenant data.
      */
-    public void deprovisionTenant(String tenantId) {
+    public void deprovisionTenant(Integer tenantId) {
         log.warn("Deprovisioning tenant data for tenant ID: {}", tenantId);
         
         // In same-schema approach, we don't drop schemas

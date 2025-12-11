@@ -15,9 +15,9 @@ public abstract class BaseController {
      * Get current tenant ID from context (extracted from JWT token).
      * Throws exception if not set (should not happen for authenticated requests).
      */
-    protected String getCurrentTenantId() {
-        String tenantId = TenantContext.getTenantId();
-        if (tenantId == null || tenantId.isBlank()) {
+    protected Integer getCurrentTenantId() {
+        Integer tenantId = TenantContext.getTenantId();
+        if (tenantId == null) {
             throw new UnauthorizedException("Tenant ID not found in token. Please login again.");
         }
         return tenantId;

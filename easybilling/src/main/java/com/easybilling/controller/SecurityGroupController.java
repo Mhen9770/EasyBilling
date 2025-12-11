@@ -34,7 +34,7 @@ public class SecurityGroupController extends BaseController {
     @Operation(summary = "Create security group", description = "Create a new security group (Admin only)")
     @PreAuthorize("hasPermission(null, 'SECURITY_GROUP_CREATE')")
     public ApiResponse<SecurityGroupResponse> createSecurityGroup(@Valid @RequestBody SecurityGroupRequest request) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         String createdBy = getCurrentUsername();
         
         SecurityGroupResponse response = securityGroupService.createSecurityGroup(tenantId, request, createdBy);
@@ -65,7 +65,7 @@ public class SecurityGroupController extends BaseController {
     @Operation(summary = "Get all security groups", description = "Get all security groups for current tenant (Admin only)")
     @PreAuthorize("hasPermission(null, 'SECURITY_GROUP_LIST')")
     public ApiResponse<List<SecurityGroupResponse>> getSecurityGroups() {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         List<SecurityGroupResponse> response = securityGroupService.getSecurityGroupsByTenant(tenantId);
         return ApiResponse.success(response);
     }
@@ -74,7 +74,7 @@ public class SecurityGroupController extends BaseController {
     @Operation(summary = "Get active security groups", description = "Get active security groups for current tenant (Admin only)")
     @PreAuthorize("hasPermission(null, 'SECURITY_GROUP_LIST')")
     public ApiResponse<List<SecurityGroupResponse>> getActiveSecurityGroups() {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         List<SecurityGroupResponse> response = securityGroupService.getActiveSecurityGroups(tenantId);
         return ApiResponse.success(response);
     }

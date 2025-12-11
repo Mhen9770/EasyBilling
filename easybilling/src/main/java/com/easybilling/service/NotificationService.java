@@ -23,7 +23,7 @@ public class NotificationService {
     
     @Async
     @Transactional
-    public void sendNotification(NotificationRequest request, String tenantId) {
+    public void sendNotification(NotificationRequest request, Integer tenantId) {
         log.info("Sending {} notification to {} for tenant: {}", 
                 request.getType(), request.getRecipient(), tenantId);
         
@@ -53,12 +53,12 @@ public class NotificationService {
     }
     
     @Transactional(readOnly = true)
-    public Page<Notification> getNotifications(String tenantId, Pageable pageable) {
+    public Page<Notification> getNotifications(Integer tenantId, Pageable pageable) {
         return notificationRepository.findByTenantId(tenantId, pageable);
     }
     
     @Transactional(readOnly = true)
-    public Page<Notification> getNotificationsByStatus(String tenantId, NotificationStatus status, Pageable pageable) {
+    public Page<Notification> getNotificationsByStatus(Integer tenantId, NotificationStatus status, Pageable pageable) {
         return notificationRepository.findByTenantIdAndStatus(tenantId, status, pageable);
     }
 }

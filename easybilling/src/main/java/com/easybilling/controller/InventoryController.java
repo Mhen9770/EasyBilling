@@ -32,7 +32,7 @@ public class InventoryController extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a new product")
     public ApiResponse<ProductResponse> createProduct(@Valid @RequestBody ProductRequest request) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         return ApiResponse.success("Product created successfully", 
                 inventoryService.createProduct(request, tenantId));
     }
@@ -42,7 +42,7 @@ public class InventoryController extends BaseController {
     public ApiResponse<PageResponse<ProductResponse>> getProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         Pageable pageable = PageRequest.of(page, size);
         return ApiResponse.success(inventoryService.getProducts(tenantId, pageable));
     }
@@ -50,14 +50,14 @@ public class InventoryController extends BaseController {
     @GetMapping("/products/{id}")
     @Operation(summary = "Get product by ID")
     public ApiResponse<ProductResponse> getProduct(@PathVariable Long id) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         return ApiResponse.success(inventoryService.getProduct(id, tenantId));
     }
 
     @GetMapping("/products/barcode/{barcode}")
     @Operation(summary = "Search product by barcode")
     public ApiResponse<ProductResponse> getProductByBarcode(@PathVariable String barcode) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         return ApiResponse.success(inventoryService.getProductByBarcode(barcode, tenantId));
     }
 
@@ -66,7 +66,7 @@ public class InventoryController extends BaseController {
     public ApiResponse<ProductResponse> updateProduct(
             @PathVariable Long id,
             @Valid @RequestBody ProductRequest request) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         return ApiResponse.success("Product updated successfully", 
                 inventoryService.updateProduct(id, request, tenantId));
     }
@@ -74,7 +74,7 @@ public class InventoryController extends BaseController {
     @DeleteMapping("/products/{id}")
     @Operation(summary = "Delete product")
     public ApiResponse<Void> deleteProduct(@PathVariable Long id) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         inventoryService.deleteProduct(id, tenantId);
         return ApiResponse.<Void>builder()
                 .success(true)
@@ -87,7 +87,7 @@ public class InventoryController extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a new category")
     public ApiResponse<CategoryResponse> createCategory(@Valid @RequestBody CategoryRequest request) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         return ApiResponse.success("Category created successfully", 
                 inventoryService.createCategory(request, tenantId));
     }
@@ -95,7 +95,7 @@ public class InventoryController extends BaseController {
     @GetMapping("/categories")
     @Operation(summary = "Get all categories")
     public ApiResponse<List<CategoryResponse>> getCategories() {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         return ApiResponse.success(inventoryService.getCategories(tenantId));
     }
 
@@ -104,7 +104,7 @@ public class InventoryController extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a new brand")
     public ApiResponse<BrandResponse> createBrand(@Valid @RequestBody BrandRequest request) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         return ApiResponse.success("Brand created successfully", 
                 inventoryService.createBrand(request, tenantId));
     }
@@ -112,7 +112,7 @@ public class InventoryController extends BaseController {
     @GetMapping("/brands")
     @Operation(summary = "Get all brands")
     public ApiResponse<List<BrandResponse>> getBrands() {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         return ApiResponse.success(inventoryService.getBrands(tenantId));
     }
 
@@ -120,7 +120,7 @@ public class InventoryController extends BaseController {
     @GetMapping("/stock/product/{productId}")
     @Operation(summary = "Get stock levels for a product")
     public ApiResponse<List<StockResponse>> getStockForProduct(@PathVariable Long productId) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         return ApiResponse.success(inventoryService.getStockForProduct(productId, tenantId));
     }
 
@@ -128,7 +128,7 @@ public class InventoryController extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Record stock movement")
     public ApiResponse<Void> recordStockMovement(@Valid @RequestBody StockMovementRequest request) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         String userId = getCurrentUserId();
         inventoryService.recordStockMovement(request, tenantId, userId);
         return ApiResponse.<Void>builder()
@@ -142,7 +142,7 @@ public class InventoryController extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Adjust stock levels")
     public ApiResponse<Void> adjustStock(@Valid @RequestBody StockAdjustmentRequest request) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         String userId = getCurrentUserId();
         inventoryService.adjustStock(request, tenantId, userId);
         return ApiResponse.<Void>builder()
@@ -155,7 +155,7 @@ public class InventoryController extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Transfer stock between locations")
     public ApiResponse<Void> transferStock(@Valid @RequestBody StockTransferRequest request) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         String userId = getCurrentUserId();
         inventoryService.transferStock(request, tenantId, userId);
         return ApiResponse.<Void>builder()
@@ -167,7 +167,7 @@ public class InventoryController extends BaseController {
     @PostMapping("/products/bulk-update")
     @Operation(summary = "Bulk update products")
     public ApiResponse<Void> bulkUpdateProducts(@Valid @RequestBody BulkProductUpdateRequest request) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         inventoryService.bulkUpdateProducts(request, tenantId);
         return ApiResponse.<Void>builder()
                 .success(true)
@@ -178,14 +178,14 @@ public class InventoryController extends BaseController {
     @PostMapping("/products/search")
     @Operation(summary = "Advanced product search")
     public ApiResponse<PageResponse<ProductResponse>> searchProducts(@Valid @RequestBody ProductSearchRequest request) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         return ApiResponse.success(inventoryService.searchProducts(request, tenantId));
     }
 
     @GetMapping("/inventory/dashboard")
     @Operation(summary = "Get inventory dashboard data")
     public ApiResponse<InventoryDashboardResponse> getInventoryDashboard() {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         return ApiResponse.success(inventoryService.getInventoryDashboard(tenantId));
     }
 
@@ -193,7 +193,7 @@ public class InventoryController extends BaseController {
     @Operation(summary = "Get low stock alerts")
     public ApiResponse<List<StockResponse>> getLowStockAlerts(
             @RequestParam(required = false) String locationId) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         return ApiResponse.success(inventoryService.getLowStockAlerts(tenantId, locationId));
     }
 }

@@ -18,7 +18,7 @@ import java.util.List;
 @Slf4j
 public class ReportsService {
     
-    public Object generateReport(ReportRequest request, String tenantId) {
+    public Object generateReport(ReportRequest request, Integer tenantId) {
         log.info("Generating {} report for tenant: {}", request.getReportType(), tenantId);
         
         return switch (request.getReportType()) {
@@ -31,7 +31,7 @@ public class ReportsService {
         };
     }
     
-    private SalesReportResponse generateSalesReport(ReportRequest request, String tenantId) {
+    private SalesReportResponse generateSalesReport(ReportRequest request, Integer tenantId) {
         // TODO: Integrate with billing service to get actual sales data
         // For now, return mock data structure
         
@@ -63,7 +63,7 @@ public class ReportsService {
                 .build();
     }
     
-    private InventoryReportResponse generateInventoryReport(ReportRequest request, String tenantId) {
+    private InventoryReportResponse generateInventoryReport(ReportRequest request, Integer tenantId) {
         // TODO: Integrate with inventory service to get actual stock data
         
         return InventoryReportResponse.builder()
@@ -76,22 +76,22 @@ public class ReportsService {
                 .build();
     }
     
-    private Object generateCustomerReport(ReportRequest request, String tenantId) {
+    private Object generateCustomerReport(ReportRequest request, Integer tenantId) {
         // TODO: Integrate with customer service
         return new Object();
     }
     
-    private Object generateTaxReport(ReportRequest request, String tenantId) {
+    private Object generateTaxReport(ReportRequest request, Integer tenantId) {
         // TODO: Calculate tax summary from invoices
         return new Object();
     }
     
-    private Object generateProfitLossReport(ReportRequest request, String tenantId) {
+    private Object generateProfitLossReport(ReportRequest request, Integer tenantId) {
         // TODO: Calculate P&L from sales and purchases
         return new Object();
     }
     
-    private Object generatePerformanceReport(ReportRequest request, String tenantId) {
+    private Object generatePerformanceReport(ReportRequest request, Integer tenantId) {
         // TODO: Generate user/store performance metrics
         return new Object();
     }
