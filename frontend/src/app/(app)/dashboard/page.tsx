@@ -10,10 +10,12 @@ import { PageLoader } from '@/components/ui/Loader';
 import { StatCard, Card, CardHeader, CardTitle, CardContent, Badge } from '@/components/ui';
 import { SalesLineChart, RevenueBarChart } from '@/components/ui/Charts';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const router = useRouter();
 
   // Get today's date range
   const today = new Date();
@@ -111,7 +113,7 @@ export default function DashboardPage() {
             isPositive: true,
             label: 'vs last month',
           }}
-          onClick={() => window.location.href = '/reports'}
+          onClick={() => router.push('/reports')}
         />
         
         <StatCard
@@ -124,7 +126,7 @@ export default function DashboardPage() {
             isPositive: false,
             label: 'low stock items',
           }}
-          onClick={() => window.location.href = '/inventory/products'}
+          onClick={() => router.push('/inventory/products')}
         />
         
         <StatCard
@@ -137,7 +139,7 @@ export default function DashboardPage() {
             isPositive: true,
             label: 'new this month',
           }}
-          onClick={() => window.location.href = '/customers'}
+          onClick={() => router.push('/customers')}
         />
         
         <StatCard

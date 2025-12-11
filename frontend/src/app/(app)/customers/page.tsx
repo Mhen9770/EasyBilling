@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack:react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { customerApi, type CustomerRequest, type CustomerResponse } from '@/lib/api/customer/customerApi';
 import { useToastStore } from '@/components/ui/toast';
 import { Card, CardHeader, CardTitle, CardContent, Button, Input, Modal, Badge, Table, type Column } from '@/components/ui';

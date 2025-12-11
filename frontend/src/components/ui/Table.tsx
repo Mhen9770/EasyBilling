@@ -103,7 +103,7 @@ export function Table<T>({
             ))}
           </tr>
         </thead>
-        <tbody className={`bg-white divide-y divide-gray-200 ${striped ? 'divide-gray-200' : ''}`}>
+        <tbody className={`bg-white divide-y divide-gray-200`}>
           {sortedData.map((item, index) => (
             <tr
               key={keyExtractor(item)}

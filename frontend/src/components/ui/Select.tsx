@@ -24,7 +24,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     },
     ref
   ) => {
-    const selectId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
+    const selectId = id || `select-${Math.random().toString(36).substring(2, 9)}`;
     
     const baseStyles = 'block px-3 py-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 transition-colors duration-200 bg-white';
     const stateStyles = error
