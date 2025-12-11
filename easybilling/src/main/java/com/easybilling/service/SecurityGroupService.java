@@ -99,8 +99,8 @@ public class SecurityGroupService {
         securityGroup = securityGroupRepository.save(securityGroup);
         
         log.info("Security group updated: {}", securityGroupId);
-        int userCount = userSecurityGroupRepository.findBySecurityGroupId(securityGroupId).size();
-        return mapToResponse(securityGroup, userCount);
+        long userCount = userSecurityGroupRepository.countBySecurityGroupId(securityGroupId);
+        return mapToResponse(securityGroup, (int) userCount);
     }
     
     /**
@@ -111,9 +111,9 @@ public class SecurityGroupService {
         log.debug("Getting security group: {}", securityGroupId);
         
         SecurityGroup securityGroup = findSecurityGroupById(securityGroupId);
-        int userCount = userSecurityGroupRepository.findBySecurityGroupId(securityGroupId).size();
+        long userCount = userSecurityGroupRepository.countBySecurityGroupId(securityGroupId);
         
-        return mapToResponse(securityGroup, userCount);
+        return mapToResponse(securityGroup, (int) userCount);
     }
     
     /**
@@ -128,8 +128,8 @@ public class SecurityGroupService {
         
         return securityGroups.stream()
                 .map(sg -> {
-                    int userCount = userSecurityGroupRepository.findBySecurityGroupId(sg.getId()).size();
-                    return mapToResponse(sg, userCount);
+                    long userCount = userSecurityGroupRepository.countBySecurityGroupId(sg.getId());
+                    return mapToResponse(sg, (int) userCount);
                 })
                 .collect(Collectors.toList());
     }
@@ -145,8 +145,8 @@ public class SecurityGroupService {
         
         return securityGroups.stream()
                 .map(sg -> {
-                    int userCount = userSecurityGroupRepository.findBySecurityGroupId(sg.getId()).size();
-                    return mapToResponse(sg, userCount);
+                    long userCount = userSecurityGroupRepository.countBySecurityGroupId(sg.getId());
+                    return mapToResponse(sg, (int) userCount);
                 })
                 .collect(Collectors.toList());
     }

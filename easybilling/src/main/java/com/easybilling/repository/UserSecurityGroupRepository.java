@@ -27,6 +27,11 @@ public interface UserSecurityGroupRepository extends JpaRepository<UserSecurityG
     List<UserSecurityGroup> findBySecurityGroupId(String securityGroupId);
     
     /**
+     * Count users in a security group.
+     */
+    long countBySecurityGroupId(String securityGroupId);
+    
+    /**
      * Check if user is assigned to a security group.
      */
     boolean existsByUserIdAndSecurityGroupId(String userId, String securityGroupId);

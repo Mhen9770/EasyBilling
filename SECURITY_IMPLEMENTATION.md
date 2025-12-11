@@ -74,11 +74,12 @@ user_security_groups (
 - Helper component for complex permission checks
 - Supports `hasAnyPermission()` - user has at least one permission
 - Supports `hasAllPermissions()` - user has all specified permissions
-- Used in custom annotations
+- Can be used in SpEL expressions for advanced authorization logic
 
-**Custom Annotations**
-- `@RequirePermission(Permission.X)` - Single permission check
-- `@RequireAnyPermission({Permission.X, Permission.Y})` - Any permission check
+**Permission Annotations**
+- Use `@PreAuthorize("hasPermission(null, 'PERMISSION_NAME')")` for permission checks
+- Example: `@PreAuthorize("hasPermission(null, 'PRODUCT_CREATE')")`
+- Supports SpEL expressions for complex conditions
 
 #### 4. Performance Optimization
 
