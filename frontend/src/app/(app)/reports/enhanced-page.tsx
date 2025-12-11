@@ -282,7 +282,7 @@ export default function EnhancedReportsPage() {
                 />
                 <StatCard
                   title="Out of Stock"
-                  value={inventoryData.summary?.outOfStock || 0}
+                  value={inventoryData.summary?.outOfStockItems || 0}
                   icon="❌"
                   color="red"
                 />
