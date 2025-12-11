@@ -1,0 +1,77 @@
+package com.runtime.engine.plugin;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import com.runtime.engine.util.JsonAttributesConverter;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+
+@Entity
+@Table(name = "plugin_definitions")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class PluginDefinition {
+    
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @Column(nullable = false, unique = true)
+    private String name;
+    
+    @Column(length = 1000)
+    private String description;
+    
+    @Column(nullable = false)
+    private String pluginType;
+    
+    @Column(nullable = false)
+    private String tenantId;
+    
+    @Column(nullable = false)
+    private String trigger;
+    
+    @Column(nullable = false)
+    private String handlerClass;
+    
+    @Convert(converter = JsonAttributesConverter.class)
+    @Column(columnDefinition = "JSON")
+    private Map<String, Object> config;
+    
+    @Column(nullable = false)
+    private Integer priority = 0;
+    
+    @Column(nullable = false)
+    private Boolean active = true;
+    
+    @Convert(converter = JsonAttributesConverter.class)
+    @Column(columnDefinition = "JSON")
+    private Map<String, Object> metadata;
+    
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+    
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+    
+    private String createdBy;
+    
+    private String updatedBy;
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+    }
+    
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+}

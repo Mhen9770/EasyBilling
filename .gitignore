@@ -27,6 +27,12 @@ backend/**/build/
 *.ear
 hs_err_pid*
 
+# Maven
+**/target/
+**/.mvn/
+**/mvnw
+**/mvnw.cmd
+
 # Node/Frontend
 frontend/node_modules/
 frontend/.next/
