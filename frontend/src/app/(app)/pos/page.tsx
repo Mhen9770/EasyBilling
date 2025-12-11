@@ -8,6 +8,9 @@ import { billingApi, InvoiceRequest, PaymentRequest, HeldInvoiceResponse } from 
 import { customerApi } from '@/lib/api/customer/customerApi';
 import { useToastStore } from '@/components/ui/toast';
 import { PageLoader, ButtonLoader, InlineLoader } from '@/components/ui/Loader';
+import { GSTINInput } from '@/components/gst/GSTINInput';
+import { GSTBreakdown } from '@/components/gst/GSTBreakdown';
+import { formatIndianCurrency, convertCurrencyToWords, getStateCodeFromGSTIN } from '@/lib/utils/indianFormatter';
 
 export default function POSPage() {
   const [searchInput, setSearchInput] = useState('');
@@ -24,6 +27,9 @@ export default function POSPage() {
   const [discountModal, setDiscountModal] = useState<{ open: boolean; itemId?: string }>({ open: false });
   const [discountType, setDiscountType] = useState<'PERCENTAGE' | 'FLAT'>('PERCENTAGE');
   const [discountValue, setDiscountValue] = useState('');
+  const [customerGstin, setCustomerGstin] = useState('');
+  const [supplierGstin, setSupplierGstin] = useState('27AABCU9603R1ZX'); // Default supplier GSTIN
+  const [showGstSection, setShowGstSection] = useState(false);
   
   const searchInputRef = useRef<HTMLInputElement>(null);
   const { addToast } = useToastStore();
@@ -334,6 +340,11 @@ export default function POSPage() {
 
     setIsProcessing(true);
 
+    // Determine if interstate based on GSTIN
+    const supplierState = supplierGstin ? getStateCodeFromGSTIN(supplierGstin) : null;
+    const customerState = customerGstin ? getStateCodeFromGSTIN(customerGstin) : null;
+    const isInterstate = supplierState && customerState ? supplierState !== customerState : false;
+
     const invoiceData: InvoiceRequest = {
       customerName: selectedCustomer?.name || customer.name,
       customerPhone: selectedCustomer?.phone || customer.phone,
@@ -348,7 +359,16 @@ export default function POSPage() {
         discountType: item.discountType,
         discountValue: item.discountValue,
         taxRate: item.taxRate,
+        // GST fields
+        hsnCode: '1234', // Default HSN, should be from product
+        cgstRate: isInterstate ? 0 : (item.taxRate || 0) / 2,
+        sgstRate: isInterstate ? 0 : (item.taxRate || 0) / 2,
+        igstRate: isInterstate ? (item.taxRate || 0) : 0,
       })),
+      // GST fields
+      customerGstin: customerGstin || undefined,
+      supplierGstin: supplierGstin || undefined,
+      placeOfSupply: customerState || undefined,
     };
 
     const paymentsList: PaymentRequest[] = payments.map((p) => ({
@@ -652,6 +672,45 @@ export default function POSPage() {
                 >
                   + Add customer
                 </button>
+              </div>
+            )}
+          </div>
+
+          {/* GST Section */}
+          <div className="p-4 border-b border-gray-200">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold text-gray-900">GST Details (India)</h2>
+              <button
+                onClick={() => setShowGstSection(!showGstSection)}
+                className="text-xs text-blue-600 hover:text-blue-700"
+              >
+                {showGstSection ? 'Hide' : 'Show'}
+              </button>
+            </div>
+
+            {showGstSection && (
+              <div className="space-y-3">
+                <div>
+                  <GSTINInput
+                    value={customerGstin}
+                    onChange={setCustomerGstin}
+                    label="Customer GSTIN"
+                    placeholder="Optional - for B2B"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Your GSTIN
+                  </label>
+                  <input
+                    type="text"
+                    value={supplierGstin}
+                    onChange={(e) => setSupplierGstin(e.target.value.toUpperCase())}
+                    placeholder="Your business GSTIN"
+                    maxLength={15}
+                    className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -1044,23 +1103,45 @@ export default function POSPage() {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Subtotal:</span>
-                    <span>₹{completedInvoice.subtotal.toFixed(2)}</span>
+                    <span>{formatIndianCurrency(completedInvoice.subtotal)}</span>
                   </div>
                   {completedInvoice.totalDiscount > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Discount:</span>
-                      <span>-₹{completedInvoice.totalDiscount.toFixed(2)}</span>
+                      <span>-{formatIndianCurrency(completedInvoice.totalDiscount)}</span>
                     </div>
                   )}
                   <div className="flex justify-between">
                     <span>Tax:</span>
-                    <span>₹{completedInvoice.totalTax.toFixed(2)}</span>
+                    <span>{formatIndianCurrency(completedInvoice.totalTax)}</span>
                   </div>
                   <div className="flex justify-between font-bold text-lg border-t pt-2">
                     <span>Total:</span>
-                    <span>₹{completedInvoice.total.toFixed(2)}</span>
+                    <span>{formatIndianCurrency(completedInvoice.total)}</span>
                   </div>
+                  
+                  {/* Amount in words */}
+                  {completedInvoice.total > 0 && (
+                    <div className="text-xs text-gray-600 border-t pt-2 italic">
+                      Amount in words: {convertCurrencyToWords(completedInvoice.total)} Only
+                    </div>
+                  )}
                 </div>
+
+                {/* GST Breakdown if available */}
+                {(completedInvoice.totalCgst > 0 || completedInvoice.totalSgst > 0 || completedInvoice.totalIgst > 0) && (
+                  <div className="border-t pt-4">
+                    <GSTBreakdown
+                      taxableAmount={completedInvoice.subtotal - (completedInvoice.totalDiscount || 0)}
+                      cgst={completedInvoice.totalCgst || 0}
+                      sgst={completedInvoice.totalSgst || 0}
+                      igst={completedInvoice.totalIgst || 0}
+                      cess={completedInvoice.totalCess || 0}
+                      isInterstate={completedInvoice.isInterstate || false}
+                      showRates={false}
+                    />
+                  </div>
+                )}
 
                 {completedInvoice.payments && completedInvoice.payments.length > 0 && (
                   <div className="border-t pt-4">

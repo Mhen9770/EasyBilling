@@ -10,6 +10,13 @@ export interface InvoiceItemRequest {
   discountValue?: number;
   taxType?: 'CGST_SGST' | 'IGST' | 'NONE';
   taxRate?: number;
+  // GST fields (India)
+  hsnCode?: string;
+  sacCode?: string;
+  cgstRate?: number;
+  sgstRate?: number;
+  igstRate?: number;
+  cessRate?: number;
 }
 
 export interface PaymentRequest {
@@ -27,6 +34,11 @@ export interface InvoiceRequest {
   counterId: string;
   items: InvoiceItemRequest[];
   notes?: string;
+  // GST fields (India)
+  customerGstin?: string;
+  placeOfSupply?: string;
+  supplierGstin?: string;
+  reverseCharge?: boolean;
 }
 
 export interface InvoiceItemResponse {
@@ -42,6 +54,17 @@ export interface InvoiceItemResponse {
   taxRate?: number;
   taxAmount: number;
   lineTotal: number;
+  // GST fields (India)
+  hsnCode?: string;
+  sacCode?: string;
+  cgstRate?: number;
+  sgstRate?: number;
+  igstRate?: number;
+  cessRate?: number;
+  cgstAmount?: number;
+  sgstAmount?: number;
+  igstAmount?: number;
+  cessAmount?: number;
 }
 
 export interface PaymentResponse {
@@ -73,6 +96,16 @@ export interface InvoiceResponse {
   completedBy?: string;
   createdAt: string;
   completedAt?: string;
+  // GST fields (India)
+  customerGstin?: string;
+  supplierGstin?: string;
+  placeOfSupply?: string;
+  reverseCharge?: boolean;
+  isInterstate?: boolean;
+  totalCgst?: number;
+  totalSgst?: number;
+  totalIgst?: number;
+  totalCess?: number;
 }
 
 export const billingApi = {
