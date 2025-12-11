@@ -19,7 +19,17 @@ export type { TenantRequest, TenantResponse } from './tenant/tenantApi';
 // User Management
 import { userApi } from './user/userApi';
 export { userApi };
-export type { UserRequest, UserResponse, UserRole, UserStatus } from './user/userApi';
+export type { UserRequest, UserResponse, UserRole, UserStatus, CreateUserRequest } from './user/userApi';
+
+// Security Management
+import { securityApi } from './security/securityApi';
+export { securityApi };
+export type {
+  Permission,
+  SecurityGroupRequest,
+  SecurityGroupResponse,
+  AssignSecurityGroupRequest,
+} from './security/securityApi';
 
 // Customer
 import { customerApi } from './customer/customerApi';
@@ -85,6 +95,7 @@ export const api = {
   auth: authApi,
   tenant: tenantApi,
   user: userApi,
+  security: securityApi,
   customer: customerApi,
   supplier: supplierApi,
   inventory: inventoryApi,
