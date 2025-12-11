@@ -56,7 +56,7 @@ app:
   
   multi-tenancy:
     domain: easybilling.com
-    strategy: SCHEMA_PER_TENANT
+    strategy: SAME_SCHEMA_WITH_TENANT_ID
   
   billing:
     invoice-prefix: INV

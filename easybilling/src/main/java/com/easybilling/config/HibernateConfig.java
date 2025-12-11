@@ -1,9 +1,6 @@
 package com.easybilling.config;
 
 import lombok.RequiredArgsConstructor;
-import org.hibernate.cfg.AvailableSettings;
-import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
-import org.hibernate.engine.jdbc.connections.spi.MultiTenantConnectionProvider;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,8 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Hibernate configuration for multi-tenancy support.
- * Configures schema-per-tenant strategy.
+ * Hibernate configuration for same-schema multitenancy.
+ * Uses tenant filtering instead of schema-per-tenant strategy.
  */
 @Configuration
 @RequiredArgsConstructor
@@ -25,8 +22,6 @@ public class HibernateConfig {
     
     private final DataSource dataSource;
     private final JpaProperties jpaProperties;
-    private final MultiTenantConnectionProvider multiTenantConnectionProvider;
-    private final CurrentTenantIdentifierResolver currentTenantIdentifierResolver;
     
     @Bean
     public JpaVendorAdapter jpaVendorAdapter() {
@@ -42,14 +37,9 @@ public class HibernateConfig {
         
         Map<String, Object> jpaPropertiesMap = new HashMap<>(jpaProperties.getProperties());
         
-        // Multi-tenancy configuration
-        jpaPropertiesMap.put("hibernate.multiTenancy", "SCHEMA");
-        jpaPropertiesMap.put(AvailableSettings.MULTI_TENANT_IDENTIFIER_RESOLVER, currentTenantIdentifierResolver);
-        jpaPropertiesMap.put(AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER, multiTenantConnectionProvider);
-
-        jpaPropertiesMap.put(AvailableSettings.HBM2DDL_AUTO, "update");
-        
-        // JPA will handle schema creation via ddl-auto setting from application.yml
+        // No longer using schema-based multitenancy
+        // Tenant isolation is now handled via Hibernate filters and tenant_id column
+        jpaPropertiesMap.put("hibernate.hbm2ddl.auto", "update");
         
         em.setJpaPropertyMap(jpaPropertiesMap);
         

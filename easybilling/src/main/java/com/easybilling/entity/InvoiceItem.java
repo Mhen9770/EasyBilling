@@ -1,21 +1,31 @@
 package com.easybilling.entity;
 
 import com.easybilling.enums.DiscountType;
+import com.easybilling.listener.TenantEntityListener;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "invoice_items")
+@Table(name = "invoice_items", indexes = {
+        @Index(name = "idx_invoice_item_tenant", columnList = "tenant_id"),
+        @Index(name = "idx_invoice_item_invoice", columnList = "invoice_id")
+})
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = String.class))
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class InvoiceItem {
+@EntityListeners(TenantEntityListener.class)
+public class InvoiceItem implements TenantAware {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -57,6 +67,9 @@ public class InvoiceItem {
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal lineTotal;
+    
+    @Column(nullable = false, name = "tenant_id")
+    private String tenantId;
     
     // GST fields for India
     @Column(name = "hsn_code", length = 20)

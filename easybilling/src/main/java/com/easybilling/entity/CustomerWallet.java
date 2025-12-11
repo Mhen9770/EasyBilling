@@ -1,11 +1,15 @@
 package com.easybilling.entity;
 
+import com.easybilling.listener.TenantEntityListener;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -18,12 +22,14 @@ import java.time.LocalDateTime;
     @Index(name = "idx_wallet_customer", columnList = "customer_id"),
     @Index(name = "idx_wallet_tenant", columnList = "tenant_id")
 })
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = String.class))
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-public class CustomerWallet {
+@EntityListeners({AuditingEntityListener.class, TenantEntityListener.class})
+public class CustomerWallet implements TenantAware {
     
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

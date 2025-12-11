@@ -2,11 +2,15 @@ package com.easybilling.entity;
 
 import com.easybilling.enums.NotificationStatus;
 import com.easybilling.enums.NotificationType;
+import com.easybilling.listener.TenantEntityListener;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -18,12 +22,14 @@ import java.time.LocalDateTime;
     @Index(name = "idx_notification_status", columnList = "status"),
     @Index(name = "idx_notification_type", columnList = "type")
 })
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = String.class))
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-public class Notification {
+@EntityListeners({AuditingEntityListener.class, TenantEntityListener.class})
+public class Notification implements TenantAware {
     
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

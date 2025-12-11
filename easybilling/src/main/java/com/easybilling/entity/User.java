@@ -1,8 +1,12 @@
 package com.easybilling.entity;
 
+import com.easybilling.listener.TenantEntityListener;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
@@ -19,12 +23,15 @@ import java.util.Set;
         @Index(name = "idx_user_tenant", columnList = "tenant_id"),
         @Index(name = "idx_user_status", columnList = "status")
 })
+@FilterDef(name = "tenantFilter", parameters = @ParamDef(name = "tenantId", type = String.class))
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class User {
+@EntityListeners(TenantEntityListener.class)
+public class User implements TenantAware {
     
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
