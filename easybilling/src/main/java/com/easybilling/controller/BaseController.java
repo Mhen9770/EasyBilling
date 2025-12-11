@@ -3,6 +3,8 @@ package com.easybilling.controller;
 import com.easybilling.context.TenantContext;
 import com.easybilling.context.UserContext;
 import com.easybilling.exception.UnauthorizedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Base controller with helper methods for multi-tenancy.
@@ -31,6 +33,17 @@ public abstract class BaseController {
             throw new UnauthorizedException("User ID not found in token. Please login again.");
         }
         return userId;
+    }
+    
+    /**
+     * Get current username from Spring Security context.
+     */
+    protected String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getName() == null) {
+            throw new UnauthorizedException("User not authenticated");
+        }
+        return authentication.getName();
     }
 }
 

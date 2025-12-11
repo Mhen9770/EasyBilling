@@ -69,6 +69,7 @@ export type {
   UserStatus,
   UserRequest,
   UserResponse,
+  CreateUserRequest,
 } from './user/userApi';
 
 // Re-export types from tenant API
@@ -76,3 +77,11 @@ export type {
   TenantRequest,
   TenantResponse,
 } from './tenant/tenantApi';
+
+// Re-export types from security API
+export type {
+  Permission,
+  SecurityGroupRequest,
+  SecurityGroupResponse,
+  AssignSecurityGroupRequest,
+} from './security/securityApi';

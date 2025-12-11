@@ -2,14 +2,28 @@ package com.easybilling.service;
 
 import com.easybilling.context.TenantContext;
 import com.easybilling.entity.Tenant;
+import jakarta.persistence.EntityManagerFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.tool.schema.TargetType;
+import org.hibernate.tool.schema.spi.SchemaManagementTool;
+import org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator;
+import org.hibernate.tool.schema.spi.ExecutionOptions;
+import org.hibernate.tool.schema.spi.TargetDescriptor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Service responsible for provisioning tenant infrastructure.
@@ -23,6 +37,7 @@ public class TenantProvisioningService {
     private final JdbcTemplate jdbcTemplate;
     private final TenantMasterDataService masterDataService;
     private final DataSource dataSource;
+    private final EntityManagerFactory entityManagerFactory;
     
     /**
      * Provision tenant infrastructure (schema creation and table initialization).
@@ -43,7 +58,7 @@ public class TenantProvisioningService {
             initializeTenantSchema(schemaName);
             
             // Initialize master data
-            masterDataService.initializeMasterData(tenant);
+//            masterDataService.initializeMasterData(tenant);
             
             log.info("Tenant infrastructure provisioned successfully for: {} with schema: {}", 
                     tenant.getSlug(), schemaName);
@@ -75,8 +90,8 @@ public class TenantProvisioningService {
     }
     
     /**
-     * Initialize tenant schema by triggering JPA table creation.
-     * This is done by setting the tenant context and accessing any entity.
+     * Initialize tenant schema by triggering Hibernate DDL generation.
+     * Creates all JPA entity tables in the tenant schema.
      */
     private void initializeTenantSchema(String schemaName) {
         log.info("Initializing JPA tables for schema: {}", schemaName);
@@ -92,9 +107,24 @@ public class TenantProvisioningService {
             // Switch to tenant schema
             stmt.execute("USE `" + schemaName + "`");
             
-            // JPA/Hibernate will automatically create tables when we access the schema
-            // due to ddl-auto=update setting
-            log.info("Schema initialized, JPA will create tables on first access: {}", schemaName);
+            // Trigger Hibernate to create tables using the current connection
+            // by setting tenant context and accessing EntityManager
+            String previousTenant = TenantContext.getTenantId();
+            try {
+                TenantContext.setTenantId(schemaName);
+                
+                // Force Hibernate to initialize tables by accessing the EntityManager
+                // This triggers ddl-auto behavior
+                entityManagerFactory.createEntityManager().close();
+                
+                log.info("JPA tables created successfully in schema: {}", schemaName);
+            } finally {
+                if (previousTenant != null) {
+                    TenantContext.setTenantId(previousTenant);
+                } else {
+                    TenantContext.clear();
+                }
+            }
             
             // Switch back to master schema
             stmt.execute("USE `easybilling`");

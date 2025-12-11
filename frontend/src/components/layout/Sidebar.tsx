@@ -44,6 +44,11 @@ const navigationItems: NavItem[] = [
     icon: '🏢',
   },
   {
+    label: 'GST Management',
+    href: '/gst',
+    icon: '🇮🇳',
+  },
+  {
     label: 'Reports',
     href: '/reports',
     icon: '📈',

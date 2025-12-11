@@ -1,8 +1,19 @@
 import apiClient from '../client';
 import { ApiResponse, PageResponse } from '../types';
 
-export type UserRole = 'ADMIN' | 'MANAGER' | 'STAFF' | 'VIEWER';
-export type UserStatus = 'ACTIVE' | 'SUSPENDED' | 'INACTIVE';
+export type UserRole = 'ADMIN' | 'STAFF';
+export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'LOCKED' | 'PENDING_VERIFICATION';
+
+export interface CreateUserRequest {
+  username: string;
+  email: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  role: UserRole;
+  securityGroupIds?: string[]; // Only for STAFF users
+}
 
 export interface UserRequest {
   username: string;
@@ -17,16 +28,19 @@ export interface UserResponse {
   id: string;
   username: string;
   email: string;
-  fullName: string;
+  firstName?: string;
+  lastName?: string;
   phone?: string;
-  role: UserRole;
+  tenantId: string;
   status: UserStatus;
+  roles: string[];
   lastLogin?: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export const userApi = {
-  createUser: async (data: UserRequest): Promise<ApiResponse<UserResponse>> => {
+  createUser: async (data: CreateUserRequest): Promise<ApiResponse<UserResponse>> => {
     const response = await apiClient.post<ApiResponse<UserResponse>>(
       '/api/v1/users',
       data
@@ -34,10 +48,10 @@ export const userApi = {
     return response.data;
   },
 
-  listUsers: async (page = 0, size = 20, role?: UserRole): Promise<ApiResponse<PageResponse<UserResponse>>> => {
+  listUsers: async (page = 0, size = 20, sortBy = 'createdAt', sortDirection = 'DESC'): Promise<ApiResponse<PageResponse<UserResponse>>> => {
     const response = await apiClient.get<ApiResponse<PageResponse<UserResponse>>>(
       '/api/v1/users',
-      { params: { page, size, role } }
+      { params: { page, size, sortBy, sortDirection } }
     );
     return response.data;
   },
@@ -64,24 +78,23 @@ export const userApi = {
     return response.data;
   },
 
-  suspendUser: async (id: string): Promise<ApiResponse<UserResponse>> => {
-    const response = await apiClient.post<ApiResponse<UserResponse>>(
-      `/api/v1/users/${id}/suspend`
-    );
-    return response.data;
-  },
-
-  activateUser: async (id: string): Promise<ApiResponse<UserResponse>> => {
-    const response = await apiClient.post<ApiResponse<UserResponse>>(
-      `/api/v1/users/${id}/activate`
-    );
-    return response.data;
-  },
-
-  updateRole: async (id: string, role: UserRole): Promise<ApiResponse<UserResponse>> => {
+  updateUserStatus: async (id: string, status: UserStatus): Promise<ApiResponse<UserResponse>> => {
     const response = await apiClient.put<ApiResponse<UserResponse>>(
-      `/api/v1/users/${id}/role`,
-      { role }
+      `/api/v1/users/${id}/status?status=${status}`
+    );
+    return response.data;
+  },
+
+  addRoleToUser: async (id: string, role: string): Promise<ApiResponse<UserResponse>> => {
+    const response = await apiClient.post<ApiResponse<UserResponse>>(
+      `/api/v1/users/${id}/roles/${role}`
+    );
+    return response.data;
+  },
+
+  removeRoleFromUser: async (id: string, role: string): Promise<ApiResponse<UserResponse>> => {
+    const response = await apiClient.delete<ApiResponse<UserResponse>>(
+      `/api/v1/users/${id}/roles/${role}`
     );
     return response.data;
   },

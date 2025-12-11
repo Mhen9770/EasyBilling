@@ -19,7 +19,26 @@ export type { TenantRequest, TenantResponse } from './tenant/tenantApi';
 // User Management
 import { userApi } from './user/userApi';
 export { userApi };
-export type { UserRequest, UserResponse, UserRole, UserStatus } from './user/userApi';
+export type { UserRequest, UserResponse, UserRole, UserStatus, CreateUserRequest } from './user/userApi';
+
+// Security Management
+import { securityApi } from './security/securityApi';
+export { securityApi };
+export type {
+  Permission,
+  SecurityGroupRequest,
+  SecurityGroupResponse,
+  AssignSecurityGroupRequest,
+} from './security/securityApi';
+
+// GST (India)
+import { gstApi } from './gst/gstApi';
+export { gstApi };
+export type {
+  GstRate,
+  GstCalculation,
+  GstCalculationRequest,
+} from './gst/gstApi';
 
 // Customer
 import { customerApi } from './customer/customerApi';
@@ -85,6 +104,8 @@ export const api = {
   auth: authApi,
   tenant: tenantApi,
   user: userApi,
+  security: securityApi,
+  gst: gstApi,
   customer: customerApi,
   supplier: supplierApi,
   inventory: inventoryApi,
