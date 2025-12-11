@@ -12,6 +12,8 @@ public interface EntityDefinitionRepository extends JpaRepository<EntityDefiniti
     
     Optional<EntityDefinition> findByName(String name);
     
+    Optional<EntityDefinition> findByNameAndTenantId(String name, String tenantId);
+    
     List<EntityDefinition> findByTenantId(String tenantId);
     
     List<EntityDefinition> findByTenantIdAndActive(String tenantId, Boolean active);

@@ -5,9 +5,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface WorkflowRepository extends JpaRepository<WorkflowDefinition, Long> {
+    
+    Optional<WorkflowDefinition> findByNameAndTenantId(String name, String tenantId);
     
     List<WorkflowDefinition> findByEntityTypeAndTenantId(String entityType, String tenantId);
     

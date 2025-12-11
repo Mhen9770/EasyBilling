@@ -131,88 +131,75 @@ function DemoDashboard() {
 }
 
 /**
- * Demo Form Component
+ * Demo Form Component - Fetches from backend
  */
 function DemoForm() {
-  const [formMeta] = useState<FormMetadata>({
-    id: 'customer.form.basic',
-    entity: 'Customer',
-    title: 'Create Customer',
-    layout: {
-      type: 'two-column',
-      areas: [
-        { name: 'left', width: 60 },
-        { name: 'right', width: 40 },
-      ],
-    },
-    fields: [
-      {
-        name: 'customerName',
-        component: 'Text',
-        label: 'Customer Name',
-        required: true,
-        validation: { minLength: 2, maxLength: 100 },
-      },
-      {
-        name: 'email',
-        component: 'Text',
-        label: 'Email Address',
-        required: true,
-        validation: { pattern: '^[A-Za-z0-9+_.-]+@(.+)$' },
-      },
-      {
-        name: 'phoneNumber',
-        component: 'Text',
-        label: 'Phone Number',
-        required: true,
-        validation: { maxLength: 20 },
-      },
-      {
-        name: 'address',
-        component: 'TextArea',
-        label: 'Address',
-      },
-      {
-        name: 'balance',
-        component: 'Number',
-        label: 'Account Balance',
-        validation: { min: -999999999, max: 999999999 },
-      },
-      {
-        name: 'creditLimit',
-        component: 'Number',
-        label: 'Credit Limit',
-        validation: { min: 0, max: 999999999 },
-      },
-      {
-        name: 'status',
-        component: 'Select',
-        label: 'Status',
-        optionsSource: {
-          type: 'data',
-          data: [
-            { value: 'active', label: 'Active' },
-            { value: 'inactive', label: 'Inactive' },
-            { value: 'suspended', label: 'Suspended' },
-            { value: 'blocked', label: 'Blocked' },
-          ],
-        },
-      },
-    ],
-    actions: [
-      {
-        id: 'save',
-        label: 'Save Customer',
-        type: 'submit',
-        permission: 'entity:Customer:write',
-      },
-    ],
-  });
+  const [formMeta, setFormMeta] = useState<FormMetadata | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadForm = async () => {
+      try {
+        setLoading(true);
+        metadataClient.setHeaders('default', 'admin');
+        const metadata = await metadataClient.fetchForm('Customer');
+        setFormMeta(metadata);
+      } catch (err: any) {
+        console.error('Error loading form metadata:', err);
+        setError(err.message || 'Failed to load form metadata');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadForm();
+  }, []);
 
   const handleSuccess = async (data: any) => {
-    console.log('Form submitted successfully:', data);
-    alert('Customer created!\n\n' + JSON.stringify(data, null, 2));
+    console.log('Form submitted:', data);
+    try {
+      apiClient.setCredentials('default', 'admin');
+      const result = await apiClient.createEntity('Customer', data);
+      alert('Customer created successfully!\n\n' + JSON.stringify(result, null, 2));
+    } catch (err: any) {
+      console.error('Error creating customer:', err);
+      alert('Error: ' + (err.response?.data?.error || err.message));
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading form metadata from backend...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="bg-red-50 border border-red-200 rounded p-4 text-red-800">
+          <h3 className="font-semibold mb-2">Error Loading Form</h3>
+          <p>{error}</p>
+          <p className="text-sm mt-2">Make sure the backend is running at http://localhost:8081</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!formMeta) {
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <p className="text-gray-600">No form metadata available</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -222,28 +209,63 @@ function DemoForm() {
 }
 
 /**
- * Demo List Component
+ * Demo List Component - Fetches from backend
  */
 function DemoList() {
-  const [listMeta] = useState<ListMetadata>({
-    id: 'customer.list',
-    entity: 'Customer',
-    columns: [
-      { field: 'customerName', label: 'Customer Name', sortable: true },
-      { field: 'email', label: 'Email', sortable: true },
-      { field: 'phoneNumber', label: 'Phone', sortable: false },
-      { field: 'balance', label: 'Balance', sortable: true, format: 'currency' },
-      { field: 'status', label: 'Status', sortable: true },
-    ],
-    pageSize: 10,
-    filters: [
-      { name: 'customerName', component: 'Text', label: 'Name' },
-    ],
-    rowActions: [
-      { id: 'edit', label: 'Edit', type: 'navigate' },
-      { id: 'delete', label: 'Delete', type: 'action' },
-    ],
-  });
+  const [listMeta, setListMeta] = useState<ListMetadata | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadList = async () => {
+      try {
+        setLoading(true);
+        metadataClient.setHeaders('default', 'admin');
+        const metadata = await metadataClient.fetchList('Customer');
+        setListMeta(metadata);
+      } catch (err: any) {
+        console.error('Error loading list metadata:', err);
+        setError(err.message || 'Failed to load list metadata');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadList();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading list metadata from backend...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <div className="bg-red-50 border border-red-200 rounded p-4 text-red-800">
+          <h3 className="font-semibold mb-2">Error Loading List</h3>
+          <p>{error}</p>
+          <p className="text-sm mt-2">Make sure the backend is running at http://localhost:8081</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!listMeta) {
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <p className="text-gray-600">No list metadata available</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
