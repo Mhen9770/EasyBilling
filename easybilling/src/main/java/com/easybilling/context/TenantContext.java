@@ -9,19 +9,19 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class TenantContext {
     
-    private static final ThreadLocal<String> CURRENT_TENANT = new InheritableThreadLocal<>();
+    private static final ThreadLocal<Integer> CURRENT_TENANT = new InheritableThreadLocal<>();
     
     private TenantContext() {
         throw new UnsupportedOperationException("Utility class");
     }
     
-    public static void setTenantId(String tenantId) {
+    public static void setTenantId(Integer tenantId) {
         log.debug("Setting tenant context: {}", tenantId);
         CURRENT_TENANT.set(tenantId);
     }
     
-    public static String getTenantId() {
-        String tenantId = CURRENT_TENANT.get();
+    public static Integer getTenantId() {
+        Integer tenantId = CURRENT_TENANT.get();
         log.trace("Getting tenant context: {}", tenantId);
         return tenantId;
     }

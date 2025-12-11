@@ -1,11 +1,13 @@
 package com.easybilling.entity;
 
 import com.easybilling.enums.PaymentMode;
+import com.easybilling.listener.TenantEntityListener;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Filter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -13,13 +15,17 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "payments")
+@Table(name = "payments", indexes = {
+        @Index(name = "idx_payment_tenant", columnList = "tenant_id"),
+        @Index(name = "idx_payment_invoice", columnList = "invoice_id")
+})
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EntityListeners(AuditingEntityListener.class)
-public class Payment {
+@EntityListeners({AuditingEntityListener.class, TenantEntityListener.class})
+public class Payment implements TenantAware {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -35,6 +41,9 @@ public class Payment {
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
+    
+    @Column(nullable = false, name = "tenant_id")
+    private Integer tenantId;
 
     private String referenceNumber;
     

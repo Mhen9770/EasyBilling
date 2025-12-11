@@ -50,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (token != null && jwtTokenProvider.validateToken(token)) {
                 // Extract user ID and tenant ID from token
                 String userId = jwtTokenProvider.getUserIdFromToken(token);
-                String tenantId = jwtTokenProvider.getTenantIdFromToken(token);
+                Integer tenantId = jwtTokenProvider.getTenantIdFromToken(token);
                 List<String> roles = jwtTokenProvider.getRolesFromToken(token);
                 
                 // Set in thread-local context

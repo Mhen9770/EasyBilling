@@ -21,5 +21,5 @@ public class LoginRequest {
     @NotBlank(message = "Password is required")
     private String password;
     
-    private String tenantId; // Optional, can be resolved from subdomain/header
+    private Integer tenantId; // Optional, can be resolved from subdomain/header
 }

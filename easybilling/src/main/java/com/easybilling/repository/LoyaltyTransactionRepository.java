@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LoyaltyTransactionRepository extends JpaRepository<LoyaltyTransaction, String> {
     
-    Page<LoyaltyTransaction> findByTenantIdAndCustomerId(String tenantId, String customerId, Pageable pageable);
+    Page<LoyaltyTransaction> findByTenantIdAndCustomerId(Integer tenantId, String customerId, Pageable pageable);
 }

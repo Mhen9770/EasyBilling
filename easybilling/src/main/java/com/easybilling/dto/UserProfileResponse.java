@@ -26,7 +26,7 @@ public class UserProfileResponse {
     private String firstName;
     private String lastName;
     private String phone;
-    private String tenantId;
+    private Integer tenantId;
     private UserStatus status;
     private Set<String> roles;
     private Instant lastLogin;

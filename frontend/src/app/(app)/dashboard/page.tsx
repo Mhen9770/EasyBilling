@@ -220,7 +220,7 @@ export default function DashboardPage() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-gray-900">₹{invoice.total.toFixed(2)}</p>
+                      <p className="font-semibold text-gray-900">₹{invoice?.total?.toFixed(2)}</p>
                       <Badge
                         variant={
                           invoice.status === 'COMPLETED' ? 'success' :

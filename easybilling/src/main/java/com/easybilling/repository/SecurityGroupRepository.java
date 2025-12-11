@@ -18,22 +18,22 @@ public interface SecurityGroupRepository extends JpaRepository<SecurityGroup, St
     /**
      * Find all security groups by tenant ID.
      */
-    List<SecurityGroup> findByTenantId(String tenantId);
+    List<SecurityGroup> findByTenantId(Integer tenantId);
     
     /**
      * Find active security groups by tenant ID.
      */
-    List<SecurityGroup> findByTenantIdAndIsActiveTrue(String tenantId);
+    List<SecurityGroup> findByTenantIdAndIsActiveTrue(Integer tenantId);
     
     /**
      * Find security group by name and tenant ID.
      */
-    Optional<SecurityGroup> findByNameAndTenantId(String name, String tenantId);
+    Optional<SecurityGroup> findByNameAndTenantId(String name, Integer tenantId);
     
     /**
      * Check if security group exists by name and tenant ID.
      */
-    boolean existsByNameAndTenantId(String name, String tenantId);
+    boolean existsByNameAndTenantId(String name, Integer tenantId);
     
     /**
      * Find security groups for a user.

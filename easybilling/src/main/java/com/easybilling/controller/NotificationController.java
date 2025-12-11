@@ -26,7 +26,7 @@ public class NotificationController extends BaseController {
     
     @PostMapping("/send")
     public ResponseEntity<Map<String, Object>> sendNotification(@Valid @RequestBody NotificationRequest request) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Sending notification for tenant: {}", tenantId);
         
         notificationService.sendNotification(request, tenantId);
@@ -44,7 +44,7 @@ public class NotificationController extends BaseController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(required = false) NotificationStatus status) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         
         PageRequest pageRequest = PageRequest.of(page, size);
         Page<Notification> notifications;

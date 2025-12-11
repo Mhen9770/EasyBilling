@@ -8,7 +8,7 @@ spring:
     name: easybilling-monolith
   
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:tenant_dd}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:easy_billing}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: ${DB_USER:root}
     password: ${DB_PASSWORD:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -56,7 +56,7 @@ app:
   
   multi-tenancy:
     domain: easybilling.com
-    strategy: SCHEMA_PER_TENANT
+    strategy: SAME_SCHEMA_WITH_TENANT_ID
   
   billing:
     invoice-prefix: INV

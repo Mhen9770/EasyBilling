@@ -21,7 +21,7 @@ public class NotificationTriggerService {
     /**
      * Send invoice notification to customer
      */
-    public void sendInvoiceNotification(String tenantId, String customerEmail, String customerPhone,
+    public void sendInvoiceNotification(Integer tenantId, String customerEmail, String customerPhone,
                                        String invoiceNumber, BigDecimal amount) {
         log.info("Triggering invoice notification for invoice: {}", invoiceNumber);
         
@@ -52,7 +52,7 @@ public class NotificationTriggerService {
     /**
      * Send low stock alert
      */
-    public void sendLowStockAlert(String tenantId, String adminEmail, String productName,
+    public void sendLowStockAlert(Integer tenantId, String adminEmail, String productName,
                                  int currentStock, int threshold) {
         log.info("Triggering low stock alert for product: {}", productName);
         
@@ -70,7 +70,7 @@ public class NotificationTriggerService {
     /**
      * Send payment reminder to customer
      */
-    public void sendPaymentReminder(String tenantId, String customerEmail, String customerPhone,
+    public void sendPaymentReminder(Integer tenantId, String customerEmail, String customerPhone,
                                    BigDecimal outstandingAmount, int daysDue) {
         log.info("Triggering payment reminder. Outstanding amount: {}", outstandingAmount);
         
@@ -88,7 +88,7 @@ public class NotificationTriggerService {
     /**
      * Send welcome notification to new customer
      */
-    public void sendWelcomeNotification(String tenantId, String customerEmail, String customerPhone,
+    public void sendWelcomeNotification(Integer tenantId, String customerEmail, String customerPhone,
                                        String customerName) {
         log.info("Sending welcome notification to: {}", customerName);
         
@@ -106,7 +106,7 @@ public class NotificationTriggerService {
     /**
      * Send loyalty points earned notification
      */
-    public void sendLoyaltyPointsNotification(String tenantId, String customerPhone,
+    public void sendLoyaltyPointsNotification(Integer tenantId, String customerPhone,
                                               int pointsEarned, int totalPoints) {
         log.info("Sending loyalty points notification. Points earned: {}", pointsEarned);
         
@@ -124,7 +124,7 @@ public class NotificationTriggerService {
     /**
      * Send offer activation notification
      */
-    public void sendOfferNotification(String tenantId, String recipientEmail, String recipientPhone,
+    public void sendOfferNotification(Integer tenantId, String recipientEmail, String recipientPhone,
                                      String offerName, String offerDescription) {
         log.info("Sending offer notification: {}", offerName);
         
@@ -142,7 +142,7 @@ public class NotificationTriggerService {
     /**
      * Send payment confirmation
      */
-    public void sendPaymentConfirmation(String tenantId, String customerEmail, String customerPhone,
+    public void sendPaymentConfirmation(Integer tenantId, String customerEmail, String customerPhone,
                                        BigDecimal amount, String paymentMethod) {
         log.info("Sending payment confirmation. Amount: {}", amount);
         

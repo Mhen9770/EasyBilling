@@ -22,7 +22,7 @@ public class SupplierService {
     
     private final SupplierRepository supplierRepository;
     
-    public SupplierResponse createSupplier(SupplierRequest request, String tenantId) {
+    public SupplierResponse createSupplier(SupplierRequest request, Integer tenantId) {
         log.info("Creating supplier for tenant: {}", tenantId);
         
         Supplier supplier = Supplier.builder()
@@ -53,25 +53,25 @@ public class SupplierService {
     }
     
     @Transactional(readOnly = true)
-    public Page<SupplierResponse> getAllSuppliers(String tenantId, Pageable pageable) {
+    public Page<SupplierResponse> getAllSuppliers(Integer tenantId, Pageable pageable) {
         return supplierRepository.findByTenantId(tenantId, pageable)
                 .map(this::mapToResponse);
     }
     
     @Transactional(readOnly = true)
-    public Page<SupplierResponse> searchSuppliers(String tenantId, String search, Pageable pageable) {
+    public Page<SupplierResponse> searchSuppliers(Integer tenantId, String search, Pageable pageable) {
         return supplierRepository.searchSuppliers(tenantId, search, pageable)
                 .map(this::mapToResponse);
     }
     
     @Transactional(readOnly = true)
-    public SupplierResponse getSupplierById(String id, String tenantId) {
+    public SupplierResponse getSupplierById(String id, Integer tenantId) {
         Supplier supplier = supplierRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new RuntimeException("Supplier not found"));
         return mapToResponse(supplier);
     }
     
-    public SupplierResponse updateSupplier(String id, SupplierRequest request, String tenantId) {
+    public SupplierResponse updateSupplier(String id, SupplierRequest request, Integer tenantId) {
         Supplier supplier = supplierRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new RuntimeException("Supplier not found"));
         
@@ -98,7 +98,7 @@ public class SupplierService {
         return mapToResponse(updated);
     }
     
-    public void deleteSupplier(String id, String tenantId) {
+    public void deleteSupplier(String id, Integer tenantId) {
         Supplier supplier = supplierRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new RuntimeException("Supplier not found"));
         supplierRepository.delete(supplier);
@@ -109,7 +109,7 @@ public class SupplierService {
     /**
      * Record a purchase from supplier
      */
-    public SupplierResponse recordPurchase(String supplierId, String tenantId, BigDecimal amount, boolean isPaid) {
+    public SupplierResponse recordPurchase(String supplierId, Integer tenantId, BigDecimal amount, boolean isPaid) {
         log.info("Recording purchase of {} from supplier {} in tenant {}", amount, supplierId, tenantId);
         
         Supplier supplier = supplierRepository.findByIdAndTenantId(supplierId, tenantId)
@@ -135,7 +135,7 @@ public class SupplierService {
     /**
      * Record payment to supplier
      */
-    public SupplierResponse recordPayment(String supplierId, String tenantId, BigDecimal amount) {
+    public SupplierResponse recordPayment(String supplierId, Integer tenantId, BigDecimal amount) {
         log.info("Recording payment of {} to supplier {} in tenant {}", amount, supplierId, tenantId);
         
         Supplier supplier = supplierRepository.findByIdAndTenantId(supplierId, tenantId)
@@ -157,7 +157,7 @@ public class SupplierService {
     /**
      * Calculate payment due date based on credit days
      */
-    public LocalDateTime calculateDueDate(String supplierId, String tenantId) {
+    public LocalDateTime calculateDueDate(String supplierId, Integer tenantId) {
         Supplier supplier = supplierRepository.findByIdAndTenantId(supplierId, tenantId)
                 .orElseThrow(() -> new RuntimeException("Supplier not found"));
         
@@ -171,7 +171,7 @@ public class SupplierService {
     /**
      * Check if payment is overdue
      */
-    public boolean isPaymentOverdue(String supplierId, String tenantId) {
+    public boolean isPaymentOverdue(String supplierId, Integer tenantId) {
         LocalDateTime dueDate = calculateDueDate(supplierId, tenantId);
         return LocalDateTime.now().isAfter(dueDate);
     }
@@ -180,7 +180,7 @@ public class SupplierService {
      * Get suppliers with outstanding balance
      */
     @Transactional(readOnly = true)
-    public Page<SupplierResponse> getSuppliersWithOutstanding(String tenantId, Pageable pageable) {
+    public Page<SupplierResponse> getSuppliersWithOutstanding(Integer tenantId, Pageable pageable) {
         // This would need a repository method
         return supplierRepository.findByTenantId(tenantId, pageable)
                 .map(this::mapToResponse)
@@ -195,7 +195,7 @@ public class SupplierService {
     /**
      * Deactivate supplier
      */
-    public SupplierResponse deactivateSupplier(String supplierId, String tenantId) {
+    public SupplierResponse deactivateSupplier(String supplierId, Integer tenantId) {
         Supplier supplier = supplierRepository.findByIdAndTenantId(supplierId, tenantId)
                 .orElseThrow(() -> new RuntimeException("Supplier not found"));
         
@@ -208,7 +208,7 @@ public class SupplierService {
     /**
      * Reactivate supplier
      */
-    public SupplierResponse reactivateSupplier(String supplierId, String tenantId) {
+    public SupplierResponse reactivateSupplier(String supplierId, Integer tenantId) {
         Supplier supplier = supplierRepository.findByIdAndTenantId(supplierId, tenantId)
                 .orElseThrow(() -> new RuntimeException("Supplier not found"));
         
@@ -221,7 +221,7 @@ public class SupplierService {
     /**
      * Update credit terms
      */
-    public SupplierResponse updateCreditTerms(String supplierId, String tenantId, int creditDays) {
+    public SupplierResponse updateCreditTerms(String supplierId, Integer tenantId, int creditDays) {
         log.info("Updating credit terms to {} days for supplier {} in tenant {}", creditDays, supplierId, tenantId);
         
         Supplier supplier = supplierRepository.findByIdAndTenantId(supplierId, tenantId)

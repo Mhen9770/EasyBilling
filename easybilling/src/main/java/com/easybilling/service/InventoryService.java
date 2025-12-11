@@ -39,7 +39,7 @@ public class InventoryService {
 
     // Product Management
     @Transactional
-    public ProductResponse createProduct(ProductRequest request, String tenantId) {
+    public ProductResponse createProduct(ProductRequest request, Integer tenantId) {
         // Check if barcode already exists
         if (productRepository.existsByBarcodeAndTenantId(request.getBarcode(), tenantId)) {
             throw new ValidationException("Product with barcode " + request.getBarcode() + " already exists");
@@ -78,7 +78,7 @@ public class InventoryService {
         return mapToProductResponse(product);
     }
 
-    public PageResponse<ProductResponse> getProducts(String tenantId, Pageable pageable) {
+    public PageResponse<ProductResponse> getProducts(Integer tenantId, Pageable pageable) {
         Page<Product> page = productRepository.findByTenantId(tenantId, pageable);
         List<ProductResponse> products = page.getContent().stream()
                 .map(this::mapToProductResponse)
@@ -92,20 +92,20 @@ public class InventoryService {
         );
     }
 
-    public ProductResponse getProduct(Long id, String tenantId) {
+    public ProductResponse getProduct(Long id, Integer tenantId) {
         Product product = productRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         return mapToProductResponse(product);
     }
 
-    public ProductResponse getProductByBarcode(String barcode, String tenantId) {
+    public ProductResponse getProductByBarcode(String barcode, Integer tenantId) {
         Product product = productRepository.findByBarcodeAndTenantId(barcode, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with barcode: " + barcode));
         return mapToProductResponse(product);
     }
 
     @Transactional
-    public ProductResponse updateProduct(Long id, ProductRequest request, String tenantId) {
+    public ProductResponse updateProduct(Long id, ProductRequest request, Integer tenantId) {
         Product product = productRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
@@ -138,7 +138,7 @@ public class InventoryService {
     }
 
     @Transactional
-    public void deleteProduct(Long id, String tenantId) {
+    public void deleteProduct(Long id, Integer tenantId) {
         Product product = productRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
         product.setIsActive(false);
@@ -147,7 +147,7 @@ public class InventoryService {
 
     // Category Management
     @Transactional
-    public CategoryResponse createCategory(CategoryRequest request, String tenantId) {
+    public CategoryResponse createCategory(CategoryRequest request, Integer tenantId) {
         Category category = new Category();
         category.setName(request.getName());
         category.setDescription(request.getDescription());
@@ -163,7 +163,7 @@ public class InventoryService {
         return mapToCategoryResponse(category);
     }
 
-    public List<CategoryResponse> getCategories(String tenantId) {
+    public List<CategoryResponse> getCategories(Integer tenantId) {
         return categoryRepository.findByTenantIdAndIsActive(tenantId, true).stream()
                 .map(this::mapToCategoryResponse)
                 .collect(Collectors.toList());
@@ -171,7 +171,7 @@ public class InventoryService {
 
     // Brand Management
     @Transactional
-    public BrandResponse createBrand(BrandRequest request, String tenantId) {
+    public BrandResponse createBrand(BrandRequest request, Integer tenantId) {
         Brand brand = new Brand();
         brand.setName(request.getName());
         brand.setDescription(request.getDescription());
@@ -182,14 +182,14 @@ public class InventoryService {
         return mapToBrandResponse(brand);
     }
 
-    public List<BrandResponse> getBrands(String tenantId) {
+    public List<BrandResponse> getBrands(Integer tenantId) {
         return brandRepository.findByTenantIdAndIsActive(tenantId, true).stream()
                 .map(this::mapToBrandResponse)
                 .collect(Collectors.toList());
     }
 
     // Stock Management
-    public List<StockResponse> getStockForProduct(Long productId, String tenantId) {
+    public List<StockResponse> getStockForProduct(Long productId, Integer tenantId) {
         Product product = productRepository.findByIdAndTenantId(productId, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
@@ -199,7 +199,7 @@ public class InventoryService {
     }
 
     @Transactional
-    public void recordStockMovement(StockMovementRequest request, String tenantId, String userId) {
+    public void recordStockMovement(StockMovementRequest request, Integer tenantId, String userId) {
         Product product = productRepository.findByIdAndTenantId(request.getProductId(), tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
@@ -264,7 +264,7 @@ public class InventoryService {
     /**
      * Check if product has sufficient stock available
      */
-    public boolean checkStockAvailability(String productId, String locationId, BigDecimal quantity, String tenantId) {
+    public boolean checkStockAvailability(String productId, String locationId, BigDecimal quantity, Integer tenantId) {
         try {
             Long productIdLong = Long.parseLong(productId);
             var stockList = getStockForProduct(productIdLong, tenantId);
@@ -291,7 +291,7 @@ public class InventoryService {
     /**
      * Deduct stock when invoice is completed
      */
-    public void deductStock(String productId, String locationId, BigDecimal quantity, String referenceId, String performedBy, String tenantId) {
+    public void deductStock(String productId, String locationId, BigDecimal quantity, String referenceId, String performedBy, Integer tenantId) {
         try {
             Long productIdLong = Long.parseLong(productId);
             StockMovementRequest request = new StockMovementRequest();
@@ -315,7 +315,7 @@ public class InventoryService {
     /**
      * Reverse stock deduction (for returns/cancellations)
      */
-    public void reverseStockDeduction(String productId, String locationId, BigDecimal quantity, String referenceId, String performedBy, String tenantId) {
+    public void reverseStockDeduction(String productId, String locationId, BigDecimal quantity, String referenceId, String performedBy, Integer tenantId) {
         try {
             Long productIdLong = Long.parseLong(productId);
             StockMovementRequest request = new StockMovementRequest();
@@ -405,7 +405,7 @@ public class InventoryService {
     // Advanced Inventory Features
     
     @Transactional
-    public void adjustStock(StockAdjustmentRequest request, String tenantId, String userId) {
+    public void adjustStock(StockAdjustmentRequest request, Integer tenantId, String userId) {
         Product product = productRepository.findByIdAndTenantId(request.getProductId(), tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
@@ -465,7 +465,7 @@ public class InventoryService {
     }
 
     @Transactional
-    public void transferStock(StockTransferRequest request, String tenantId, String userId) {
+    public void transferStock(StockTransferRequest request, Integer tenantId, String userId) {
         Product product = productRepository.findByIdAndTenantId(request.getProductId(), tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
@@ -537,7 +537,7 @@ public class InventoryService {
     }
 
     @Transactional
-    public void bulkUpdateProducts(BulkProductUpdateRequest request, String tenantId) {
+    public void bulkUpdateProducts(BulkProductUpdateRequest request, Integer tenantId) {
         List<Product> products = productRepository.findAllById(request.getProductIds())
                 .stream()
                 .filter(p -> p.getTenantId().equals(tenantId))
@@ -586,7 +586,7 @@ public class InventoryService {
         log.info("Bulk updated {} products for tenant: {}", products.size(), tenantId);
     }
 
-    public PageResponse<ProductResponse> searchProducts(ProductSearchRequest request, String tenantId) {
+    public PageResponse<ProductResponse> searchProducts(ProductSearchRequest request, Integer tenantId) {
         // This is a simplified search - in production, use JPA Specifications or QueryDSL
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
         Page<Product> page = productRepository.findByTenantId(tenantId, pageable);
@@ -623,7 +623,7 @@ public class InventoryService {
         return PageResponse.of(products, request.getPage(), request.getSize(), filtered.size());
     }
 
-    public InventoryDashboardResponse getInventoryDashboard(String tenantId) {
+    public InventoryDashboardResponse getInventoryDashboard(Integer tenantId) {
         List<Product> allProducts = productRepository.findByTenantId(tenantId, Pageable.unpaged()).getContent();
         List<Stock> allStocks = stockRepository.findByTenantId(tenantId);
         
@@ -712,7 +712,7 @@ public class InventoryService {
                 .build();
     }
 
-    public List<StockResponse> getLowStockAlerts(String tenantId, String locationId) {
+    public List<StockResponse> getLowStockAlerts(Integer tenantId, String locationId) {
         List<Product> products = productRepository.findByTenantId(tenantId, Pageable.unpaged()).getContent();
         List<Stock> stocks = locationId != null 
                 ? stockRepository.findByLocationIdAndTenantId(locationId, tenantId)

@@ -9,5 +9,5 @@ import java.util.Optional;
 @Repository
 public interface CustomerWalletRepository extends JpaRepository<CustomerWallet, String> {
     
-    Optional<CustomerWallet> findByTenantIdAndCustomerId(String tenantId, String customerId);
+    Optional<CustomerWallet> findByTenantIdAndCustomerId(Integer tenantId, String customerId);
 }

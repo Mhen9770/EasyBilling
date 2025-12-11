@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface WalletTransactionRepository extends JpaRepository<WalletTransaction, String> {
     
-    Page<WalletTransaction> findByTenantIdAndCustomerId(String tenantId, String customerId, Pageable pageable);
+    Page<WalletTransaction> findByTenantIdAndCustomerId(Integer tenantId, String customerId, Pageable pageable);
 }

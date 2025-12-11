@@ -21,7 +21,7 @@ public class ReportsController extends BaseController {
     
     @PostMapping("/generate")
     public ResponseEntity<Map<String, Object>> generateReport(@Valid @RequestBody ReportRequest request) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Generating report of type {} for tenant: {}", request.getReportType(), tenantId);
         
         Object reportData = reportsService.generateReport(request, tenantId);

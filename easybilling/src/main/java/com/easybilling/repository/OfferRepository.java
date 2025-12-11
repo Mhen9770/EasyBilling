@@ -16,18 +16,18 @@ import java.util.Optional;
 @Repository
 public interface OfferRepository extends JpaRepository<Offer, String> {
     
-    Page<Offer> findByTenantId(String tenantId, Pageable pageable);
+    Page<Offer> findByTenantId(Integer tenantId, Pageable pageable);
     
-    Optional<Offer> findByIdAndTenantId(String id, String tenantId);
+    Optional<Offer> findByIdAndTenantId(String id, Integer tenantId);
     
-    Page<Offer> findByTenantIdAndStatus(String tenantId, OfferStatus status, Pageable pageable);
+    Page<Offer> findByTenantIdAndStatus(Integer tenantId, OfferStatus status, Pageable pageable);
     
     @Query("SELECT o FROM Offer o WHERE o.tenantId = :tenantId " +
            "AND o.status = 'ACTIVE' " +
            "AND o.validFrom <= :now " +
            "AND o.validTo >= :now")
-    List<Offer> findActiveOffers(@Param("tenantId") String tenantId, 
+    List<Offer> findActiveOffers(@Param("tenantId") Integer tenantId, 
                                   @Param("now") LocalDateTime now);
     
-    long countByTenantIdAndStatus(String tenantId, OfferStatus status);
+    long countByTenantIdAndStatus(Integer tenantId, OfferStatus status);
 }

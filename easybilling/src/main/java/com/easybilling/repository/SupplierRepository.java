@@ -13,24 +13,24 @@ import java.util.Optional;
 @Repository
 public interface SupplierRepository extends JpaRepository<Supplier, String> {
     
-    Page<Supplier> findByTenantId(String tenantId, Pageable pageable);
+    Page<Supplier> findByTenantId(Integer tenantId, Pageable pageable);
     
-    Optional<Supplier> findByIdAndTenantId(String id, String tenantId);
+    Optional<Supplier> findByIdAndTenantId(String id, Integer tenantId);
     
-    Optional<Supplier> findByPhoneAndTenantId(String phone, String tenantId);
+    Optional<Supplier> findByPhoneAndTenantId(String phone, Integer tenantId);
     
-    Optional<Supplier> findByGstinAndTenantId(String gstin, String tenantId);
+    Optional<Supplier> findByGstinAndTenantId(String gstin, Integer tenantId);
     
-    Page<Supplier> findByTenantIdAndActive(String tenantId, Boolean active, Pageable pageable);
+    Page<Supplier> findByTenantIdAndActive(Integer tenantId, Boolean active, Pageable pageable);
     
     @Query("SELECT s FROM Supplier s WHERE s.tenantId = :tenantId AND " +
            "(LOWER(s.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(s.phone) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(s.email) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(s.gstin) LIKE LOWER(CONCAT('%', :search, '%')))")
-    Page<Supplier> searchSuppliers(@Param("tenantId") String tenantId, 
+    Page<Supplier> searchSuppliers(@Param("tenantId") Integer tenantId, 
                                    @Param("search") String search, 
                                    Pageable pageable);
     
-    long countByTenantId(String tenantId);
+    long countByTenantId(Integer tenantId);
 }

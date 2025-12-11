@@ -37,7 +37,7 @@ public class LoginResponse {
         private String email;
         private String firstName;
         private String lastName;
-        private String tenantId;
+        private Integer tenantId;
         private Set<String> roles;
     }
 }

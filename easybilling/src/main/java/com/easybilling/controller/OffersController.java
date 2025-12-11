@@ -28,7 +28,7 @@ public class OffersController extends BaseController {
     
     @PostMapping
     public ResponseEntity<Map<String, Object>> createOffer(@Valid @RequestBody OfferRequest request) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Creating offer for tenant: {}", tenantId);
         OfferResponse response = offersService.createOffer(request, tenantId);
         return ResponseEntity.status(HttpStatus.CREATED).body(createSuccessResponse(response));
@@ -38,7 +38,7 @@ public class OffersController extends BaseController {
     public ResponseEntity<Map<String, Object>> getAllOffers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Fetching offers for tenant: {}", tenantId);
         
         PageRequest pageRequest = PageRequest.of(page, size, Sort.by("createdAt").descending());
@@ -49,7 +49,7 @@ public class OffersController extends BaseController {
     
     @GetMapping("/active")
     public ResponseEntity<Map<String, Object>> getActiveOffers() {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Fetching active offers for tenant: {}", tenantId);
         List<OfferResponse> offers = offersService.getActiveOffers(tenantId);
         return ResponseEntity.ok(createSuccessResponse(offers));
@@ -57,7 +57,7 @@ public class OffersController extends BaseController {
     
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getOfferById(@PathVariable String id) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Fetching offer {} for tenant: {}", id, tenantId);
         OfferResponse response = offersService.getOfferById(id, tenantId);
         return ResponseEntity.ok(createSuccessResponse(response));
@@ -67,7 +67,7 @@ public class OffersController extends BaseController {
     public ResponseEntity<Map<String, Object>> updateOffer(
             @PathVariable String id,
             @Valid @RequestBody OfferRequest request) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Updating offer {} for tenant: {}", id, tenantId);
         OfferResponse response = offersService.updateOffer(id, request, tenantId);
         return ResponseEntity.ok(createSuccessResponse(response));
@@ -75,7 +75,7 @@ public class OffersController extends BaseController {
     
     @PostMapping("/{id}/activate")
     public ResponseEntity<Map<String, Object>> activateOffer(@PathVariable String id) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Activating offer {} for tenant: {}", id, tenantId);
         OfferResponse response = offersService.activateOffer(id, tenantId);
         return ResponseEntity.ok(createSuccessResponse(response));
@@ -83,7 +83,7 @@ public class OffersController extends BaseController {
     
     @PostMapping("/{id}/pause")
     public ResponseEntity<Map<String, Object>> pauseOffer(@PathVariable String id) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Pausing offer {} for tenant: {}", id, tenantId);
         OfferResponse response = offersService.pauseOffer(id, tenantId);
         return ResponseEntity.ok(createSuccessResponse(response));
@@ -91,7 +91,7 @@ public class OffersController extends BaseController {
     
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>> deleteOffer(@PathVariable String id) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Deleting offer {} for tenant: {}", id, tenantId);
         offersService.deleteOffer(id, tenantId);
         return ResponseEntity.ok(createSuccessResponse("Offer deleted successfully"));
@@ -103,7 +103,7 @@ public class OffersController extends BaseController {
             @RequestParam BigDecimal purchaseAmount,
             @RequestParam(required = false) List<String> productIds,
             @RequestParam(required = false) List<String> categoryIds) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Calculating discount for offer {} with purchase amount {}", id, purchaseAmount);
         
         BigDecimal discount = offersService.calculateDiscount(id, tenantId, purchaseAmount, productIds, categoryIds);
@@ -123,7 +123,7 @@ public class OffersController extends BaseController {
             @RequestParam BigDecimal purchaseAmount,
             @RequestParam(required = false) List<String> productIds,
             @RequestParam(required = false) List<String> categoryIds) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Applying offer {} to purchase of {}", id, purchaseAmount);
         
         BigDecimal discount = offersService.applyOffer(id, tenantId, purchaseAmount, productIds, categoryIds);
@@ -143,7 +143,7 @@ public class OffersController extends BaseController {
             @RequestParam BigDecimal purchaseAmount,
             @RequestParam(required = false) List<String> productIds,
             @RequestParam(required = false) List<String> categoryIds) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Getting applicable offers for tenant: {}, amount: {}", tenantId, purchaseAmount);
         
         List<OfferResponse> offers = offersService.getApplicableOffers(tenantId, purchaseAmount, productIds, categoryIds);
@@ -155,7 +155,7 @@ public class OffersController extends BaseController {
             @RequestParam BigDecimal purchaseAmount,
             @RequestParam(required = false) List<String> productIds,
             @RequestParam(required = false) List<String> categoryIds) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Calculating best offer combination for tenant: {}, amount: {}", tenantId, purchaseAmount);
         
         List<OfferResponse> offers = offersService.calculateBestOfferCombination(tenantId, purchaseAmount, productIds, categoryIds);

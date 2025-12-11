@@ -36,7 +36,7 @@ public class JwtTokenProvider {
     /**
      * Generate access token with user details.
      */
-    public String generateAccessToken(String userId, String tenantId, List<String> roles) {
+    public String generateAccessToken(String userId, Integer tenantId, List<String> roles) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("tenantId", tenantId);
@@ -105,9 +105,9 @@ public class JwtTokenProvider {
     /**
      * Get tenant ID from token.
      */
-    public String getTenantIdFromToken(String token) {
+    public Integer getTenantIdFromToken(String token) {
         Claims claims = getClaims(token);
-        return claims.get("tenantId", String.class);
+        return claims.get("tenantId", Integer.class);
     }
     
     /**

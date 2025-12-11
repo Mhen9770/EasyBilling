@@ -44,7 +44,7 @@ public class BillingService {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public InvoiceResponse createInvoice(String tenantId, String userId, InvoiceRequest request) {
+    public InvoiceResponse createInvoice(Integer tenantId, String userId, InvoiceRequest request) {
         // Business Logic: Validate stock availability before creating invoice
         String locationId = request.getStoreId(); // Using store as location
         for (InvoiceItemRequest itemReq : request.getItems()) {
@@ -109,7 +109,7 @@ public class BillingService {
         return mapToResponse(saved);
     }
 
-    public InvoiceResponse completeInvoice(String tenantId, String invoiceId, String userId, List<PaymentRequest> paymentRequests) {
+    public InvoiceResponse completeInvoice(Integer tenantId, String invoiceId, String userId, List<PaymentRequest> paymentRequests) {
         Invoice invoice = findInvoice(tenantId, invoiceId);
         
         // Business Logic: Create and persist payments first (child entities)
@@ -176,7 +176,7 @@ public class BillingService {
         return mapToResponse(saved);
     }
 
-    public String holdInvoice(String tenantId, String userId, InvoiceRequest request) {
+    public String holdInvoice(Integer tenantId, String userId, InvoiceRequest request) {
         try {
             String holdReference = "HOLD-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
             String invoiceData = objectMapper.writeValueAsString(request);
@@ -200,12 +200,12 @@ public class BillingService {
         }
     }
 
-    public List<HeldInvoiceResponse> listHeldInvoices(String tenantId) {
+    public List<HeldInvoiceResponse> listHeldInvoices(Integer tenantId) {
         List<HeldInvoice> heldInvoices = heldInvoiceRepository.findByTenantIdOrderByHeldAtDesc(tenantId);
         return heldInvoices.stream().map(this::mapHeldInvoiceToResponse).collect(Collectors.toList());
     }
 
-    public InvoiceRequest resumeHeldInvoice(String tenantId, String holdReference) {
+    public InvoiceRequest resumeHeldInvoice(Integer tenantId, String holdReference) {
         HeldInvoice heldInvoice = heldInvoiceRepository.findByTenantIdAndHoldReference(tenantId, holdReference)
                 .orElseThrow(() -> new ResourceNotFoundException("Held invoice not found"));
         
@@ -219,7 +219,7 @@ public class BillingService {
         }
     }
 
-    public void deleteHeldInvoice(String tenantId, String holdReference) {
+    public void deleteHeldInvoice(Integer tenantId, String holdReference) {
         HeldInvoice heldInvoice = heldInvoiceRepository.findByTenantIdAndHoldReference(tenantId, holdReference)
                 .orElseThrow(() -> new ResourceNotFoundException("Held invoice not found"));
         heldInvoiceRepository.delete(heldInvoice);
@@ -267,17 +267,17 @@ public class BillingService {
         }
     }
 
-    public Page<InvoiceResponse> listInvoices(String tenantId, Pageable pageable) {
+    public Page<InvoiceResponse> listInvoices(Integer tenantId, Pageable pageable) {
         return invoiceRepository.findByTenantIdOrderByCreatedAtDesc(tenantId, pageable)
                 .map(this::mapToResponse);
     }
 
-    public InvoiceResponse getInvoice(String tenantId, String invoiceId) {
+    public InvoiceResponse getInvoice(Integer tenantId, String invoiceId) {
         Invoice invoice = findInvoice(tenantId, invoiceId);
         return mapToResponse(invoice);
     }
 
-    private Invoice findInvoice(String tenantId, String invoiceId) {
+    private Invoice findInvoice(Integer tenantId, String invoiceId) {
         Invoice invoice = invoiceRepository.findById(invoiceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Invoice not found"));
         if (!invoice.getTenantId().equals(tenantId)) {
@@ -286,7 +286,7 @@ public class BillingService {
         return invoice;
     }
 
-    private String generateInvoiceNumber(String tenantId) {
+    private String generateInvoiceNumber(Integer tenantId) {
         String dateStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         Long count = invoiceRepository.countInvoicesSince(tenantId, LocalDateTime.now().toLocalDate().atStartOfDay());
         return String.format("INV-%s-%05d", dateStr, count + 1);
@@ -346,7 +346,7 @@ public class BillingService {
     /**
      * Business Logic: Cancel invoice and reverse stock
      */
-    public InvoiceResponse cancelInvoice(String tenantId, String invoiceId, String userId, String reason) {
+    public InvoiceResponse cancelInvoice(Integer tenantId, String invoiceId, String userId, String reason) {
         Invoice invoice = findInvoice(tenantId, invoiceId);
         
         if (invoice.getStatus() != InvoiceStatus.COMPLETED) {
@@ -381,7 +381,7 @@ public class BillingService {
     /**
      * Business Logic: Process return for items
      */
-    public InvoiceResponse processReturn(String tenantId, String invoiceId, String userId, List<String> itemIds, String reason) {
+    public InvoiceResponse processReturn(Integer tenantId, String invoiceId, String userId, List<String> itemIds, String reason) {
         Invoice invoice = findInvoice(tenantId, invoiceId);
         
         if (invoice.getStatus() != InvoiceStatus.COMPLETED) {

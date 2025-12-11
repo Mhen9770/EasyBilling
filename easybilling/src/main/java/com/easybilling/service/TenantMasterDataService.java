@@ -28,7 +28,7 @@ public class TenantMasterDataService {
      */
     public void initializeMasterData(Tenant tenant) {
         String schemaName = tenant.getSchemaName();
-        String tenantId = tenant.getId(); // Use tenant ID for tenantId field
+        Integer tenantId = tenant.getId(); // Use tenant ID for tenantId field
         log.info("Initializing master data for tenant schema: {}", schemaName);
         
         // Validate schema name to prevent SQL injection
@@ -61,7 +61,7 @@ public class TenantMasterDataService {
     /**
      * Insert default categories.
      */
-    private void insertDefaultCategories(Connection connection, String tenantId) throws Exception {
+    private void insertDefaultCategories(Connection connection, Integer tenantId) throws Exception {
         log.debug("Inserting default categories");
         
         String insertSQL = "INSERT INTO categories (id, name, description, parent_id, is_active, tenant_id, created_at, updated_at) " +
@@ -104,7 +104,7 @@ public class TenantMasterDataService {
     /**
      * Helper method to insert a single category.
      */
-    private void insertCategory(PreparedStatement pstmt, Long id, String name, String description, Long parentId, String tenantId) throws Exception {
+    private void insertCategory(PreparedStatement pstmt, Long id, String name, String description, Long parentId, Integer tenantId) throws Exception {
         pstmt.setLong(1, id);
         pstmt.setString(2, name);
         pstmt.setString(3, description);
@@ -114,14 +114,14 @@ public class TenantMasterDataService {
             pstmt.setNull(4, java.sql.Types.BIGINT);
         }
         pstmt.setBoolean(5, true);
-        pstmt.setString(6, tenantId);
+        pstmt.setInt(6, tenantId);
         pstmt.executeUpdate();
     }
     
     /**
      * Insert default brands.
      */
-    private void insertDefaultBrands(Connection connection, String tenantId) throws Exception {
+    private void insertDefaultBrands(Connection connection, Integer tenantId) throws Exception {
         log.debug("Inserting default brands");
         
         String insertSQL = "INSERT INTO brands (id, name, description, is_active, tenant_id, created_at, updated_at) " +
@@ -139,12 +139,12 @@ public class TenantMasterDataService {
     /**
      * Helper method to insert a single brand.
      */
-    private void insertBrand(PreparedStatement pstmt, Long id, String name, String description, String tenantId) throws Exception {
+    private void insertBrand(PreparedStatement pstmt, Long id, String name, String description, Integer tenantId) throws Exception {
         pstmt.setLong(1, id);
         pstmt.setString(2, name);
         pstmt.setString(3, description);
         pstmt.setBoolean(4, true);
-        pstmt.setString(5, tenantId);
+        pstmt.setInt(5, tenantId);
         pstmt.executeUpdate();
     }
     

@@ -1,8 +1,10 @@
 package com.easybilling.entity;
 
+import com.easybilling.listener.TenantEntityListener;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
@@ -17,14 +19,17 @@ import java.time.LocalDate;
 @Table(name = "gst_rates", indexes = {
         @Index(name = "idx_hsn_code", columnList = "hsn_code"),
         @Index(name = "idx_sac_code", columnList = "sac_code"),
-        @Index(name = "idx_active", columnList = "is_active")
+        @Index(name = "idx_active", columnList = "is_active"),
+        @Index(name = "idx_gst_rate_tenant", columnList = "tenant_id")
 })
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId OR tenant_id IS NULL")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class GstRate {
+@EntityListeners(TenantEntityListener.class)
+public class GstRate implements TenantAware {
     
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -61,6 +66,9 @@ public class GstRate {
     @Column(name = "is_active")
     @Builder.Default
     private Boolean isActive = true;
+    
+    @Column(name = "tenant_id")
+    private Integer tenantId; // null for global GST rates, specific for tenant-specific overrides
     
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

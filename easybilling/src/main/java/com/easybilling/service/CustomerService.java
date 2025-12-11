@@ -28,7 +28,7 @@ public class CustomerService {
     private static final BigDecimal PREMIUM_THRESHOLD = new BigDecimal("100000");
     private static final int LOYALTY_POINTS_PER_100 = 1; // 1 point per 100 currency spent
     
-    public CustomerResponse createCustomer(CustomerRequest request, String tenantId) {
+    public CustomerResponse createCustomer(CustomerRequest request, Integer tenantId) {
         log.info("Creating customer for tenant: {}", tenantId);
         
         Customer customer = Customer.builder()
@@ -49,32 +49,32 @@ public class CustomerService {
     }
     
     @Transactional(readOnly = true)
-    public Page<CustomerResponse> getAllCustomers(String tenantId, Pageable pageable) {
+    public Page<CustomerResponse> getAllCustomers(Integer tenantId, Pageable pageable) {
         return customerRepository.findByTenantId(tenantId, pageable)
                 .map(this::mapToResponse);
     }
     
     @Transactional(readOnly = true)
-    public Page<CustomerResponse> searchCustomers(String tenantId, String search, Pageable pageable) {
+    public Page<CustomerResponse> searchCustomers(Integer tenantId, String search, Pageable pageable) {
         return customerRepository.searchCustomers(tenantId, search, pageable)
                 .map(this::mapToResponse);
     }
     
     @Transactional(readOnly = true)
-    public CustomerResponse getCustomerById(String id, String tenantId) {
+    public CustomerResponse getCustomerById(String id, Integer tenantId) {
         Customer customer = customerRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
         return mapToResponse(customer);
     }
     
     @Transactional(readOnly = true)
-    public CustomerResponse getCustomerByPhone(String phone, String tenantId) {
+    public CustomerResponse getCustomerByPhone(String phone, Integer tenantId) {
         Customer customer = customerRepository.findByPhoneAndTenantId(phone, tenantId)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
         return mapToResponse(customer);
     }
     
-    public CustomerResponse updateCustomer(String id, CustomerRequest request, String tenantId) {
+    public CustomerResponse updateCustomer(String id, CustomerRequest request, Integer tenantId) {
         Customer customer = customerRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
         
@@ -92,7 +92,7 @@ public class CustomerService {
         return mapToResponse(updated);
     }
     
-    public void deleteCustomer(String id, String tenantId) {
+    public void deleteCustomer(String id, Integer tenantId) {
         Customer customer = customerRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
         customerRepository.delete(customer);
@@ -103,7 +103,7 @@ public class CustomerService {
     /**
      * Record a purchase and update customer metrics
      */
-    public CustomerResponse recordPurchase(String customerId, String tenantId, BigDecimal amount) {
+    public CustomerResponse recordPurchase(String customerId, Integer tenantId, BigDecimal amount) {
         log.info("Recording purchase of {} for customer {} in tenant {}", amount, customerId, tenantId);
         
         Customer customer = customerRepository.findByIdAndTenantId(customerId, tenantId)
@@ -133,7 +133,7 @@ public class CustomerService {
     /**
      * Add money to customer wallet
      */
-    public CustomerResponse addToWallet(String customerId, String tenantId, BigDecimal amount) {
+    public CustomerResponse addToWallet(String customerId, Integer tenantId, BigDecimal amount) {
         log.info("Adding {} to wallet for customer {} in tenant {}", amount, customerId, tenantId);
         
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
@@ -152,7 +152,7 @@ public class CustomerService {
     /**
      * Deduct money from customer wallet
      */
-    public CustomerResponse deductFromWallet(String customerId, String tenantId, BigDecimal amount) {
+    public CustomerResponse deductFromWallet(String customerId, Integer tenantId, BigDecimal amount) {
         log.info("Deducting {} from wallet for customer {} in tenant {}", amount, customerId, tenantId);
         
         Customer customer = customerRepository.findByIdAndTenantId(customerId, tenantId)
@@ -171,7 +171,7 @@ public class CustomerService {
     /**
      * Redeem loyalty points
      */
-    public CustomerResponse redeemLoyaltyPoints(String customerId, String tenantId, int points) {
+    public CustomerResponse redeemLoyaltyPoints(String customerId, Integer tenantId, int points) {
         log.info("Redeeming {} loyalty points for customer {} in tenant {}", points, customerId, tenantId);
         
         Customer customer = customerRepository.findByIdAndTenantId(customerId, tenantId)
@@ -198,7 +198,7 @@ public class CustomerService {
      * Get customer statistics
      */
     @Transactional(readOnly = true)
-    public CustomerResponse getCustomerStatistics(String customerId, String tenantId) {
+    public CustomerResponse getCustomerStatistics(String customerId, Integer tenantId) {
         Customer customer = customerRepository.findByIdAndTenantId(customerId, tenantId)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
         
@@ -218,7 +218,7 @@ public class CustomerService {
      * Get customers by segment
      */
     @Transactional(readOnly = true)
-    public Page<CustomerResponse> getCustomersBySegment(String tenantId, CustomerSegment segment, Pageable pageable) {
+    public Page<CustomerResponse> getCustomersBySegment(Integer tenantId, CustomerSegment segment, Pageable pageable) {
         return customerRepository.findByTenantIdAndSegment(tenantId, segment, pageable)
                 .map(this::mapToResponse);
     }
@@ -226,7 +226,7 @@ public class CustomerService {
     /**
      * Deactivate customer
      */
-    public CustomerResponse deactivateCustomer(String customerId, String tenantId) {
+    public CustomerResponse deactivateCustomer(String customerId, Integer tenantId) {
         Customer customer = customerRepository.findByIdAndTenantId(customerId, tenantId)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
         
@@ -239,7 +239,7 @@ public class CustomerService {
     /**
      * Reactivate customer
      */
-    public CustomerResponse reactivateCustomer(String customerId, String tenantId) {
+    public CustomerResponse reactivateCustomer(String customerId, Integer tenantId) {
         Customer customer = customerRepository.findByIdAndTenantId(customerId, tenantId)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
         

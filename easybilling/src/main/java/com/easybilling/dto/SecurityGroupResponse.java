@@ -21,7 +21,7 @@ public class SecurityGroupResponse {
     private String id;
     private String name;
     private String description;
-    private String tenantId;
+    private Integer tenantId;
     private Set<Permission> permissions;
     private Boolean isActive;
     private Instant createdAt;

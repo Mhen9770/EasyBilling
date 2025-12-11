@@ -12,11 +12,11 @@ import java.util.List;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, String> {
     
-    Page<Notification> findByTenantId(String tenantId, Pageable pageable);
+    Page<Notification> findByTenantId(Integer tenantId, Pageable pageable);
     
-    Page<Notification> findByTenantIdAndStatus(String tenantId, NotificationStatus status, Pageable pageable);
+    Page<Notification> findByTenantIdAndStatus(Integer tenantId, NotificationStatus status, Pageable pageable);
     
     List<Notification> findByStatusAndRetryCountLessThan(NotificationStatus status, Integer maxRetries);
     
-    long countByTenantIdAndStatus(String tenantId, NotificationStatus status);
+    long countByTenantIdAndStatus(Integer tenantId, NotificationStatus status);
 }

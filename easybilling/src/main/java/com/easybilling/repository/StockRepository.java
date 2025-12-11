@@ -9,8 +9,8 @@ import java.util.Optional;
 
 @Repository
 public interface StockRepository extends JpaRepository<Stock, Long> {
-    Optional<Stock> findByProductIdAndLocationIdAndTenantId(Long productId, String locationId, String tenantId);
-    List<Stock> findByProductIdAndTenantId(Long productId, String tenantId);
-    List<Stock> findByTenantId(String tenantId);
-    List<Stock> findByLocationIdAndTenantId(String locationId, String tenantId);
+    Optional<Stock> findByProductIdAndLocationIdAndTenantId(Long productId, String locationId, Integer tenantId);
+    List<Stock> findByProductIdAndTenantId(Long productId, Integer tenantId);
+    List<Stock> findByTenantId(Integer tenantId);
+    List<Stock> findByLocationIdAndTenantId(String locationId, Integer tenantId);
 }

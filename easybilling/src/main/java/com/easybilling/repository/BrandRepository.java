@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface BrandRepository extends JpaRepository<Brand, Long> {
-    List<Brand> findByTenantIdAndIsActive(String tenantId, Boolean isActive);
-    Optional<Brand> findByIdAndTenantId(Long id, String tenantId);
+    List<Brand> findByTenantIdAndIsActive(Integer tenantId, Boolean isActive);
+    Optional<Brand> findByIdAndTenantId(Long id, Integer tenantId);
 }

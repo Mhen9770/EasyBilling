@@ -36,5 +36,5 @@ public class RegisterRequest {
     private String phone;
     
     @NotBlank(message = "Tenant ID is required")
-    private String tenantId;
+    private Integer tenantId;
 }

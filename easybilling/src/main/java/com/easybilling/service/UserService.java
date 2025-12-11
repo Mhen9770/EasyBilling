@@ -40,7 +40,7 @@ public class UserService {
      * Create a new user.
      */
     @Transactional
-    public UserProfileResponse createUser(String tenantId, CreateUserRequest request, String createdBy) {
+    public UserProfileResponse createUser(Integer tenantId, CreateUserRequest request, String createdBy) {
         log.info("Creating new user: {} for tenant: {}", request.getUsername(), tenantId);
         
         // Check if username already exists
@@ -194,7 +194,7 @@ public class UserService {
      * Get users by tenant.
      */
     @Transactional(readOnly = true)
-    public List<UserProfileResponse> getUsersByTenant(String tenantId) {
+    public List<UserProfileResponse> getUsersByTenant(Integer tenantId) {
         log.debug("Getting users for tenant: {}", tenantId);
         
         return userRepository.findByTenantId(tenantId).stream()

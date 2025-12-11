@@ -31,11 +31,16 @@ public class TenantInterceptor implements HandlerInterceptor {
         
         // Try each resolver until one returns a tenant ID
         for (TenantResolver resolver : sortedResolvers) {
-            String tenantId = resolver.resolveTenantId(request);
-            if (tenantId != null && !tenantId.isBlank()) {
-                TenantContext.setTenantId(tenantId);
-                log.debug("Tenant resolved: {} by {}", tenantId, resolver.getClass().getSimpleName());
-                return true;
+            String tenantIdStr = resolver.resolveTenantId(request);
+            if (tenantIdStr != null && !tenantIdStr.isBlank()) {
+                try {
+                    Integer tenantId = Integer.parseInt(tenantIdStr);
+                    TenantContext.setTenantId(tenantId);
+                    log.debug("Tenant resolved: {} by {}", tenantId, resolver.getClass().getSimpleName());
+                    return true;
+                } catch (NumberFormatException e) {
+                    log.warn("Invalid tenant ID format: {}", tenantIdStr);
+                }
             }
         }
         

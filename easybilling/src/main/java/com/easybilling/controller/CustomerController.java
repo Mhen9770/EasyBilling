@@ -27,7 +27,7 @@ public class CustomerController extends BaseController {
     
     @PostMapping
     public ResponseEntity<Map<String, Object>> createCustomer(@Valid @RequestBody CustomerRequest request) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Creating customer for tenant: {}", tenantId);
         CustomerResponse response = customerService.createCustomer(request, tenantId);
         return ResponseEntity.status(HttpStatus.CREATED).body(createSuccessResponse(response));
@@ -38,7 +38,7 @@ public class CustomerController extends BaseController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(required = false) String search) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Fetching customers for tenant: {}", tenantId);
         
         Page<CustomerResponse> customers;
@@ -55,7 +55,7 @@ public class CustomerController extends BaseController {
     
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getCustomerById(@PathVariable String id) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Fetching customer {} for tenant: {}", id, tenantId);
         CustomerResponse response = customerService.getCustomerById(id, tenantId);
         return ResponseEntity.ok(createSuccessResponse(response));
@@ -65,7 +65,7 @@ public class CustomerController extends BaseController {
     public ResponseEntity<Map<String, Object>> updateCustomer(
             @PathVariable String id,
             @Valid @RequestBody CustomerRequest request) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Updating customer {} for tenant: {}", id, tenantId);
         CustomerResponse response = customerService.updateCustomer(id, request, tenantId);
         return ResponseEntity.ok(createSuccessResponse(response));
@@ -73,7 +73,7 @@ public class CustomerController extends BaseController {
     
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>> deleteCustomer(@PathVariable String id) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Deleting customer {} for tenant: {}", id, tenantId);
         customerService.deleteCustomer(id, tenantId);
         return ResponseEntity.ok(createSuccessResponse("Customer deleted successfully"));
@@ -81,7 +81,7 @@ public class CustomerController extends BaseController {
     
     @GetMapping("/phone/{phone}")
     public ResponseEntity<Map<String, Object>> getCustomerByPhone(@PathVariable String phone) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Fetching customer by phone {} for tenant: {}", phone, tenantId);
         CustomerResponse response = customerService.getCustomerByPhone(phone, tenantId);
         return ResponseEntity.ok(createSuccessResponse(response));
@@ -91,7 +91,7 @@ public class CustomerController extends BaseController {
     public ResponseEntity<Map<String, Object>> recordPurchase(
             @PathVariable String id,
             @RequestParam BigDecimal amount) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Recording purchase of {} for customer {} in tenant: {}", amount, id, tenantId);
         CustomerResponse response = customerService.recordPurchase(id, tenantId, amount);
         return ResponseEntity.ok(createSuccessResponse(response));
@@ -101,7 +101,7 @@ public class CustomerController extends BaseController {
     public ResponseEntity<Map<String, Object>> addToWallet(
             @PathVariable String id,
             @RequestParam BigDecimal amount) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Adding {} to wallet for customer {} in tenant: {}", amount, id, tenantId);
         CustomerResponse response = customerService.addToWallet(id, tenantId, amount);
         return ResponseEntity.ok(createSuccessResponse(response));
@@ -111,7 +111,7 @@ public class CustomerController extends BaseController {
     public ResponseEntity<Map<String, Object>> deductFromWallet(
             @PathVariable String id,
             @RequestParam BigDecimal amount) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Deducting {} from wallet for customer {} in tenant: {}", amount, id, tenantId);
         CustomerResponse response = customerService.deductFromWallet(id, tenantId, amount);
         return ResponseEntity.ok(createSuccessResponse(response));
@@ -121,7 +121,7 @@ public class CustomerController extends BaseController {
     public ResponseEntity<Map<String, Object>> redeemLoyaltyPoints(
             @PathVariable String id,
             @RequestParam int points) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Redeeming {} loyalty points for customer {} in tenant: {}", points, id, tenantId);
         CustomerResponse response = customerService.redeemLoyaltyPoints(id, tenantId, points);
         return ResponseEntity.ok(createSuccessResponse(response));
@@ -129,7 +129,7 @@ public class CustomerController extends BaseController {
     
     @PostMapping("/{id}/deactivate")
     public ResponseEntity<Map<String, Object>> deactivateCustomer(@PathVariable String id) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Deactivating customer {} for tenant: {}", id, tenantId);
         CustomerResponse response = customerService.deactivateCustomer(id, tenantId);
         return ResponseEntity.ok(createSuccessResponse(response));
@@ -137,7 +137,7 @@ public class CustomerController extends BaseController {
     
     @PostMapping("/{id}/reactivate")
     public ResponseEntity<Map<String, Object>> reactivateCustomer(@PathVariable String id) {
-        String tenantId = getCurrentTenantId();
+        Integer tenantId = getCurrentTenantId();
         log.info("Reactivating customer {} for tenant: {}", id, tenantId);
         CustomerResponse response = customerService.reactivateCustomer(id, tenantId);
         return ResponseEntity.ok(createSuccessResponse(response));

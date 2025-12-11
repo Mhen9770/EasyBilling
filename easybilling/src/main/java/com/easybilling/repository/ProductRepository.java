@@ -10,9 +10,9 @@ import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    Page<Product> findByTenantId(String tenantId, Pageable pageable);
-    Optional<Product> findByIdAndTenantId(Long id, String tenantId);
-    Optional<Product> findByBarcodeAndTenantId(String barcode, String tenantId);
-    Optional<Product> findBySkuAndTenantId(String sku, String tenantId);
-    boolean existsByBarcodeAndTenantId(String barcode, String tenantId);
+    Page<Product> findByTenantId(Integer tenantId, Pageable pageable);
+    Optional<Product> findByIdAndTenantId(Long id, Integer tenantId);
+    Optional<Product> findByBarcodeAndTenantId(String barcode, Integer tenantId);
+    Optional<Product> findBySkuAndTenantId(String sku, Integer tenantId);
+    boolean existsByBarcodeAndTenantId(String barcode, Integer tenantId);
 }

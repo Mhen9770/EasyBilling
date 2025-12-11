@@ -10,6 +10,6 @@ import java.util.List;
 
 @Repository
 public interface StockMovementRepository extends JpaRepository<StockMovement, Long> {
-    List<StockMovement> findByProductIdAndTenantIdOrderByCreatedAtDesc(Long productId, String tenantId);
-    Page<StockMovement> findByTenantIdOrderByCreatedAtDesc(String tenantId, Pageable pageable);
+    List<StockMovement> findByProductIdAndTenantIdOrderByCreatedAtDesc(Long productId, Integer tenantId);
+    Page<StockMovement> findByTenantIdOrderByCreatedAtDesc(Integer tenantId, Pageable pageable);
 }

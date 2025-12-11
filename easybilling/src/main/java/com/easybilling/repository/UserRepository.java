@@ -18,15 +18,15 @@ public interface UserRepository extends JpaRepository<User, String> {
     
     Optional<User> findByEmail(String email);
     
-    Optional<User> findByUsernameAndTenantId(String username, String tenantId);
+    Optional<User> findByUsernameAndTenantId(String username, Integer tenantId);
     
     boolean existsByUsername(String username);
     
     boolean existsByEmail(String email);
     
-    List<User> findByTenantId(String tenantId);
+    List<User> findByTenantId(Integer tenantId);
     
     List<User> findByStatus(UserStatus status);
     
-    List<User> findByTenantIdAndStatus(String tenantId, UserStatus status);
+    List<User> findByTenantIdAndStatus(Integer tenantId, UserStatus status);
 }

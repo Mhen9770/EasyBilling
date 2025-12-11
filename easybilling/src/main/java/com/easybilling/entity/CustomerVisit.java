@@ -1,10 +1,12 @@
 package com.easybilling.entity;
 
+import com.easybilling.listener.TenantEntityListener;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Filter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -16,19 +18,20 @@ import java.time.LocalDateTime;
     @Index(name = "idx_visit_tenant", columnList = "tenant_id"),
     @Index(name = "idx_visit_date", columnList = "visit_date")
 })
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-public class CustomerVisit {
+@EntityListeners({AuditingEntityListener.class, TenantEntityListener.class})
+public class CustomerVisit implements TenantAware {
     
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     
     @Column(nullable = false)
-    private String tenantId;
+    private Integer tenantId;
     
     @Column(nullable = false)
     private String customerId;

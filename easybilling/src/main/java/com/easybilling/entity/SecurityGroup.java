@@ -1,9 +1,11 @@
 package com.easybilling.entity;
 
 import com.easybilling.enums.Permission;
+import com.easybilling.listener.TenantEntityListener;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
@@ -20,12 +22,14 @@ import java.util.Set;
         @Index(name = "idx_security_group_name", columnList = "name"),
         @Index(name = "idx_security_group_status", columnList = "is_active")
 })
+@Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class SecurityGroup {
+@EntityListeners(TenantEntityListener.class)
+public class SecurityGroup implements TenantAware {
     
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -38,7 +42,7 @@ public class SecurityGroup {
     private String description;
     
     @Column(name = "tenant_id", nullable = false, length = 36)
-    private String tenantId;
+    private Integer tenantId;
     
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "security_group_permissions", 
