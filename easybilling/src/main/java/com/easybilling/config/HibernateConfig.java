@@ -16,7 +16,7 @@ import java.util.Map;
  * Hibernate configuration for same-schema multitenancy.
  * Uses tenant filtering instead of schema-per-tenant strategy.
  */
-@Configuration
+//@Configuration
 @RequiredArgsConstructor
 public class HibernateConfig {
     
