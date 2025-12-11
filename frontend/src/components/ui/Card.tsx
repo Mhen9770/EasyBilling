@@ -9,7 +9,7 @@ export interface CardProps {
   shadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
 }
 
-export const Card: React.FC<CardProps> = ({
+const CardComponent: React.FC<CardProps> = ({
   children,
   className = '',
   hover = false,
@@ -107,3 +107,11 @@ export const CardFooter: React.FC<CardFooterProps> = ({
     </div>
   );
 };
+
+// Attach subcomponents to main Card component
+export const Card = Object.assign(CardComponent, {
+  Header: CardHeader,
+  Title: CardTitle,
+  Content: CardContent,
+  Footer: CardFooter,
+});
