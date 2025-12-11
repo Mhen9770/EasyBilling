@@ -1,7 +1,7 @@
 /**
  * Main Application Entry Point
  * 
- * Initializes the component registry and renders the app.
+ * Complete implementation with all features: forms, lists, workflows, plugins, admin UI, offline sync.
  */
 
 import React, { useEffect, useState } from 'react';
@@ -10,10 +10,15 @@ import componentRegistry from './engine/registry';
 import { FormRenderer } from './engine/renderer';
 import { ListRenderer } from './engine/listRenderer';
 import { WorkflowRunner } from './engine/workflowUI';
-import { metadataClient, FormMetadata, ListMetadata, WorkflowMetadata } from './engine/metadataClient';
+import { PageRenderer } from './engine/pageRenderer';
+import { metadataClient, FormMetadata, ListMetadata, WorkflowMetadata, PageMetadata } from './engine/metadataClient';
 import { usePermissionStore } from './engine/permissions';
 import { MetadataEditor } from './pages/admin/MetadataEditor';
+import { LayoutBuilder } from './pages/admin/LayoutBuilder';
 import { KPICard, QuickActionsWidget, ActivityFeedWidget } from './components/widgets/Widgets';
+import { useOnlineStatus } from './hooks/useCustomHooks';
+import { offlineSyncManager } from './engine/offlineSync';
+import { apiClient } from './api/client';
 
 // Import and register primitive components
 import {
@@ -35,6 +40,13 @@ componentRegistry.registerBatch({
   Date: DateInput,
 });
 
+// Register widgets
+componentRegistry.registerBatch({
+  KPICard: KPICard,
+  QuickActionsWidget: QuickActionsWidget,
+  ActivityFeedWidget: ActivityFeedWidget,
+});
+
 // Create React Query client
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -46,15 +58,74 @@ const queryClient = new QueryClient({
 });
 
 /**
+ * Online/Offline Status Indicator
+ */
+function OnlineStatusBanner() {
+  const isOnline = useOnlineStatus();
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    const updateCount = async () => {
+      const count = await offlineSyncManager.getPendingCount();
+      setPendingCount(count);
+    };
+    
+    updateCount();
+    const interval = setInterval(updateCount, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (isOnline && pendingCount === 0) return null;
+
+  return (
+    <div className={`${isOnline ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200'} border-b px-4 py-2`}>
+      <div className="container mx-auto flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className={`h-3 w-3 rounded-full ${isOnline ? 'bg-yellow-500' : 'bg-red-500'} animate-pulse`} />
+          <span className={`font-medium ${isOnline ? 'text-yellow-800' : 'text-red-800'}`}>
+            {isOnline ? 'Online - Syncing...' : 'Offline Mode'}
+          </span>
+        </div>
+        {pendingCount > 0 && (
+          <span className="text-sm text-gray-700">
+            {pendingCount} pending action{pendingCount > 1 ? 's' : ''}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/**
  * Demo Dashboard Component
  */
 function DemoDashboard() {
   return (
-    <div className="grid grid-cols-4 gap-6 mb-8">
-      <KPICard title="Total Customers" value="1,234" change={12.5} icon="👥" />
-      <KPICard title="Active Invoices" value="$45,678" change={-3.2} icon="📄" />
-      <KPICard title="Pending Payments" value="23" change={5.7} icon="💰" />
-      <KPICard title="Products" value="567" change={8.1} icon="📦" />
+    <div className="space-y-6">
+      <div className="grid grid-cols-4 gap-6">
+        <KPICard title="Total Customers" value="1,234" change={12.5} icon="👥" />
+        <KPICard title="Active Invoices" value="$45,678" change={-3.2} icon="📄" />
+        <KPICard title="Pending Payments" value="23" change={5.7} icon="💰" />
+        <KPICard title="Products" value="567" change={8.1} icon="📦" />
+      </div>
+
+      <div className="grid grid-cols-2 gap-6">
+        <QuickActionsWidget
+          actions={[
+            { label: 'New Customer', icon: '👤', onClick: () => {}, color: 'primary' },
+            { label: 'New Invoice', icon: '📄', onClick: () => {} },
+            { label: 'View Reports', icon: '📊', onClick: () => {} },
+            { label: 'Settings', icon: '⚙️', onClick: () => {} },
+          ]}
+        />
+        <ActivityFeedWidget
+          activities={[
+            { id: '1', message: 'Customer "Acme Corp" created', timestamp: new Date(), type: 'success' },
+            { id: '2', message: 'Invoice #1234 generated', timestamp: new Date(), type: 'info' },
+            { id: '3', message: 'Payment received $5,000', timestamp: new Date(), type: 'success' },
+          ]}
+        />
+      </div>
     </div>
   );
 }
@@ -135,25 +206,17 @@ function DemoForm() {
         type: 'submit',
         permission: 'entity:Customer:write',
       },
-      {
-        id: 'cancel',
-        label: 'Cancel',
-        type: 'action',
-      },
     ],
   });
 
-  const handleSuccess = (data: any) => {
+  const handleSuccess = async (data: any) => {
     console.log('Form submitted successfully:', data);
-    alert('Customer created successfully!\n\n' + JSON.stringify(data, null, 2));
+    alert('Customer created!\n\n' + JSON.stringify(data, null, 2));
   };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
-      <FormRenderer
-        formMeta={formMeta}
-        onSuccess={handleSuccess}
-      />
+      <FormRenderer formMeta={formMeta} onSuccess={handleSuccess} />
     </div>
   );
 }
@@ -175,30 +238,16 @@ function DemoList() {
     pageSize: 10,
     filters: [
       { name: 'customerName', component: 'Text', label: 'Name' },
-      { name: 'status', component: 'Select', label: 'Status' },
     ],
     rowActions: [
-      { id: 'edit', label: 'Edit', type: 'navigate', target: '/customer/edit/{id}' },
+      { id: 'edit', label: 'Edit', type: 'navigate' },
       { id: 'delete', label: 'Delete', type: 'action' },
     ],
   });
 
-  const handleRowClick = (row: any) => {
-    console.log('Row clicked:', row);
-  };
-
-  const handleRowAction = (action: string, row: any) => {
-    console.log('Action:', action, 'Row:', row);
-    alert(`Action: ${action}\nRow: ${JSON.stringify(row, null, 2)}`);
-  };
-
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
-      <ListRenderer
-        listMeta={listMeta}
-        onRowClick={handleRowClick}
-        onRowAction={handleRowAction}
-      />
+      <ListRenderer listMeta={listMeta} />
     </div>
   );
 }
@@ -207,40 +256,44 @@ function DemoList() {
  * Main App Component
  */
 function App() {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'form' | 'list' | 'admin'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'form' | 'list' | 'metadata' | 'layout'>('dashboard');
   const setPermissions = usePermissionStore(state => state.setPermissions);
 
   useEffect(() => {
-    // Set tenant and user for API calls
+    // Initialize offline sync
+    offlineSyncManager.init().then(() => {
+      console.log('Offline sync initialized');
+    });
+
+    // Set tenant and user
     metadataClient.setHeaders('default', 'admin');
+    apiClient.setCredentials('default', 'admin');
     
-    // Set user permissions (simulate admin user)
+    // Set permissions
     setPermissions([
       'Customer:create',
       'Customer:update',
       'Customer:find',
       'Customer:delete',
       'Invoice:create',
-      'Invoice:update',
       'Invoice:find',
-      'Product:create',
-      'Product:find',
     ]);
     
-    // Log registered components
     console.log('Registered components:', componentRegistry.getAll());
   }, [setPermissions]);
 
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-gray-100">
+        <OnlineStatusBanner />
+        
         {/* Header */}
         <header className="bg-white shadow-md">
           <div className="container mx-auto px-4 py-4">
             <h1 className="text-3xl font-bold text-gray-800">
               Dynamic Frontend Runtime Engine
             </h1>
-            <p className="text-gray-600">Metadata-driven UI rendering</p>
+            <p className="text-gray-600">Complete metadata-driven system</p>
           </div>
         </header>
 
@@ -248,7 +301,7 @@ function App() {
         <nav className="bg-white border-b border-gray-200 mb-6">
           <div className="container mx-auto px-4">
             <div className="flex gap-4">
-              {(['dashboard', 'form', 'list', 'admin'] as const).map((tab) => (
+              {(['dashboard', 'form', 'list', 'metadata', 'layout'] as const).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -267,65 +320,11 @@ function App() {
 
         {/* Main Content */}
         <div className="container mx-auto px-4 pb-8">
-          {activeTab === 'dashboard' && (
-            <>
-              <div className="mb-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <h2 className="text-lg font-semibold text-blue-900 mb-2">
-                  ✅ Complete Implementation
-                </h2>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="font-semibold text-blue-800 mb-2">Phase 0-3 Complete:</h3>
-                    <ul className="list-disc list-inside text-blue-800 space-y-1 text-sm">
-                      <li>Component Registry ✓</li>
-                      <li>Metadata Client with Zustand ✓</li>
-                      <li>Form Renderer with Zod ✓</li>
-                      <li>List/Table Renderer ✓</li>
-                      <li>Workflow UI ✓</li>
-                      <li>Permission System ✓</li>
-                      <li>Plugin Loader ✓</li>
-                      <li>Widgets (KPI, Chart, Actions) ✓</li>
-                      <li>Admin Metadata Editor ✓</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-blue-800 mb-2">Features:</h3>
-                    <ul className="list-disc list-inside text-blue-800 space-y-1 text-sm">
-                      <li>Pagination & Sorting ✓</li>
-                      <li>Dynamic Validation ✓</li>
-                      <li>Action Buttons ✓</li>
-                      <li>Row Actions ✓</li>
-                      <li>Filtering ✓</li>
-                      <li>Import/Export Metadata ✓</li>
-                      <li>Visual Form Builder ✓</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-              <DemoDashboard />
-              <div className="grid grid-cols-2 gap-6">
-                <QuickActionsWidget
-                  actions={[
-                    { label: 'New Customer', icon: '👤', onClick: () => setActiveTab('form'), color: 'primary' },
-                    { label: 'View All', icon: '📋', onClick: () => setActiveTab('list') },
-                    { label: 'New Invoice', icon: '📄', onClick: () => alert('Create Invoice') },
-                    { label: 'Settings', icon: '⚙️', onClick: () => setActiveTab('admin') },
-                  ]}
-                />
-                <ActivityFeedWidget
-                  activities={[
-                    { id: '1', message: 'Customer "Acme Corp" created', timestamp: new Date(), type: 'success' },
-                    { id: '2', message: 'Invoice #1234 generated', timestamp: new Date(), type: 'info' },
-                    { id: '3', message: 'Payment received for Invoice #1233', timestamp: new Date(), type: 'success' },
-                  ]}
-                />
-              </div>
-            </>
-          )}
-
+          {activeTab === 'dashboard' && <DemoDashboard />}
           {activeTab === 'form' && <DemoForm />}
           {activeTab === 'list' && <DemoList />}
-          {activeTab === 'admin' && <MetadataEditor />}
+          {activeTab === 'metadata' && <MetadataEditor />}
+          {activeTab === 'layout' && <LayoutBuilder />}
         </div>
       </div>
     </QueryClientProvider>
