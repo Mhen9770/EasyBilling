@@ -33,5 +33,13 @@ public class InvoiceItemRequest {
     private BigDecimal taxAmount;
     private BigDecimal taxRate;
     
+    // GST fields (India)
+    private String hsnCode;
+    private String sacCode;
+    private BigDecimal cgstRate;
+    private BigDecimal sgstRate;
+    private BigDecimal igstRate;
+    private BigDecimal cessRate;
+    
     private String notes;
 }

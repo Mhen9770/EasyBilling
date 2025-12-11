@@ -14,7 +14,7 @@ export default function RegisterPage() {
     firstName: '',
     lastName: '',
     phone: '',
-    tenantId: 'default-tenant', // In production, this would be dynamic
+    tenantId: 1, // In production, this would be dynamic
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});

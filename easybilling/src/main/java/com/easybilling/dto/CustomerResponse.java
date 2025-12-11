@@ -24,6 +24,7 @@ public class CustomerResponse {
     private String city;
     private String state;
     private String pincode;
+    private String gstin;
     private CustomerSegment segment;
     private Integer loyaltyPoints;
     private BigDecimal walletBalance;

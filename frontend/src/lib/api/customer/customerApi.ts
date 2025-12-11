@@ -11,7 +11,7 @@ export interface CustomerResponse {
   state?: string;
   pincode?: string;
   gstin?: string;
-  totalPurchases: number;
+  totalSpent: number;
   segment: 'REGULAR' | 'VIP' | 'PREMIUM';
   walletBalance: number;
   loyaltyPoints: number;

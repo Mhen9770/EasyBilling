@@ -28,5 +28,7 @@ public class CustomerRequest {
     
     private String pincode;
     
+    private String gstin;
+    
     private String notes;
 }

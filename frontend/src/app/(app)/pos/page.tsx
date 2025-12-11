@@ -1105,25 +1105,25 @@ export default function POSPage() {
                     <span>Subtotal:</span>
                     <span>{formatIndianCurrency(completedInvoice.subtotal)}</span>
                   </div>
-                  {completedInvoice.totalDiscount > 0 && (
+                  {completedInvoice.discountAmount > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Discount:</span>
-                      <span>-{formatIndianCurrency(completedInvoice.totalDiscount)}</span>
+                      <span>-{formatIndianCurrency(completedInvoice.discountAmount)}</span>
                     </div>
                   )}
                   <div className="flex justify-between">
                     <span>Tax:</span>
-                    <span>{formatIndianCurrency(completedInvoice.totalTax)}</span>
+                    <span>{formatIndianCurrency(completedInvoice.taxAmount)}</span>
                   </div>
                   <div className="flex justify-between font-bold text-lg border-t pt-2">
                     <span>Total:</span>
-                    <span>{formatIndianCurrency(completedInvoice.total)}</span>
+                    <span>{formatIndianCurrency(completedInvoice.totalAmount)}</span>
                   </div>
                   
                   {/* Amount in words */}
-                  {completedInvoice.total > 0 && (
+                  {completedInvoice.totalAmount > 0 && (
                     <div className="text-xs text-gray-600 border-t pt-2 italic">
-                      Amount in words: {convertCurrencyToWords(completedInvoice.total)} Only
+                      Amount in words: {convertCurrencyToWords(completedInvoice.totalAmount)} Only
                     </div>
                   )}
                 </div>
@@ -1132,7 +1132,7 @@ export default function POSPage() {
                 {(completedInvoice.totalCgst > 0 || completedInvoice.totalSgst > 0 || completedInvoice.totalIgst > 0) && (
                   <div className="border-t pt-4">
                     <GSTBreakdown
-                      taxableAmount={completedInvoice.subtotal - (completedInvoice.totalDiscount || 0)}
+                      taxableAmount={completedInvoice.subtotal - (completedInvoice.discountAmount || 0)}
                       cgst={completedInvoice.totalCgst || 0}
                       sgst={completedInvoice.totalSgst || 0}
                       igst={completedInvoice.totalIgst || 0}

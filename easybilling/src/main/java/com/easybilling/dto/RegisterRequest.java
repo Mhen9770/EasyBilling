@@ -2,6 +2,7 @@ package com.easybilling.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -35,6 +36,6 @@ public class RegisterRequest {
     private String lastName;
     private String phone;
     
-    @NotBlank(message = "Tenant ID is required")
+    @NotNull(message = "Tenant ID is required")
     private Integer tenantId;
 }

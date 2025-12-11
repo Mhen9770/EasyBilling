@@ -15,4 +15,16 @@ public class InvoiceItemResponse {
     private BigDecimal discountAmount;
     private BigDecimal taxAmount;
     private BigDecimal lineTotal;
+    
+    // GST fields (India)
+    private String hsnCode;
+    private String sacCode;
+    private BigDecimal cgstRate;
+    private BigDecimal sgstRate;
+    private BigDecimal igstRate;
+    private BigDecimal cessRate;
+    private BigDecimal cgstAmount;
+    private BigDecimal sgstAmount;
+    private BigDecimal igstAmount;
+    private BigDecimal cessAmount;
 }
