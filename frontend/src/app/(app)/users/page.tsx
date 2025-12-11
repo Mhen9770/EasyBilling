@@ -199,13 +199,13 @@ export default function UsersPage() {
           <div className="bg-white rounded-lg p-6 shadow-sm">
             <div className="text-sm text-gray-600 mb-1">Admins</div>
             <div className="text-3xl font-bold text-blue-600">
-              {users.filter(u => u.role === 'ADMIN').length}
+              {users.filter(u => u.roles?.includes('ROLE_ADMIN')).length}
             </div>
           </div>
           <div className="bg-white rounded-lg p-6 shadow-sm">
             <div className="text-sm text-gray-600 mb-1">Staff</div>
             <div className="text-3xl font-bold text-purple-600">
-              {users.filter(u => u.role === 'STAFF').length}
+              {users.filter(u => u.roles?.includes('ROLE_STAFF')).length}
             </div>
           </div>
         </div>
@@ -294,7 +294,7 @@ export default function UsersPage() {
                     </td>
                     <td className="px-3 sm:px-6 py-4">
                       <select
-                        value={user.role}
+                        value={user.roles?.[0]?.replace('ROLE_', '') || 'USER'}
                         onChange={(e) => handleUpdateUserRole(user.id, e.target.value)}
                         disabled={updateRoleMutation.isPending}
                         className="text-xs sm:text-sm border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 w-full sm:w-auto"
@@ -311,7 +311,7 @@ export default function UsersPage() {
                         className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           user.status === 'ACTIVE'
                             ? 'bg-green-100 text-green-800'
-                            : user.status === 'SUSPENDED'
+                            : user.status === 'INACTIVE' || user.status === 'LOCKED'
                             ? 'bg-yellow-100 text-yellow-800'
                             : 'bg-gray-100 text-gray-800'
                         }`}
@@ -498,7 +498,7 @@ export default function UsersPage() {
                   <select
                     name="role"
                     required
-                    defaultValue={editingUser?.role}
+                    defaultValue={editingUser?.roles?.[0]?.replace('ROLE_', '') || 'USER'}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                   >
                     {ROLES.map(role => (

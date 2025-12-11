@@ -197,10 +197,13 @@ export const billingApi = {
     itemIds: string[],
     reason: string
   ): Promise<ApiResponse<InvoiceResponse>> => {
+    // Spring Boot handles array query params as repeated params: ?itemIds=id1&itemIds=id2
+    const params = new URLSearchParams();
+    itemIds.forEach(itemId => params.append('itemIds', itemId));
+    params.append('reason', reason);
+    
     const response = await apiClient.post<ApiResponse<InvoiceResponse>>(
-      `/api/v1/invoices/${id}/return`,
-      null,
-      { params: { itemIds, reason } }
+      `/api/v1/invoices/${id}/return?${params.toString()}`
     );
     return response.data;
   },

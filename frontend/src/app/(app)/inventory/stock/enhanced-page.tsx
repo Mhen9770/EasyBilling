@@ -427,39 +427,41 @@ export default function EnhancedStockPage() {
             {lowStockData?.data && lowStockData.data.length > 0 ? (
               <Table
                 data={lowStockData.data}
+                keyExtractor={(item) => item.productId}
                 columns={[
                   {
+                    key: 'productName',
                     header: 'Product',
-                    accessor: 'productName',
-                    cell: (value, row: any) => (
+                    render: (row: any) => (
                       <div>
-                        <div className="font-medium">{value}</div>
+                        <div className="font-medium">{row.productName}</div>
                         <div className="text-sm text-gray-500">SKU: {row.productSku || 'N/A'}</div>
                       </div>
                     ),
                   },
                   {
+                    key: 'locationName',
                     header: 'Location',
-                    accessor: 'locationName',
-                    cell: (value, row: any) => value || row.locationId,
+                    render: (row: any) => row.locationName || row.locationId,
                   },
                   {
+                    key: 'availableQuantity',
                     header: 'Available',
-                    accessor: 'availableQuantity',
-                    cell: (value) => (
-                      <span className="font-semibold text-red-600">{value || 0}</span>
+                    render: (row: any) => (
+                      <span className="font-semibold text-red-600">{row.availableQuantity || 0}</span>
                     ),
                   },
                   {
+                    key: 'lowStockThreshold',
                     header: 'Threshold',
-                    accessor: 'lowStockThreshold',
-                    cell: (value) => value || 0,
+                    render: (row: any) => row.lowStockThreshold || 0,
                   },
                   {
+                    key: 'status',
                     header: 'Status',
-                    accessor: 'availableQuantity',
-                    cell: (value, row: any) => {
+                    render: (row: any) => {
                       const threshold = row.lowStockThreshold || 0;
+                      const value = row.availableQuantity;
                       if (value === 0) return <Badge variant="danger">Out of Stock</Badge>;
                       if (value <= threshold) return <Badge variant="warning">Low Stock</Badge>;
                       return <Badge variant="success">In Stock</Badge>;
