@@ -52,7 +52,7 @@ public class AuthService {
         
         // If tenant ID is provided, use it (for subdomain-based routing or explicit tenant selection)
         if (request.getTenantId() != null) {
-            user = userRepository.findByUsernameAndTenantId(request.getUsername(), Integer.parseInt(request.getTenantId()))
+            user = userRepository.findByUsernameAndTenantId(request.getUsername(), request.getTenantId())
                     .orElseThrow(() -> new UnauthorizedException("Invalid username or password"));
         } else {
             // Find user by username/email (tenant ID will be extracted from user record)

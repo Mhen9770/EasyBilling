@@ -28,7 +28,7 @@ public class TenantMasterDataService {
      */
     public void initializeMasterData(Tenant tenant) {
         String schemaName = tenant.getSchemaName();
-        String tenantId = tenant.getId(); // Use tenant ID for tenantId field
+        Integer tenantId = tenant.getId(); // Use tenant ID for tenantId field
         log.info("Initializing master data for tenant schema: {}", schemaName);
         
         // Validate schema name to prevent SQL injection
