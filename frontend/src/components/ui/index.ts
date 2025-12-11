@@ -22,6 +22,15 @@ export type { TableProps, Column } from './Table';
 export { StatCard } from './StatCard';
 export type { StatCardProps } from './StatCard';
 
+export { KeyboardShortcuts } from './KeyboardShortcuts';
+export type { KeyboardShortcutsProps } from './KeyboardShortcuts';
+
+export { Tooltip } from './Tooltip';
+export type { TooltipProps } from './Tooltip';
+
+export { SearchBar } from './SearchBar';
+export type { SearchBarProps } from './SearchBar';
+
 export { PageLoader, CardLoader, InlineLoader, ButtonLoader, TableLoader } from './Loader';
 
 export { useToastStore } from './toast';
