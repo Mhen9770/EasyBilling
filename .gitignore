@@ -39,6 +39,9 @@ frontend/.next/
 frontend/out/
 frontend/dist/
 frontend/.turbo/
+dynamicfrontend/node_modules/
+dynamicfrontend/dist/
+dynamicfrontend/.turbo/
 *.tsbuildinfo
 .env*.local
 
