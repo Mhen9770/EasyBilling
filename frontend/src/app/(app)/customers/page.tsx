@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack:react-query';
 import { customerApi, type CustomerRequest, type CustomerResponse } from '@/lib/api/customer/customerApi';
 import { useToastStore } from '@/components/ui/toast';
+import { Card, CardHeader, CardTitle, CardContent, Button, Input, Modal, Badge, Table, type Column } from '@/components/ui';
+import { PageLoader } from '@/components/ui/Loader';
 
 export default function CustomersPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -97,7 +99,242 @@ export default function CustomersPage() {
     setEditingCustomer(null);
   };
 
+  // Define table columns
+  const columns: Column<CustomerResponse>[] = [
+    {
+      key: 'name',
+      header: 'Customer Name',
+      sortable: true,
+      render: (customer) => (
+        <div>
+          <div className="font-medium text-gray-900">{customer.name}</div>
+          <div className="text-sm text-gray-500">{customer.phone}</div>
+        </div>
+      ),
+    },
+    {
+      key: 'email',
+      header: 'Email',
+      render: (customer) => customer.email || '-',
+    },
+    {
+      key: 'city',
+      header: 'Location',
+      render: (customer) => (
+        <div>
+          {customer.city && customer.state ? (
+            <>
+              <div className="text-sm text-gray-900">{customer.city}</div>
+              <div className="text-xs text-gray-500">{customer.state}</div>
+            </>
+          ) : (
+            '-'
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'gstin',
+      header: 'GSTIN',
+      render: (customer) => customer.gstin ? (
+        <Badge variant="primary" size="sm">{customer.gstin}</Badge>
+      ) : (
+        '-'
+      ),
+    },
+    {
+      key: 'actions',
+      header: 'Actions',
+      render: (customer) => (
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => handleEdit(customer)}
+          >
+            ✏️ Edit
+          </Button>
+          <Button
+            size="sm"
+            variant="danger"
+            onClick={() => handleDelete(customer.id)}
+          >
+            🗑️ Delete
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  if (isLoading) {
+    return <PageLoader text="Loading customers..." />;
+  }
+
   return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
+          <p className="text-sm text-gray-600 mt-1">
+            Manage your customer database
+          </p>
+        </div>
+        <Button
+          variant="primary"
+          onClick={() => setIsCreateModalOpen(true)}
+          icon="➕"
+        >
+          Add Customer
+        </Button>
+      </div>
+
+      {/* Search and Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="md:col-span-2">
+          <Input
+            placeholder="Search customers by name, phone, or email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            leftIcon={<span>🔍</span>}
+            fullWidth
+          />
+        </div>
+        <Card padding="sm">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-blue-600">{customers.length}</div>
+            <div className="text-xs text-gray-600">Total Customers</div>
+          </div>
+        </Card>
+        <Card padding="sm">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-600">
+              {customers.filter(c => c.gstin).length}
+            </div>
+            <div className="text-xs text-gray-600">B2B Customers</div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Customers Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Customer List</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Table
+            data={customers}
+            columns={columns}
+            keyExtractor={(customer) => customer.id}
+            hover
+            striped
+          />
+        </CardContent>
+      </Card>
+
+      {/* Create/Edit Modal */}
+      <Modal
+        isOpen={isCreateModalOpen}
+        onClose={handleCloseModal}
+        title={editingCustomer ? 'Edit Customer' : 'Add New Customer'}
+        size="lg"
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              name="name"
+              label="Customer Name"
+              placeholder="Enter customer name"
+              required
+              defaultValue={editingCustomer?.name}
+              fullWidth
+            />
+            
+            <Input
+              name="phone"
+              label="Phone Number"
+              type="tel"
+              placeholder="Enter phone number"
+              required
+              defaultValue={editingCustomer?.phone}
+              fullWidth
+            />
+
+            <Input
+              name="email"
+              label="Email"
+              type="email"
+              placeholder="Enter email (optional)"
+              defaultValue={editingCustomer?.email}
+              fullWidth
+            />
+
+            <Input
+              name="gstin"
+              label="GSTIN"
+              placeholder="Enter GSTIN (optional)"
+              defaultValue={editingCustomer?.gstin}
+              fullWidth
+            />
+          </div>
+
+          <Input
+            name="address"
+            label="Address"
+            placeholder="Enter address (optional)"
+            defaultValue={editingCustomer?.address}
+            fullWidth
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Input
+              name="city"
+              label="City"
+              placeholder="City"
+              defaultValue={editingCustomer?.city}
+              fullWidth
+            />
+
+            <Input
+              name="state"
+              label="State"
+              placeholder="State"
+              defaultValue={editingCustomer?.state}
+              fullWidth
+            />
+
+            <Input
+              name="pincode"
+              label="Pincode"
+              placeholder="Pincode"
+              defaultValue={editingCustomer?.pincode}
+              fullWidth
+            />
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleCloseModal}
+              fullWidth
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              loading={createMutation.isPending || updateMutation.isPending}
+              fullWidth
+            >
+              {editingCustomer ? 'Update Customer' : 'Create Customer'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+    </div>
+  );
+}
     <div className="max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Customers</h1>
