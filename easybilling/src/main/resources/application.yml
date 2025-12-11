@@ -27,17 +27,17 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
-        default_schema: public
+        default_schema: easybilling
   
   flyway:
-    enabled: false
+    enabled: true
     baseline-on-migrate: true
     baseline-version: 0
     locations: classpath:db/migration
-    schemas: public
+    schemas: easybilling
     table: flyway_schema_history
     validate-on-migrate: false
-    # Note: Tenant migrations in db/migration/tenant are run separately during tenant provisioning
+    # Flyway only manages master schema. Tenant schemas use JPA ddl-auto
   
   data:
     redis:
