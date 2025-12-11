@@ -43,7 +43,7 @@ public class TenantProvisioningService {
             initializeTenantSchema(schemaName);
             
             // Initialize master data
-            masterDataService.initializeMasterData(tenant);
+//            masterDataService.initializeMasterData(tenant);
             
             log.info("Tenant infrastructure provisioned successfully for: {} with schema: {}", 
                     tenant.getSlug(), schemaName);

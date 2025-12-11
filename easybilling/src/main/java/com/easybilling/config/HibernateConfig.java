@@ -46,6 +46,8 @@ public class HibernateConfig {
         jpaPropertiesMap.put("hibernate.multiTenancy", "SCHEMA");
         jpaPropertiesMap.put(AvailableSettings.MULTI_TENANT_IDENTIFIER_RESOLVER, currentTenantIdentifierResolver);
         jpaPropertiesMap.put(AvailableSettings.MULTI_TENANT_CONNECTION_PROVIDER, multiTenantConnectionProvider);
+
+        jpaPropertiesMap.put(AvailableSettings.HBM2DDL_AUTO, "update");
         
         // JPA will handle schema creation via ddl-auto setting from application.yml
         

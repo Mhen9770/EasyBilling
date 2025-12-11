@@ -92,7 +92,7 @@ public class AuthService {
         // Generate tokens
         String accessToken = jwtTokenProvider.generateAccessToken(
                 user.getId(),
-                user.getTenantId(),
+                user.getTenantSlug(),
                 new ArrayList<>(user.getRoles())
         );
         
@@ -159,6 +159,7 @@ public class AuthService {
                 .lastName(registerRequest.getLastName())
                 .phone(registerRequest.getPhone())
                 .tenantId(tenantId)
+                .tenantSlug(tenantResponse.getSlug())
                 .status(User.UserStatus.ACTIVE)
                 .roles(new HashSet<>())
                 .failedLoginAttempts(0)
@@ -176,7 +177,7 @@ public class AuthService {
         // Step 3: Generate tokens
         String accessToken = jwtTokenProvider.generateAccessToken(
                 adminUser.getId(),
-                adminUser.getTenantId(),
+                adminUser.getTenantSlug(),
                 new ArrayList<>(adminUser.getRoles())
         );
         
@@ -249,7 +250,7 @@ public class AuthService {
         // Generate tokens
         String accessToken = jwtTokenProvider.generateAccessToken(
                 user.getId(),
-                user.getTenantId(),
+                user.getTenantSlug(),
                 new ArrayList<>(user.getRoles())
         );
         
@@ -295,7 +296,7 @@ public class AuthService {
         // Generate new access token
         String accessToken = jwtTokenProvider.generateAccessToken(
                 user.getId(),
-                user.getTenantId(),
+                user.getTenantSlug(),
                 new ArrayList<>(user.getRoles())
         );
         

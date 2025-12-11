@@ -50,6 +50,9 @@ public class User {
     
     @Column(name = "tenant_id", nullable = false, length = 36)
     private String tenantId;
+
+    @Column(name = "tenant_slug", nullable = false, length = 36)
+    private String tenantSlug;
     
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
