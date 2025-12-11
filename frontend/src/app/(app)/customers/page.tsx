@@ -172,7 +172,7 @@ export default function CustomersPage() {
                     {customer.gstin || '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ₹{customer.totalPurchases?.toFixed(2)}
+                    ₹{customer.totalSpent?.toFixed(2)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <button 

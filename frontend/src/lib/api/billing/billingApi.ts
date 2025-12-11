@@ -22,7 +22,7 @@ export interface InvoiceItemRequest {
 export interface PaymentRequest {
   mode: 'CASH' | 'CARD' | 'UPI' | 'WALLET' | 'CREDIT' | 'BANK_TRANSFER';
   amount: number;
-  reference?: string;
+  referenceNumber?: string;
 }
 
 export interface InvoiceRequest {
@@ -71,7 +71,7 @@ export interface PaymentResponse {
   id: string;
   mode: string;
   amount: number;
-  reference?: string;
+  referenceNumber?: string;
   paidAt: string;
 }
 
@@ -83,13 +83,14 @@ export interface InvoiceResponse {
   customerPhone?: string;
   customerEmail?: string;
   storeId?: string;
+  counterId?: string;
   counterNumber?: string;
   items: InvoiceItemResponse[];
   payments: PaymentResponse[];
   subtotal: number;
-  totalDiscount: number;
-  totalTax: number;
-  total: number;
+  discountAmount: number;
+  taxAmount: number;
+  totalAmount: number;
   paidAmount: number;
   balanceAmount: number;
   createdBy?: string;
@@ -184,7 +185,8 @@ export const billingApi = {
   cancelInvoice: async (id: string, reason: string): Promise<ApiResponse<InvoiceResponse>> => {
     const response = await apiClient.post<ApiResponse<InvoiceResponse>>(
       `/api/v1/invoices/${id}/cancel`,
-      { reason }
+      null,
+      { params: { reason } }
     );
     return response.data;
   },
@@ -192,12 +194,13 @@ export const billingApi = {
   // Return an invoice
   returnInvoice: async (
     id: string,
-    items: Array<{ productId: string; quantity: number }>,
+    itemIds: string[],
     reason: string
   ): Promise<ApiResponse<InvoiceResponse>> => {
     const response = await apiClient.post<ApiResponse<InvoiceResponse>>(
       `/api/v1/invoices/${id}/return`,
-      { items, reason }
+      null,
+      { params: { itemIds, reason } }
     );
     return response.data;
   },

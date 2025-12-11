@@ -13,6 +13,8 @@ public class ProductRequest {
     private String name;
 
     private String description;
+    
+    private String sku;
 
     @NotBlank(message = "Barcode is required")
     private String barcode;

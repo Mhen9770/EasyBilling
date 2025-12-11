@@ -14,9 +14,11 @@ public class InvoiceResponse {
     private InvoiceStatus status;
     private String storeId;
     private String counterId;
+    private String counterNumber;
     private String customerId;
     private String customerName;
     private String customerPhone;
+    private String customerEmail;
     private BigDecimal subtotal;
     private BigDecimal taxAmount;
     private BigDecimal discountAmount;
@@ -26,6 +28,19 @@ public class InvoiceResponse {
     private List<InvoiceItemResponse> items;
     private List<PaymentResponse> payments;
     private LocalDateTime createdAt;
+    private String createdBy;
     private LocalDateTime completedAt;
+    private String completedBy;
     private String notes;
+    
+    // GST fields (India)
+    private String customerGstin;
+    private String supplierGstin;
+    private String placeOfSupply;
+    private Boolean reverseCharge;
+    private Boolean isInterstate;
+    private BigDecimal totalCgst;
+    private BigDecimal totalSgst;
+    private BigDecimal totalIgst;
+    private BigDecimal totalCess;
 }

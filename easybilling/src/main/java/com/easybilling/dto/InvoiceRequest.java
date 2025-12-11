@@ -23,4 +23,10 @@ public class InvoiceRequest {
     private List<InvoiceItemRequest> items;
     
     private String notes;
+    
+    // GST fields (India)
+    private String customerGstin;
+    private String placeOfSupply;
+    private String supplierGstin;
+    private Boolean reverseCharge;
 }

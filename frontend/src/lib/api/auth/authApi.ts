@@ -14,7 +14,7 @@ export interface RegisterRequest {
   firstName?: string;
   lastName?: string;
   phone?: string;
-  tenantId?: string; // Optional for onboarding, required for regular registration
+  tenantId?: number; // Optional for onboarding, required for regular registration
 }
 
 export interface OnboardRequest {

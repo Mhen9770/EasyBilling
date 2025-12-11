@@ -140,8 +140,8 @@ export const inventoryApi = {
   },
 
   // Stock management
-  getStock: async (productId: string): Promise<ApiResponse<StockResponse>> => {
-    const response = await apiClient.get<ApiResponse<StockResponse>>(
+  getStock: async (productId: string): Promise<ApiResponse<StockResponse[]>> => {
+    const response = await apiClient.get<ApiResponse<StockResponse[]>>(
       `/api/v1/stock/product/${productId}`
     );
     return response.data;
