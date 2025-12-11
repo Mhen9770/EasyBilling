@@ -75,6 +75,20 @@ app:
         premium-spending-threshold: 100000
         vip-visit-threshold: 20
         premium-visit-threshold: 50
+  
+  customization:
+    # Enable/disable customization features
+    custom-fields-enabled: true
+    custom-themes-enabled: true
+    custom-workflows-enabled: true
+    webhooks-enabled: true
+    # Maximum limits per tenant
+    max-custom-fields-per-entity: 20
+    max-webhooks-per-tenant: 50
+    max-workflows-per-tenant: 100
+    # Template settings
+    allow-custom-templates: true
+    allow-custom-css: true
 
 # Actuator endpoints
 management:
