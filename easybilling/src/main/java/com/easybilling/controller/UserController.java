@@ -1,6 +1,7 @@
 package com.easybilling.controller;
 
 import com.easybilling.dto.ChangePasswordRequest;
+import com.easybilling.dto.CreateUserRequest;
 import com.easybilling.dto.PasswordResetRequest;
 import com.easybilling.dto.UpdateProfileRequest;
 import com.easybilling.dto.UserProfileResponse;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -65,8 +67,20 @@ public class UserController extends BaseController {
     
     // Admin endpoints
     
+    @PostMapping
+    @Operation(summary = "Create user", description = "Create a new user (Admin only)")
+    @PreAuthorize("hasPermission(null, 'USER_CREATE')")
+    public ApiResponse<UserProfileResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
+        String tenantId = getCurrentTenantId();
+        String createdBy = getCurrentUsername();
+        
+        UserProfileResponse response = userService.createUser(tenantId, request, createdBy);
+        return ApiResponse.success("User created successfully", response);
+    }
+    
     @GetMapping
     @Operation(summary = "Get all users", description = "Get all users with pagination (Admin only)")
+    @PreAuthorize("hasPermission(null, 'USER_LIST')")
     public ApiResponse<PageResponse<UserProfileResponse>> getAllUsers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -82,6 +96,7 @@ public class UserController extends BaseController {
     
     @GetMapping("/{userId}")
     @Operation(summary = "Get user by ID", description = "Get user profile by ID (Admin only)")
+    @PreAuthorize("hasPermission(null, 'USER_READ')")
     public ApiResponse<UserProfileResponse> getUserById(@PathVariable String userId) {
         UserProfileResponse response = userService.getUserProfile(userId);
         return ApiResponse.success(response);
@@ -89,6 +104,7 @@ public class UserController extends BaseController {
     
     @PutMapping("/{userId}")
     @Operation(summary = "Update user", description = "Update user profile (Admin only)")
+    @PreAuthorize("hasPermission(null, 'USER_UPDATE')")
     public ApiResponse<UserProfileResponse> updateUser(
             @PathVariable String userId,
             @Valid @RequestBody UpdateProfileRequest request) {
@@ -98,6 +114,7 @@ public class UserController extends BaseController {
     
     @DeleteMapping("/{userId}")
     @Operation(summary = "Delete user", description = "Delete user (Admin only)")
+    @PreAuthorize("hasPermission(null, 'USER_DELETE')")
     public ApiResponse<Void> deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
         return ApiResponse.success("User deleted successfully", null);

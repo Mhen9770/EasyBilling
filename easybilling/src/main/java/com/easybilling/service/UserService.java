@@ -1,9 +1,12 @@
 package com.easybilling.service;
 
+import com.easybilling.dto.AssignSecurityGroupRequest;
 import com.easybilling.dto.ChangePasswordRequest;
+import com.easybilling.dto.CreateUserRequest;
 import com.easybilling.dto.UpdateProfileRequest;
 import com.easybilling.dto.UserProfileResponse;
 import com.easybilling.entity.User;
+import com.easybilling.enums.UserRole;
 import com.easybilling.repository.UserRepository;
 import com.easybilling.dto.PageResponse;
 import com.easybilling.exception.BusinessException;
@@ -19,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.HashSet;
 
 /**
  * Service for user management operations.
@@ -30,6 +34,59 @@ public class UserService {
     
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SecurityGroupService securityGroupService;
+    
+    /**
+     * Create a new user.
+     */
+    @Transactional
+    public UserProfileResponse createUser(String tenantId, CreateUserRequest request, String createdBy) {
+        log.info("Creating new user: {} for tenant: {}", request.getUsername(), tenantId);
+        
+        // Check if username already exists
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new BusinessException("USERNAME_EXISTS", "Username already exists");
+        }
+        
+        // Check if email already exists
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new BusinessException("EMAIL_EXISTS", "Email already exists");
+        }
+        
+        // Create user
+        User user = User.builder()
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .phone(request.getPhone())
+                .tenantId(tenantId)
+                .status(User.UserStatus.ACTIVE)
+                .roles(new HashSet<>())
+                .createdBy(createdBy)
+                .build();
+        
+        // Add role
+        user.addRole(request.getRole().name());
+        
+        user = userRepository.save(user);
+        
+        // Assign security groups for STAFF users
+        if (request.getRole() == UserRole.STAFF && 
+            request.getSecurityGroupIds() != null && 
+            !request.getSecurityGroupIds().isEmpty()) {
+            
+            AssignSecurityGroupRequest assignRequest = AssignSecurityGroupRequest.builder()
+                    .securityGroupIds(request.getSecurityGroupIds())
+                    .build();
+            
+            securityGroupService.assignSecurityGroupsToUser(user.getId(), assignRequest, createdBy);
+        }
+        
+        log.info("User created: {} with ID: {}", request.getUsername(), user.getId());
+        return mapToProfileResponse(user);
+    }
     
     /**
      * Get user profile by ID.
