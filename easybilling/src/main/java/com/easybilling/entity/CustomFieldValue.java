@@ -36,8 +36,8 @@ public class CustomFieldValue implements TenantAware {
     @Column(name = "entity_type", nullable = false, length = 50)
     private String entityType; // INVOICE, CUSTOMER, PRODUCT, SUPPLIER, etc.
     
-    @Column(name = "entity_id", nullable = false)
-    private Long entityId; // ID of the invoice, customer, product, etc.
+    @Column(name = "entity_id", nullable = false, length = 100)
+    private String entityId; // ID of the invoice, customer, product, etc. (supports UUID and Long)
     
     @Column(name = "field_value", columnDefinition = "TEXT")
     private String fieldValue;

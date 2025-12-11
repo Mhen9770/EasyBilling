@@ -6,6 +6,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class InvoiceResponse {
@@ -43,4 +44,8 @@ public class InvoiceResponse {
     private BigDecimal totalSgst;
     private BigDecimal totalIgst;
     private BigDecimal totalCess;
+    
+    // Custom fields integration
+    // Map of customFieldId -> value
+    private Map<Long, String> customFields;
 }

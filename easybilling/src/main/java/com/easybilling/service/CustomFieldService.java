@@ -115,7 +115,7 @@ public class CustomFieldService {
     // Custom Field Value Management
     
     @Transactional
-    public void saveCustomFieldValues(Integer tenantId, String entityType, Long entityId, Map<Long, String> fieldValues) {
+    public void saveCustomFieldValues(Integer tenantId, String entityType, String entityId, Map<Long, String> fieldValues) {
         for (Map.Entry<Long, String> entry : fieldValues.entrySet()) {
             Long customFieldId = entry.getKey();
             String value = entry.getValue();
@@ -136,7 +136,7 @@ public class CustomFieldService {
     }
     
     @Transactional(readOnly = true)
-    public Map<Long, String> getCustomFieldValues(Integer tenantId, String entityType, Long entityId) {
+    public Map<Long, String> getCustomFieldValues(Integer tenantId, String entityType, String entityId) {
         List<CustomFieldValue> values = customFieldValueRepository
                 .findByTenantIdAndEntityTypeAndEntityId(tenantId, entityType, entityId);
         
@@ -148,7 +148,7 @@ public class CustomFieldService {
     }
     
     @Transactional
-    public void deleteCustomFieldValues(Integer tenantId, String entityType, Long entityId) {
+    public void deleteCustomFieldValues(Integer tenantId, String entityType, String entityId) {
         customFieldValueRepository.deleteByTenantIdAndEntityTypeAndEntityId(tenantId, entityType, entityId);
         log.info("Deleted custom field values for entity: {} with ID: {}", entityType, entityId);
     }

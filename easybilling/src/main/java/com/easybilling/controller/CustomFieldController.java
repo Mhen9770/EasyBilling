@@ -65,7 +65,7 @@ public class CustomFieldController {
     @Operation(summary = "Get custom field values for an entity")
     public ResponseEntity<Map<Long, String>> getCustomFieldValues(
             @PathVariable String entityType,
-            @PathVariable Long entityId) {
+            @PathVariable String entityId) {
         Integer tenantId = TenantContext.getTenantId();
         return ResponseEntity.ok(customFieldService.getCustomFieldValues(tenantId, entityType, entityId));
     }
@@ -74,7 +74,7 @@ public class CustomFieldController {
     @Operation(summary = "Save custom field values for an entity")
     public ResponseEntity<Void> saveCustomFieldValues(
             @PathVariable String entityType,
-            @PathVariable Long entityId,
+            @PathVariable String entityId,
             @RequestBody Map<Long, String> fieldValues) {
         Integer tenantId = TenantContext.getTenantId();
         customFieldService.saveCustomFieldValues(tenantId, entityType, entityId, fieldValues);

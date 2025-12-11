@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class InvoiceRequest {
@@ -29,4 +30,8 @@ public class InvoiceRequest {
     private String placeOfSupply;
     private String supplierGstin;
     private Boolean reverseCharge;
+    
+    // Custom fields integration
+    // Map of customFieldId -> value
+    private Map<Long, String> customFields;
 }

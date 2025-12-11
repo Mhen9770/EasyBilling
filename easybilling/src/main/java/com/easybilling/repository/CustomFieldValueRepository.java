@@ -10,11 +10,11 @@ import java.util.Optional;
 @Repository
 public interface CustomFieldValueRepository extends JpaRepository<CustomFieldValue, Long> {
     
-    List<CustomFieldValue> findByTenantIdAndEntityTypeAndEntityId(Integer tenantId, String entityType, Long entityId);
+    List<CustomFieldValue> findByTenantIdAndEntityTypeAndEntityId(Integer tenantId, String entityType, String entityId);
     
-    Optional<CustomFieldValue> findByTenantIdAndCustomFieldIdAndEntityId(Integer tenantId, Long customFieldId, Long entityId);
+    Optional<CustomFieldValue> findByTenantIdAndCustomFieldIdAndEntityId(Integer tenantId, Long customFieldId, String entityId);
     
-    void deleteByTenantIdAndEntityTypeAndEntityId(Integer tenantId, String entityType, Long entityId);
+    void deleteByTenantIdAndEntityTypeAndEntityId(Integer tenantId, String entityType, String entityId);
     
     void deleteByCustomFieldId(Long customFieldId);
 }
