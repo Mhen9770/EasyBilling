@@ -124,7 +124,7 @@ public class InventoryController extends BaseController {
         return ApiResponse.success(inventoryService.getStockForProduct(productId, tenantId));
     }
 
-    @PostMapping("/stock/movement")
+    @PostMapping("/stock/movements")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Record stock movement")
     public ApiResponse<Void> recordStockMovement(@Valid @RequestBody StockMovementRequest request) {

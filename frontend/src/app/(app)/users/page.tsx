@@ -64,7 +64,7 @@ export default function UsersPage() {
   });
 
   const suspendMutation = useMutation({
-    mutationFn: (id: string) => userApi.suspendUser(id),
+    mutationFn: (id: string) => userApi.updateUserStatus(id, 'INACTIVE'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       addToast('User suspended successfully', 'success');
@@ -75,7 +75,7 @@ export default function UsersPage() {
   });
 
   const activateMutation = useMutation({
-    mutationFn: (id: string) => userApi.activateUser(id),
+    mutationFn: (id: string) => userApi.updateUserStatus(id, 'ACTIVE'),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       addToast('User activated successfully', 'success');
@@ -86,7 +86,8 @@ export default function UsersPage() {
   });
 
   const updateRoleMutation = useMutation({
-    mutationFn: ({ id, role }: { id: string; role: UserRole }) => userApi.updateRole(id, role),
+    mutationFn: ({ id, role }: { id: string; role: UserRole }) => 
+      userApi.updateUser(id, { role }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       addToast('User role updated successfully', 'success');
@@ -97,12 +98,13 @@ export default function UsersPage() {
   });
 
   const filteredUsers = users.filter(user => {
+    const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
     const matchesSearch = 
       user.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.fullName.toLowerCase().includes(searchQuery.toLowerCase());
+      fullName.toLowerCase().includes(searchQuery.toLowerCase());
     
-    const matchesRole = filterRole === 'ALL' || user.role === filterRole;
+    const matchesRole = filterRole === 'ALL' || user.roles.includes(`ROLE_${filterRole}`);
     
     return matchesSearch && matchesRole;
   });
@@ -278,11 +280,11 @@ export default function UsersPage() {
                     <td className="px-3 sm:px-6 py-4">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-xs sm:text-sm">
-                          {user.fullName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                          {((user.firstName?.[0] || '') + (user.lastName?.[0] || '')).toUpperCase() || user.username.slice(0, 2).toUpperCase()}
                         </div>
                         <div className="ml-2 sm:ml-4 min-w-0">
                           <div className="text-sm font-medium text-gray-900 truncate">
-                            {user.fullName}
+                            {`${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username}
                           </div>
                           <div className="text-xs sm:text-sm text-gray-500 truncate">
                             {user.email}
@@ -416,9 +418,23 @@ export default function UsersPage() {
                   </label>
                   <input
                     type="text"
-                    name="fullName"
+                    name="firstName"
                     required
-                    defaultValue={editingUser?.fullName}
+                    placeholder="First Name"
+                    defaultValue={editingUser?.firstName}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Last Name
+                  </label>
+                  <input
+                    type="text"
+                    name="lastName"
+                    placeholder="Last Name"
+                    defaultValue={editingUser?.lastName}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
                   />
                 </div>

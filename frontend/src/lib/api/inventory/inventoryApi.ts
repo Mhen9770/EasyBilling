@@ -245,4 +245,58 @@ export const inventoryApi = {
     );
     return response.data;
   },
+
+  // Bulk operations
+  bulkUpdateProducts: async (updates: Array<{ id: string; updates: Partial<ProductRequest> }>): Promise<ApiResponse<ProductResponse[]>> => {
+    const response = await apiClient.post<ApiResponse<ProductResponse[]>>(
+      '/api/v1/products/bulk-update',
+      updates
+    );
+    return response.data;
+  },
+
+  searchProducts: async (filters: {
+    name?: string;
+    category?: string;
+    brand?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    inStock?: boolean;
+  }): Promise<ApiResponse<PageResponse<ProductResponse>>> => {
+    const response = await apiClient.post<ApiResponse<PageResponse<ProductResponse>>>(
+      '/api/v1/products/search',
+      filters
+    );
+    return response.data;
+  },
+
+  // Stock adjustment
+  adjustStock: async (
+    productId: string,
+    locationId: string,
+    quantity: number,
+    reason: string,
+    notes?: string
+  ): Promise<ApiResponse<void>> => {
+    const response = await apiClient.post<ApiResponse<void>>(
+      '/api/v1/stock/adjust',
+      { productId, locationId, quantity, reason, notes }
+    );
+    return response.data;
+  },
+
+  // Stock transfer
+  transferStock: async (
+    productId: string,
+    fromLocationId: string,
+    toLocationId: string,
+    quantity: number,
+    notes?: string
+  ): Promise<ApiResponse<void>> => {
+    const response = await apiClient.post<ApiResponse<void>>(
+      '/api/v1/stock/transfer',
+      { productId, fromLocationId, toLocationId, quantity, notes }
+    );
+    return response.data;
+  },
 };
