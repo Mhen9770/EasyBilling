@@ -198,8 +198,9 @@ export default function EnhancedProductsPage() {
       description: formData.get('description') as string,
       categoryId: formData.get('categoryId') as string || undefined,
       brandId: formData.get('brandId') as string || undefined,
-      price: parseFloat(formData.get('price') as string),
-      cost: parseFloat(formData.get('cost') as string),
+      costPrice: parseFloat(formData.get('price') as string),
+      sellingPrice: parseFloat(formData.get('price') as string),
+      mrp: parseFloat(formData.get('price') as string),
       taxRate: parseFloat(formData.get('taxRate') as string) || 0,
       unit: formData.get('unit') as string,
       trackStock: formData.get('trackStock') === 'true',
@@ -368,11 +369,11 @@ export default function EnhancedProductsPage() {
           selectedProducts={selectedProducts}
           onSelectAll={handleSelectAll}
           onSelectProduct={handleSelectProduct}
-          onEdit={(product) => {
+          onEdit={(product: any) => {
             setEditingProduct(product);
             setIsCreateModalOpen(true);
           }}
-          onDelete={(id) => {
+          onDelete={(id: any) => {
             if (confirm('Are you sure you want to delete this product?')) {
               deleteMutation.mutate(id.toString());
             }

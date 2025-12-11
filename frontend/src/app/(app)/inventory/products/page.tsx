@@ -373,11 +373,11 @@ export default function EnhancedProductsPage() {
           selectedProducts={selectedProducts}
           onSelectAll={handleSelectAll}
           onSelectProduct={handleSelectProduct}
-          onEdit={(product) => {
+          onEdit={(product: any) => {
             setEditingProduct(product);
             setIsCreateModalOpen(true);
           }}
-          onDelete={(id) => {
+          onDelete={(id: any) => {
             if (confirm('Are you sure you want to delete this product?')) {
               deleteMutation.mutate(id.toString());
             }
