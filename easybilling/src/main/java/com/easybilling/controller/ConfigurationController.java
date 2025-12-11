@@ -90,6 +90,7 @@ public class ConfigurationController {
     }
     
     @GetMapping("/value/{configKey}")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get configuration value (supports tenant override)")
     public ResponseEntity<String> getConfigValue(@PathVariable String configKey) {
         String value = configurationService.getConfigValue(configKey);

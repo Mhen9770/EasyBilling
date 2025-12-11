@@ -73,7 +73,7 @@ public class ConfigurationService {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            log.warn("Invalid integer config value for key {}: {}", configKey, value);
+            log.warn("Invalid integer config value for key {}, using default value", configKey);
             return defaultValue;
         }
     }
@@ -100,7 +100,7 @@ public class ConfigurationService {
         try {
             return Double.parseDouble(value);
         } catch (NumberFormatException e) {
-            log.warn("Invalid double config value for key {}: {}", configKey, value);
+            log.warn("Invalid double config value for key {}, using default value", configKey);
             return defaultValue;
         }
     }

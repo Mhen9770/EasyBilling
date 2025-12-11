@@ -47,7 +47,9 @@ public class CustomFieldService {
     public CustomFieldDTO createCustomField(CustomFieldDTO dto) {
         if (customFieldRepository.existsByTenantIdAndEntityTypeAndFieldName(
                 dto.getTenantId(), dto.getEntityType(), dto.getFieldName())) {
-            throw new IllegalArgumentException("Custom field already exists: " + dto.getFieldName());
+            throw new IllegalArgumentException(
+                String.format("Custom field '%s' already exists for entity type '%s' in tenant %d",
+                    dto.getFieldName(), dto.getEntityType(), dto.getTenantId()));
         }
         
         CustomField field = CustomField.builder()
