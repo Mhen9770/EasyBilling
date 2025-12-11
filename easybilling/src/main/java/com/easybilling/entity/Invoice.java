@@ -89,6 +89,40 @@ public class Invoice {
     @Column(precision = 10, scale = 2)
     private BigDecimal balanceAmount;
 
+    // GST fields for India
+    @Column(name = "total_cgst", precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal totalCgst = BigDecimal.ZERO;
+    
+    @Column(name = "total_sgst", precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal totalSgst = BigDecimal.ZERO;
+    
+    @Column(name = "total_igst", precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal totalIgst = BigDecimal.ZERO;
+    
+    @Column(name = "total_cess", precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal totalCess = BigDecimal.ZERO;
+    
+    @Column(name = "place_of_supply", length = 50)
+    private String placeOfSupply; // State name or code
+    
+    @Column(name = "supplier_gstin", length = 15)
+    private String supplierGstin; // Tenant's GSTIN
+    
+    @Column(name = "customer_gstin", length = 15)
+    private String customerGstin; // Customer's GSTIN (if B2B)
+    
+    @Column(name = "reverse_charge")
+    @Builder.Default
+    private Boolean reverseCharge = false;
+    
+    @Column(name = "is_interstate")
+    @Builder.Default
+    private Boolean isInterstate = false;
+
     private String notes;
 
     // Helper methods
@@ -118,6 +152,23 @@ public class Invoice {
 
         this.discountAmount = items.stream()
                 .map(InvoiceItem::getDiscountAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        // Calculate GST totals
+        this.totalCgst = items.stream()
+                .map(InvoiceItem::getCgstAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        this.totalSgst = items.stream()
+                .map(InvoiceItem::getSgstAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        this.totalIgst = items.stream()
+                .map(InvoiceItem::getIgstAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        this.totalCess = items.stream()
+                .map(InvoiceItem::getCessAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         this.totalAmount = subtotal.add(taxAmount).subtract(discountAmount);

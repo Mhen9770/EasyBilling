@@ -31,6 +31,15 @@ export type {
   AssignSecurityGroupRequest,
 } from './security/securityApi';
 
+// GST (India)
+import { gstApi } from './gst/gstApi';
+export { gstApi };
+export type {
+  GstRate,
+  GstCalculation,
+  GstCalculationRequest,
+} from './gst/gstApi';
+
 // Customer
 import { customerApi } from './customer/customerApi';
 export { customerApi };
@@ -96,6 +105,7 @@ export const api = {
   tenant: tenantApi,
   user: userApi,
   security: securityApi,
+  gst: gstApi,
   customer: customerApi,
   supplier: supplierApi,
   inventory: inventoryApi,
