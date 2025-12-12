@@ -31,7 +31,7 @@ public class WebhookService {
     
     private final WebhookRepository webhookRepository;
     private final ObjectMapper objectMapper;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
     
     @Transactional(readOnly = true)
     public List<WebhookDTO> getAllWebhooks(Integer tenantId) {
@@ -245,6 +245,8 @@ public class WebhookService {
     
     /**
      * Retry failed webhook
+     * Note: This is a simple retry implementation. For production, consider using
+     * Spring Retry or a message queue for better reliability and async handling.
      */
     private void retryWebhook(Webhook webhook, Map<String, Object> eventData) {
         int maxRetries = webhook.getRetryCount();
@@ -257,6 +259,10 @@ public class WebhookService {
                 webhook.setSuccessCount(webhook.getSuccessCount() + 1);
                 webhookRepository.save(webhook);
                 log.info("Webhook {} succeeded on retry attempt {}", webhook.getWebhookName(), attempt);
+                return;
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.error("Webhook retry interrupted", e);
                 return;
             } catch (Exception e) {
                 log.warn("Webhook {} retry attempt {} failed", webhook.getWebhookName(), attempt);

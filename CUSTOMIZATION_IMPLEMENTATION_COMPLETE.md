@@ -513,6 +513,30 @@ integration.webhook_enabled=true
 - **Audit Logging**: All configuration changes logged
 - **Role-Based Access**: MANAGE_TENANT_SETTINGS permission required
 
+## Production Considerations
+
+### Current Implementation Notes
+
+1. **Webhook Retries**: Uses simple Thread.sleep() for retries. For production, consider:
+   - Spring Retry with @Retryable annotation
+   - Message queue (RabbitMQ/Kafka) for async processing
+   - Scheduled executor service for better resource management
+
+2. **RestTemplate**: Uses synchronous RestTemplate. For production, consider:
+   - Migrating to WebClient for reactive programming
+   - Connection pooling configuration
+   - Circuit breaker pattern (Resilience4j)
+
+3. **Workflow Actions**: Email, SMS, and Task actions are placeholders. Production requires:
+   - Integration with NotificationService for email/SMS
+   - Integration with TaskService for task creation
+   - Integration with WebhookService for webhook calls
+
+4. **Template Rendering**: Uses simple string replacement. For production, consider:
+   - Proper template engine (Thymeleaf, Handlebars, Freemarker)
+   - Template compilation and caching
+   - XSS prevention and sanitization
+
 ## Future Enhancements
 
 1. **Configuration Versioning**: Track changes and rollback
@@ -523,6 +547,8 @@ integration.webhook_enabled=true
 6. **AI Recommendations**: Smart configuration suggestions
 7. **Plugin System**: Extensible architecture
 8. **Multi-Currency**: Full currency conversion support
+9. **Async Webhook Processing**: Message queue integration
+10. **Advanced Template Engine**: Full Handlebars/Thymeleaf support
 
 ## Conclusion
 
