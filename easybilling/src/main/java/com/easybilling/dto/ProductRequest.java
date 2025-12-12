@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 @Data
 public class ProductRequest {
@@ -42,4 +43,7 @@ public class ProductRequest {
     private Boolean trackStock = true;
     private Integer lowStockThreshold = 10;
     private String imageUrl;
+    
+    // Custom fields integration
+    private Map<Long, String> customFields;
 }

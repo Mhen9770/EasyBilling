@@ -21,9 +21,20 @@ import java.time.LocalDateTime;
 public class SupplierService {
     
     private final SupplierRepository supplierRepository;
+    private final ConfigurationService configurationService;
+    private final CustomFieldService customFieldService;
     
     public SupplierResponse createSupplier(SupplierRequest request, Integer tenantId) {
         log.info("Creating supplier for tenant: {}", tenantId);
+        
+        // Use configurable default credit days if not provided
+        Integer creditDays = request.getCreditDays();
+        if (creditDays == null) {
+            creditDays = configurationService.getConfigValueAsInt(
+                "supplier.default_credit_days", 
+                0
+            );
+        }
         
         Supplier supplier = Supplier.builder()
                 .tenantId(tenantId)
@@ -42,33 +53,51 @@ public class SupplierService {
                 .bankName(request.getBankName())
                 .accountNumber(request.getAccountNumber())
                 .ifscCode(request.getIfscCode())
-                .creditDays(request.getCreditDays() != null ? request.getCreditDays() : 0)
+                .creditDays(creditDays)
                 .totalPurchases(BigDecimal.ZERO)
                 .outstandingBalance(BigDecimal.ZERO)
                 .purchaseCount(0)
                 .build();
         
         Supplier saved = supplierRepository.save(supplier);
+        
+        // Save custom fields if provided
+        if (request.getCustomFields() != null && !request.getCustomFields().isEmpty()) {
+            try {
+                customFieldService.saveCustomFieldValues(
+                    tenantId, 
+                    "SUPPLIER", 
+                    saved.getId(), 
+                    request.getCustomFields()
+                );
+                log.info("Saved {} custom field values for supplier {}", 
+                        request.getCustomFields().size(), saved.getId());
+            } catch (Exception e) {
+                log.warn("Failed to save custom fields for supplier {}: {}", 
+                        saved.getId(), e.getMessage());
+            }
+        }
+        
         return mapToResponse(saved);
     }
     
     @Transactional(readOnly = true)
     public Page<SupplierResponse> getAllSuppliers(Integer tenantId, Pageable pageable) {
         return supplierRepository.findByTenantId(tenantId, pageable)
-                .map(this::mapToResponse);
+                .map(s -> mapToResponse(s, tenantId));
     }
     
     @Transactional(readOnly = true)
     public Page<SupplierResponse> searchSuppliers(Integer tenantId, String search, Pageable pageable) {
         return supplierRepository.searchSuppliers(tenantId, search, pageable)
-                .map(this::mapToResponse);
+                .map(s -> mapToResponse(s, tenantId));
     }
     
     @Transactional(readOnly = true)
     public SupplierResponse getSupplierById(String id, Integer tenantId) {
         Supplier supplier = supplierRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new RuntimeException("Supplier not found"));
-        return mapToResponse(supplier);
+        return mapToResponse(supplier, tenantId);
     }
     
     public SupplierResponse updateSupplier(String id, SupplierRequest request, Integer tenantId) {
@@ -95,7 +124,24 @@ public class SupplierService {
         }
         
         Supplier updated = supplierRepository.save(supplier);
-        return mapToResponse(updated);
+        
+        // Update custom fields if provided
+        if (request.getCustomFields() != null && !request.getCustomFields().isEmpty()) {
+            try {
+                customFieldService.saveCustomFieldValues(
+                    tenantId, 
+                    "SUPPLIER", 
+                    updated.getId(), 
+                    request.getCustomFields()
+                );
+                log.info("Updated custom field values for supplier {}", updated.getId());
+            } catch (Exception e) {
+                log.warn("Failed to update custom fields for supplier {}: {}", 
+                        updated.getId(), e.getMessage());
+            }
+        }
+        
+        return mapToResponse(updated, tenantId);
     }
     
     public void deleteSupplier(String id, Integer tenantId) {
@@ -233,7 +279,7 @@ public class SupplierService {
         return mapToResponse(updated);
     }
     
-    private SupplierResponse mapToResponse(Supplier supplier) {
+    private SupplierResponse mapToResponse(Supplier supplier, Integer tenantId) {
         SupplierResponse response = new SupplierResponse();
         response.setId(supplier.getId());
         response.setName(supplier.getName());
@@ -259,6 +305,27 @@ public class SupplierService {
         response.setCreditDays(supplier.getCreditDays());
         response.setCreatedAt(supplier.getCreatedAt());
         response.setUpdatedAt(supplier.getUpdatedAt());
+        
+        // Retrieve custom fields
+        try {
+            java.util.Map<Long, String> customFields = customFieldService.getCustomFieldValues(
+                tenantId, 
+                "SUPPLIER", 
+                supplier.getId()
+            );
+            if (!customFields.isEmpty()) {
+                response.setCustomFields(customFields);
+            }
+        } catch (Exception e) {
+            log.debug("No custom fields found for supplier {}: {}", 
+                    supplier.getId(), e.getMessage());
+        }
+        
         return response;
+    }
+    
+    // Overload for backward compatibility
+    private SupplierResponse mapToResponse(Supplier supplier) {
+        return mapToResponse(supplier, supplier.getTenantId());
     }
 }

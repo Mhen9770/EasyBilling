@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,6 +37,8 @@ public class InventoryService {
     private final BrandRepository brandRepository;
     private final StockRepository stockRepository;
     private final StockMovementRepository stockMovementRepository;
+    private final ConfigurationService configurationService;
+    private final CustomFieldService customFieldService;
 
     // Product Management
     @Transactional
@@ -56,7 +59,18 @@ public class InventoryService {
         product.setTaxRate(request.getTaxRate());
         product.setUnit(request.getUnit());
         product.setTrackStock(request.getTrackStock());
-        product.setLowStockThreshold(request.getLowStockThreshold());
+        
+        // Use configurable default low stock threshold if not provided
+        if (request.getLowStockThreshold() != null) {
+            product.setLowStockThreshold(request.getLowStockThreshold());
+        } else {
+            Integer defaultThreshold = configurationService.getConfigValueAsInt(
+                "inventory.default_low_stock_threshold", 
+                10
+            );
+            product.setLowStockThreshold(defaultThreshold);
+        }
+        
         product.setImageUrl(request.getImageUrl());
         product.setTenantId(tenantId);
 
@@ -75,13 +89,30 @@ public class InventoryService {
         product = productRepository.save(product);
         log.info("Product created: {} for tenant: {}", product.getId(), tenantId);
 
-        return mapToProductResponse(product);
+        // Save custom fields if provided
+        if (request.getCustomFields() != null && !request.getCustomFields().isEmpty()) {
+            try {
+                customFieldService.saveCustomFieldValues(
+                    tenantId, 
+                    "PRODUCT", 
+                    product.getId().toString(), 
+                    request.getCustomFields()
+                );
+                log.info("Saved {} custom field values for product {}", 
+                        request.getCustomFields().size(), product.getId());
+            } catch (Exception e) {
+                log.warn("Failed to save custom fields for product {}: {}", 
+                        product.getId(), e.getMessage());
+            }
+        }
+
+        return mapToProductResponse(product, tenantId);
     }
 
     public PageResponse<ProductResponse> getProducts(Integer tenantId, Pageable pageable) {
         Page<Product> page = productRepository.findByTenantId(tenantId, pageable);
         List<ProductResponse> products = page.getContent().stream()
-                .map(this::mapToProductResponse)
+                .map(p -> mapToProductResponse(p, tenantId))
                 .collect(Collectors.toList());
 
         return PageResponse.of(
@@ -95,13 +126,13 @@ public class InventoryService {
     public ProductResponse getProduct(Long id, Integer tenantId) {
         Product product = productRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-        return mapToProductResponse(product);
+        return mapToProductResponse(product, tenantId);
     }
 
     public ProductResponse getProductByBarcode(String barcode, Integer tenantId) {
         Product product = productRepository.findByBarcodeAndTenantId(barcode, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with barcode: " + barcode));
-        return mapToProductResponse(product);
+        return mapToProductResponse(product, tenantId);
     }
 
     @Transactional
@@ -134,7 +165,24 @@ public class InventoryService {
         }
 
         product = productRepository.save(product);
-        return mapToProductResponse(product);
+        
+        // Update custom fields if provided
+        if (request.getCustomFields() != null && !request.getCustomFields().isEmpty()) {
+            try {
+                customFieldService.saveCustomFieldValues(
+                    tenantId, 
+                    "PRODUCT", 
+                    product.getId().toString(), 
+                    request.getCustomFields()
+                );
+                log.info("Updated custom field values for product {}", product.getId());
+            } catch (Exception e) {
+                log.warn("Failed to update custom fields for product {}: {}", 
+                        product.getId(), e.getMessage());
+            }
+        }
+        
+        return mapToProductResponse(product, tenantId);
     }
 
     @Transactional
@@ -341,8 +389,8 @@ public class InventoryService {
         return "SKU-" + datePart + "-" + randomPart;
     }
 
-    private ProductResponse mapToProductResponse(Product product) {
-        return ProductResponse.builder()
+    private ProductResponse mapToProductResponse(Product product, Integer tenantId) {
+        ProductResponse response = ProductResponse.builder()
                 .id(product.getId())
                 .sku(product.getSku())
                 .name(product.getName())
@@ -362,6 +410,23 @@ public class InventoryService {
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())
                 .build();
+        
+        // Retrieve custom fields
+        try {
+            Map<Long, String> customFields = customFieldService.getCustomFieldValues(
+                tenantId, 
+                "PRODUCT", 
+                product.getId().toString()
+            );
+            if (!customFields.isEmpty()) {
+                response.setCustomFields(customFields);
+            }
+        } catch (Exception e) {
+            log.debug("No custom fields found for product {}: {}", 
+                    product.getId(), e.getMessage());
+        }
+        
+        return response;
     }
 
     private CategoryResponse mapToCategoryResponse(Category category) {
@@ -617,7 +682,7 @@ public class InventoryService {
         }
         
         List<ProductResponse> products = filtered.stream()
-                .map(this::mapToProductResponse)
+                .map(p -> mapToProductResponse(p, tenantId))
                 .collect(Collectors.toList());
 
         return PageResponse.of(products, request.getPage(), request.getSize(), filtered.size());
