@@ -286,6 +286,215 @@ export const customizationApi = {
     );
     return response.data;
   },
+
+  // ===== Document Template APIs =====
+
+  getDocumentTemplates: async (): Promise<ApiResponse<DocumentTemplateDTO[]>> => {
+    const response = await apiClient.get<ApiResponse<DocumentTemplateDTO[]>>(
+      '/api/v1/customization/templates'
+    );
+    return response.data;
+  },
+
+  getDocumentTemplatesByType: async (templateType: string): Promise<ApiResponse<DocumentTemplateDTO[]>> => {
+    const response = await apiClient.get<ApiResponse<DocumentTemplateDTO[]>>(
+      `/api/v1/customization/templates/type/${templateType}`
+    );
+    return response.data;
+  },
+
+  getDefaultDocumentTemplate: async (templateType: string): Promise<ApiResponse<DocumentTemplateDTO>> => {
+    const response = await apiClient.get<ApiResponse<DocumentTemplateDTO>>(
+      `/api/v1/customization/templates/type/${templateType}/default`
+    );
+    return response.data;
+  },
+
+  getDocumentTemplate: async (id: number): Promise<ApiResponse<DocumentTemplateDTO>> => {
+    const response = await apiClient.get<ApiResponse<DocumentTemplateDTO>>(
+      `/api/v1/customization/templates/${id}`
+    );
+    return response.data;
+  },
+
+  createDocumentTemplate: async (data: DocumentTemplateDTO): Promise<ApiResponse<DocumentTemplateDTO>> => {
+    const response = await apiClient.post<ApiResponse<DocumentTemplateDTO>>(
+      '/api/v1/customization/templates',
+      data
+    );
+    return response.data;
+  },
+
+  updateDocumentTemplate: async (id: number, data: DocumentTemplateDTO): Promise<ApiResponse<DocumentTemplateDTO>> => {
+    const response = await apiClient.put<ApiResponse<DocumentTemplateDTO>>(
+      `/api/v1/customization/templates/${id}`,
+      data
+    );
+    return response.data;
+  },
+
+  deleteDocumentTemplate: async (id: number): Promise<ApiResponse<void>> => {
+    const response = await apiClient.delete<ApiResponse<void>>(
+      `/api/v1/customization/templates/${id}`
+    );
+    return response.data;
+  },
+
+  setDefaultDocumentTemplate: async (id: number): Promise<ApiResponse<void>> => {
+    const response = await apiClient.put<ApiResponse<void>>(
+      `/api/v1/customization/templates/${id}/set-default`
+    );
+    return response.data;
+  },
+
+  // ===== Workflow APIs =====
+
+  getWorkflows: async (): Promise<ApiResponse<CustomWorkflowDTO[]>> => {
+    const response = await apiClient.get<ApiResponse<CustomWorkflowDTO[]>>(
+      '/api/v1/customization/workflows'
+    );
+    return response.data;
+  },
+
+  getWorkflowsByTrigger: async (triggerEvent: string): Promise<ApiResponse<CustomWorkflowDTO[]>> => {
+    const response = await apiClient.get<ApiResponse<CustomWorkflowDTO[]>>(
+      `/api/v1/customization/workflows/trigger/${triggerEvent}`
+    );
+    return response.data;
+  },
+
+  getActiveWorkflows: async (): Promise<ApiResponse<CustomWorkflowDTO[]>> => {
+    const response = await apiClient.get<ApiResponse<CustomWorkflowDTO[]>>(
+      '/api/v1/customization/workflows/active'
+    );
+    return response.data;
+  },
+
+  getWorkflow: async (id: number): Promise<ApiResponse<CustomWorkflowDTO>> => {
+    const response = await apiClient.get<ApiResponse<CustomWorkflowDTO>>(
+      `/api/v1/customization/workflows/${id}`
+    );
+    return response.data;
+  },
+
+  createWorkflow: async (data: CustomWorkflowDTO): Promise<ApiResponse<CustomWorkflowDTO>> => {
+    const response = await apiClient.post<ApiResponse<CustomWorkflowDTO>>(
+      '/api/v1/customization/workflows',
+      data
+    );
+    return response.data;
+  },
+
+  updateWorkflow: async (id: number, data: CustomWorkflowDTO): Promise<ApiResponse<CustomWorkflowDTO>> => {
+    const response = await apiClient.put<ApiResponse<CustomWorkflowDTO>>(
+      `/api/v1/customization/workflows/${id}`,
+      data
+    );
+    return response.data;
+  },
+
+  deleteWorkflow: async (id: number): Promise<ApiResponse<void>> => {
+    const response = await apiClient.delete<ApiResponse<void>>(
+      `/api/v1/customization/workflows/${id}`
+    );
+    return response.data;
+  },
+
+  toggleWorkflow: async (id: number, isActive: boolean): Promise<ApiResponse<void>> => {
+    const response = await apiClient.put<ApiResponse<void>>(
+      `/api/v1/customization/workflows/${id}/toggle`,
+      null,
+      { params: { isActive } }
+    );
+    return response.data;
+  },
+
+  // ===== Webhook APIs =====
+
+  getWebhooks: async (): Promise<ApiResponse<WebhookDTO[]>> => {
+    const response = await apiClient.get<ApiResponse<WebhookDTO[]>>(
+      '/api/v1/customization/webhooks'
+    );
+    return response.data;
+  },
+
+  getWebhooksByEvent: async (eventType: string): Promise<ApiResponse<WebhookDTO[]>> => {
+    const response = await apiClient.get<ApiResponse<WebhookDTO[]>>(
+      `/api/v1/customization/webhooks/event/${eventType}`
+    );
+    return response.data;
+  },
+
+  getActiveWebhooks: async (): Promise<ApiResponse<WebhookDTO[]>> => {
+    const response = await apiClient.get<ApiResponse<WebhookDTO[]>>(
+      '/api/v1/customization/webhooks/active'
+    );
+    return response.data;
+  },
+
+  getWebhook: async (id: number): Promise<ApiResponse<WebhookDTO>> => {
+    const response = await apiClient.get<ApiResponse<WebhookDTO>>(
+      `/api/v1/customization/webhooks/${id}`
+    );
+    return response.data;
+  },
+
+  createWebhook: async (data: WebhookDTO): Promise<ApiResponse<WebhookDTO>> => {
+    const response = await apiClient.post<ApiResponse<WebhookDTO>>(
+      '/api/v1/customization/webhooks',
+      data
+    );
+    return response.data;
+  },
+
+  updateWebhook: async (id: number, data: WebhookDTO): Promise<ApiResponse<WebhookDTO>> => {
+    const response = await apiClient.put<ApiResponse<WebhookDTO>>(
+      `/api/v1/customization/webhooks/${id}`,
+      data
+    );
+    return response.data;
+  },
+
+  deleteWebhook: async (id: number): Promise<ApiResponse<void>> => {
+    const response = await apiClient.delete<ApiResponse<void>>(
+      `/api/v1/customization/webhooks/${id}`
+    );
+    return response.data;
+  },
+
+  toggleWebhook: async (id: number, isActive: boolean): Promise<ApiResponse<void>> => {
+    const response = await apiClient.put<ApiResponse<void>>(
+      `/api/v1/customization/webhooks/${id}/toggle`,
+      null,
+      { params: { isActive } }
+    );
+    return response.data;
+  },
+
+  testWebhook: async (id: number): Promise<ApiResponse<{ success: boolean }>> => {
+    const response = await apiClient.post<ApiResponse<{ success: boolean }>>(
+      `/api/v1/customization/webhooks/${id}/test`
+    );
+    return response.data;
+  },
 };
+
+// Types for workflows and webhooks
+export interface CustomWorkflowDTO {
+  id?: number;
+  workflowName: string;
+  description?: string;
+  triggerEvent: string;
+  conditions?: string; // JSON string
+  actions?: string; // JSON string
+  executionOrder?: number;
+  isActive?: boolean;
+  lastExecutedAt?: string;
+  executionCount?: number;
+  failureCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+}
 
 export default customizationApi;
