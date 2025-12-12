@@ -97,6 +97,20 @@ export type {
   DiscountCalculationResponse,
 } from './offers/offersApi';
 
+// Customization
+import { customizationApi } from './customization/customizationApi';
+export { customizationApi };
+export type {
+  SystemConfigurationDTO,
+  TenantConfigurationDTO,
+  CustomThemeDTO,
+  CustomFieldDTO,
+  CustomFieldType,
+  CustomFieldEntityType,
+  DocumentTemplateDTO,
+  WebhookDTO,
+} from './customization/customizationApi';
+
 /**
  * Combined API object for convenience
  */
@@ -112,6 +126,7 @@ export const api = {
   reports: reportsApi,
   notification: notificationApi,
   offers: offersApi,
+  customization: customizationApi,
 };
 
 export default api;

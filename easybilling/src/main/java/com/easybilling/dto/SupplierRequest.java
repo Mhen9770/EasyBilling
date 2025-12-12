@@ -4,6 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.util.Map;
+
 @Data
 public class SupplierRequest {
     
@@ -41,4 +43,7 @@ public class SupplierRequest {
     private String ifscCode;
     
     private Integer creditDays;
+    
+    // Custom fields integration
+    private Map<Long, String> customFields;
 }

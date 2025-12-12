@@ -27,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -40,6 +41,8 @@ public class BillingService {
     private final HeldInvoiceRepository heldInvoiceRepository;
     private final ObjectMapper objectMapper;
     private final InventoryService inventoryService;
+    private final InvoiceNumberService invoiceNumberService;
+    private final CustomFieldService customFieldService;
     
     @PersistenceContext
     private EntityManager entityManager;
@@ -63,7 +66,7 @@ public class BillingService {
         }
         
         Invoice invoice = Invoice.builder()
-                .invoiceNumber(generateInvoiceNumber(tenantId))
+                .invoiceNumber(invoiceNumberService.generateInvoiceNumber(tenantId))
                 .status(InvoiceStatus.DRAFT)
                 .tenantId(tenantId)
                 .storeId(request.getStoreId())
@@ -104,6 +107,23 @@ public class BillingService {
 
         invoice.calculateTotals();
         Invoice saved = invoiceRepository.save(invoice);
+        
+        // Integration with Custom Fields: Save custom field values if provided
+        if (request.getCustomFields() != null && !request.getCustomFields().isEmpty()) {
+            try {
+                customFieldService.saveCustomFieldValues(
+                    tenantId, 
+                    "INVOICE", 
+                    saved.getId(), 
+                    request.getCustomFields()
+                );
+                log.info("Saved {} custom field values for invoice {}", 
+                        request.getCustomFields().size(), saved.getInvoiceNumber());
+            } catch (Exception e) {
+                log.warn("Failed to save custom fields for invoice {}: {}", 
+                        saved.getInvoiceNumber(), e.getMessage());
+            }
+        }
         
         log.info("Invoice created: {} with {} items", saved.getInvoiceNumber(), saved.getItems().size());
         return mapToResponse(saved);
@@ -286,12 +306,6 @@ public class BillingService {
         return invoice;
     }
 
-    private String generateInvoiceNumber(Integer tenantId) {
-        String dateStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        Long count = invoiceRepository.countInvoicesSince(tenantId, LocalDateTime.now().toLocalDate().atStartOfDay());
-        return String.format("INV-%s-%05d", dateStr, count + 1);
-    }
-
     private InvoiceResponse mapToResponse(Invoice invoice) {
         InvoiceResponse response = new InvoiceResponse();
         response.setId(invoice.getId());
@@ -314,6 +328,21 @@ public class BillingService {
         
         response.setItems(invoice.getItems().stream().map(this::mapItemToResponse).collect(Collectors.toList()));
         response.setPayments(invoice.getPayments().stream().map(this::mapPaymentToResponse).collect(Collectors.toList()));
+        
+        // Integration with Custom Fields: Retrieve custom field values
+        try {
+            Map<Long, String> customFields = customFieldService.getCustomFieldValues(
+                invoice.getTenantId(), 
+                "INVOICE", 
+                invoice.getId()
+            );
+            if (!customFields.isEmpty()) {
+                response.setCustomFields(customFields);
+            }
+        } catch (Exception e) {
+            log.debug("No custom fields found for invoice {}: {}", 
+                    invoice.getInvoiceNumber(), e.getMessage());
+        }
         
         return response;
     }

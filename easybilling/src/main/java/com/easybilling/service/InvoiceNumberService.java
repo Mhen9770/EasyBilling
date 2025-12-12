@@ -1,5 +1,6 @@
 package com.easybilling.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +12,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Service for generating Indian financial year based invoice numbers.
  * Format: INV/2024-25/0001
+ * Integrated with ConfigurationService for customizable invoice prefix.
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class InvoiceNumberService {
+    
+    private final ConfigurationService configurationService;
     
     // In-memory counter per tenant and financial year
     // In production, this should be stored in database or Redis
@@ -40,10 +45,17 @@ public class InvoiceNumberService {
     }
     
     /**
-     * Generate invoice number with default prefix.
+     * Generate invoice number with default prefix from configuration.
+     * Uses tenant-specific or system default invoice prefix.
      */
     public String generateInvoiceNumber(Integer tenantId) {
-        return generateInvoiceNumber(tenantId, "INV");
+        // Get tenant-specific invoice prefix from configuration
+        String prefix = configurationService.getConfigValue("billing.invoice_prefix", tenantId);
+        if (prefix == null || prefix.isEmpty()) {
+            prefix = "INV"; // Fallback to default
+        }
+        log.debug("Using invoice prefix '{}' for tenant: {}", prefix, tenantId);
+        return generateInvoiceNumber(tenantId, prefix);
     }
     
     /**

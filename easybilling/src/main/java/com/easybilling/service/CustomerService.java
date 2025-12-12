@@ -22,11 +22,13 @@ import java.time.LocalDateTime;
 public class CustomerService {
     
     private final CustomerRepository customerRepository;
+    private final ConfigurationService configurationService;
+    private final CustomFieldService customFieldService;
     
-    // Business Logic Constants
-    private static final BigDecimal VIP_THRESHOLD = new BigDecimal("50000");
-    private static final BigDecimal PREMIUM_THRESHOLD = new BigDecimal("100000");
-    private static final int LOYALTY_POINTS_PER_100 = 1; // 1 point per 100 currency spent
+    // Business Logic Constants - now configurable via ConfigurationService
+    private static final BigDecimal DEFAULT_VIP_THRESHOLD = new BigDecimal("50000");
+    private static final BigDecimal DEFAULT_PREMIUM_THRESHOLD = new BigDecimal("100000");
+    private static final double DEFAULT_LOYALTY_POINTS_PER_RUPEE = 0.01; // 1 point per 100 rupees
     
     public CustomerResponse createCustomer(CustomerRequest request, Integer tenantId) {
         log.info("Creating customer for tenant: {}", tenantId);
@@ -101,7 +103,8 @@ public class CustomerService {
     // Business Logic Methods
     
     /**
-     * Record a purchase and update customer metrics
+     * Record a purchase and update customer metrics.
+     * Uses configurable loyalty points calculation.
      */
     public CustomerResponse recordPurchase(String customerId, Integer tenantId, BigDecimal amount) {
         log.info("Recording purchase of {} for customer {} in tenant {}", amount, customerId, tenantId);
@@ -112,16 +115,16 @@ public class CustomerService {
         // Update total spent
         customer.setTotalSpent(customer.getTotalSpent().add(amount));
         
-        // Calculate and add loyalty points
-        int pointsEarned = calculateLoyaltyPoints(amount);
+        // Calculate and add loyalty points using configurable rate
+        int pointsEarned = calculateLoyaltyPoints(amount, tenantId);
         customer.setLoyaltyPoints(customer.getLoyaltyPoints() + pointsEarned);
         
         // Update visit tracking
         customer.setVisitCount(customer.getVisitCount() + 1);
         customer.setLastVisitDate(LocalDateTime.now());
         
-        // Auto-upgrade customer segment based on spending
-        updateCustomerSegment(customer);
+        // Auto-upgrade customer segment based on configurable thresholds
+        updateCustomerSegment(customer, tenantId);
         
         Customer updated = customerRepository.save(customer);
         log.info("Customer {} earned {} loyalty points. New total: {}", 
@@ -169,13 +172,26 @@ public class CustomerService {
     }
     
     /**
-     * Redeem loyalty points
+     * Redeem loyalty points with configurable minimum redemption threshold.
      */
     public CustomerResponse redeemLoyaltyPoints(String customerId, Integer tenantId, int points) {
         log.info("Redeeming {} loyalty points for customer {} in tenant {}", points, customerId, tenantId);
         
         Customer customer = customerRepository.findByIdAndTenantId(customerId, tenantId)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
+        
+        // Get minimum redemption points from configuration
+        Integer minRedemptionPoints = configurationService.getConfigValueAsInt(
+            "customer.loyalty.minimum_redemption_points", 
+            tenantId
+        );
+        if (minRedemptionPoints == null) {
+            minRedemptionPoints = 100; // Default
+        }
+        
+        if (points < minRedemptionPoints) {
+            throw new RuntimeException("Minimum redemption is " + minRedemptionPoints + " points");
+        }
         
         if (customer.getLoyaltyPoints() < points) {
             throw new RuntimeException("Insufficient loyalty points");
@@ -251,20 +267,74 @@ public class CustomerService {
     
     // Private helper methods
     
-    private int calculateLoyaltyPoints(BigDecimal amount) {
-        // 1 point for every 100 currency units spent
-        return amount.divide(new BigDecimal("100"), 0, BigDecimal.ROUND_DOWN).intValue() * LOYALTY_POINTS_PER_100;
+    /**
+     * Calculate loyalty points based on configurable rate.
+     * Uses tenant-specific configuration or system default.
+     */
+    private int calculateLoyaltyPoints(BigDecimal amount, Integer tenantId) {
+        String configValue = configurationService.getConfigValue(
+            "customer.loyalty.points_per_rupee", 
+            tenantId
+        );
+        
+        double pointsPerRupee = DEFAULT_LOYALTY_POINTS_PER_RUPEE;
+        if (configValue != null) {
+            try {
+                pointsPerRupee = Double.parseDouble(configValue);
+            } catch (NumberFormatException e) {
+                log.warn("Invalid points_per_rupee config, using default: {}", DEFAULT_LOYALTY_POINTS_PER_RUPEE);
+            }
+        }
+        
+        int points = (int) (amount.doubleValue() * pointsPerRupee);
+        log.debug("Calculated {} loyalty points for amount {} using rate {}", 
+                points, amount, pointsPerRupee);
+        return points;
     }
     
-    private void updateCustomerSegment(Customer customer) {
+    /**
+     * Update customer segment based on configurable spending thresholds.
+     */
+    private void updateCustomerSegment(Customer customer, Integer tenantId) {
         BigDecimal totalSpent = customer.getTotalSpent();
         
-        if (totalSpent.compareTo(PREMIUM_THRESHOLD) >= 0) {
+        // Get configurable thresholds
+        String vipConfig = configurationService.getConfigValue(
+            "customer.segment.vip_spending_threshold", 
+            tenantId
+        );
+        String premiumConfig = configurationService.getConfigValue(
+            "customer.segment.premium_spending_threshold", 
+            tenantId
+        );
+        
+        BigDecimal vipAmount = DEFAULT_VIP_THRESHOLD;
+        BigDecimal premiumAmount = DEFAULT_PREMIUM_THRESHOLD;
+        
+        if (vipConfig != null) {
+            try {
+                vipAmount = new BigDecimal(vipConfig);
+            } catch (NumberFormatException e) {
+                log.warn("Invalid vip_spending_threshold config, using default");
+            }
+        }
+        
+        if (premiumConfig != null) {
+            try {
+                premiumAmount = new BigDecimal(premiumConfig);
+            } catch (NumberFormatException e) {
+                log.warn("Invalid premium_spending_threshold config, using default");
+            }
+        }
+        
+        if (totalSpent.compareTo(premiumAmount) >= 0) {
             customer.setSegment(CustomerSegment.PREMIUM);
-            log.info("Customer {} upgraded to PREMIUM segment", customer.getId());
-        } else if (totalSpent.compareTo(VIP_THRESHOLD) >= 0) {
+            log.info("Customer {} upgraded to PREMIUM segment (spent: {})", 
+                    customer.getId(), totalSpent);
+        } else if (totalSpent.compareTo(vipAmount) >= 0) {
             customer.setSegment(CustomerSegment.VIP);
-            log.info("Customer {} upgraded to VIP segment", customer.getId());
+            log.info("Customer {} upgraded to VIP segment (spent: {})", 
+                    customer.getId(), totalSpent);
         } else {
             customer.setSegment(CustomerSegment.REGULAR);
         }
