@@ -122,7 +122,7 @@ public class CreditNoteService {
     /**
      * Update existing credit note (only in DRAFT status)
      */
-    public CreditNoteResponse updateCreditNote(Long id, Integer tenantId, String userId, CreditNoteRequest request) {
+    public CreditNoteResponse updateCreditNote(String id, Integer tenantId, String userId, CreditNoteRequest request) {
         log.info("Updating credit note: {} for tenant: {}", id, tenantId);
 
         CreditNote creditNote = creditNoteRepository.findByIdAndTenantId(id, tenantId)
@@ -204,7 +204,7 @@ public class CreditNoteService {
     /**
      * Submit credit note for approval
      */
-    public CreditNoteResponse submitForApproval(Long id, Integer tenantId, String userId) {
+    public CreditNoteResponse submitForApproval(String id, Integer tenantId, String userId) {
         log.info("Submitting credit note {} for approval", id);
 
         CreditNote creditNote = creditNoteRepository.findByIdAndTenantId(id, tenantId)
@@ -225,7 +225,7 @@ public class CreditNoteService {
     /**
      * Approve credit note
      */
-    public CreditNoteResponse approveCreditNote(Long id, Integer tenantId, String userId) {
+    public CreditNoteResponse approveCreditNote(String id, Integer tenantId, String userId) {
         log.info("Approving credit note: {}", id);
 
         CreditNote creditNote = creditNoteRepository.findByIdAndTenantId(id, tenantId)
@@ -248,7 +248,7 @@ public class CreditNoteService {
     /**
      * Issue credit note (after approval)
      */
-    public CreditNoteResponse issueCreditNote(Long id, Integer tenantId, String userId) {
+    public CreditNoteResponse issueCreditNote(String id, Integer tenantId, String userId) {
         log.info("Issuing credit note: {}", id);
 
         CreditNote creditNote = creditNoteRepository.findByIdAndTenantId(id, tenantId)
@@ -275,7 +275,7 @@ public class CreditNoteService {
     /**
      * Apply credit note to invoice or customer account
      */
-    public CreditNoteResponse applyCreditNote(Long id, Integer tenantId, String userId) {
+    public CreditNoteResponse applyCreditNote(String id, Integer tenantId, String userId) {
         log.info("Applying credit note: {}", id);
 
         CreditNote creditNote = creditNoteRepository.findByIdAndTenantId(id, tenantId)
@@ -315,7 +315,7 @@ public class CreditNoteService {
     /**
      * Cancel credit note
      */
-    public CreditNoteResponse cancelCreditNote(Long id, Integer tenantId, String userId, String cancelReason) {
+    public CreditNoteResponse cancelCreditNote(String id, Integer tenantId, String userId, String cancelReason) {
         log.info("Cancelling credit note: {}", id);
 
         CreditNote creditNote = creditNoteRepository.findByIdAndTenantId(id, tenantId)
@@ -338,7 +338,7 @@ public class CreditNoteService {
      * Get credit note by ID
      */
     @Transactional(readOnly = true)
-    public CreditNoteResponse getCreditNoteById(Long id, Integer tenantId) {
+    public CreditNoteResponse getCreditNoteById(String id, Integer tenantId) {
         CreditNote creditNote = creditNoteRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new ResourceNotFoundException("Credit note not found with id: " + id));
         return mapToResponse(creditNote);

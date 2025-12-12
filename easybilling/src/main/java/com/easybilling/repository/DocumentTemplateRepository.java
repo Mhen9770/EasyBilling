@@ -17,4 +17,6 @@ public interface DocumentTemplateRepository extends JpaRepository<DocumentTempla
     List<DocumentTemplate> findByTenantIdAndIsActiveTrue(Integer tenantId);
     
     List<DocumentTemplate> findByTenantId(Integer tenantId);
+    
+    Optional<DocumentTemplate> findByIdAndTenantId(Long id, Integer tenantId);
 }

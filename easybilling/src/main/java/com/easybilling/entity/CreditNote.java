@@ -98,6 +98,10 @@ public class CreditNote implements TenantAware {
     private String refundReferenceNumber;
     private LocalDateTime refundedAt;
 
+    @Column(precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal totalTax = BigDecimal.ZERO;
+
     @Column(columnDefinition = "TEXT")
     private String notes;
 
@@ -112,6 +116,11 @@ public class CreditNote implements TenantAware {
     private LocalDateTime approvedAt;
     private String approvalNotes;
 
+    @Builder.Default
+    private Boolean restockItems = false;
+
+    private String updatedBy;
+
     @Column(nullable = false)
     private String createdBy;
 
@@ -123,4 +132,6 @@ public class CreditNote implements TenantAware {
     private LocalDateTime updatedAt;
 
     private LocalDateTime issuedAt;
+    private LocalDateTime approvedDate;
+    private LocalDateTime issuedDate;
 }
