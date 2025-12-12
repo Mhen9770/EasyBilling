@@ -14,4 +14,6 @@ public interface CustomWorkflowRepository extends JpaRepository<CustomWorkflow, 
     List<CustomWorkflow> findByTenantIdAndIsActiveTrue(Integer tenantId);
     
     List<CustomWorkflow> findByTenantId(Integer tenantId);
+    
+    java.util.Optional<CustomWorkflow> findByIdAndTenantId(Long id, Integer tenantId);
 }

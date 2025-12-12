@@ -14,4 +14,6 @@ public interface WebhookRepository extends JpaRepository<Webhook, Long> {
     List<Webhook> findByTenantIdAndIsActiveTrue(Integer tenantId);
     
     List<Webhook> findByTenantId(Integer tenantId);
+    
+    java.util.Optional<Webhook> findByIdAndTenantId(Long id, Integer tenantId);
 }

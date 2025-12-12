@@ -42,9 +42,25 @@ public class CreditNoteItem {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal unitPrice;
 
+    @Column(precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal discount = BigDecimal.ZERO;
+
+    @Column(precision = 5, scale = 2)
+    @Builder.Default
+    private BigDecimal taxPercentage = BigDecimal.ZERO;
+
     @Column(precision = 5, scale = 2)
     @Builder.Default
     private BigDecimal taxRate = BigDecimal.ZERO;
+
+    @Column(precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal subtotal = BigDecimal.ZERO;
+
+    @Column(precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal taxAmount = BigDecimal.ZERO;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
